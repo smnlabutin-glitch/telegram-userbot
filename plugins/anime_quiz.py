@@ -8,7 +8,7 @@ from typing import Dict, Optional
 import urllib.request
 
 from telethon import TelegramClient, events
-from card_engine import render_card
+from card_engine import render_card, render_quiz_card
 from plugins import get_plugin_config
 from plugins.anime_database import get_random_anime
 
@@ -196,25 +196,18 @@ def register_anime_quiz(client: TelegramClient, prefix: str):
         except Exception:
             pass
 
-        if img_bytes:
-            photo_file = io.BytesIO(img_bytes)
-            photo_file.name = "anime_quiz.jpg"
-            game_msg = await client.send_file(chat_id, file=photo_file, caption=caption)
-        else:
-            # Fallback to render_card if CDN image failed to fetch
-            fallback_card = render_card(
-                title="Угадай аниме по подсказке",
-                subtitle=f"{anime['genres']} • {anime['year']}",
-                badge_text="ВИКТОРИНА",
-                badge_type="info",
-                stats=[
-                    ("ПОДСКАЗКА", anime["masked_hint"][:25]),
-                    ("РЕЛИЗ", anime["year"]),
-                    ("ТАЙМЕР", "45 сек"),
-                ],
-                category="ANIME QUIZ MINI-GAME",
-            )
-            game_msg = await client.send_file(chat_id, file=fallback_card, caption=caption)
+        # Render branded userbot card with embedded anime frame
+        quiz_card = render_quiz_card(
+            frame_bytes=img_bytes,
+            masked_hint=anime["masked_hint"],
+            genres=anime["genres"],
+            year_season=f"{anime['year']} ({anime['season']})",
+            title="Угадай аниме по кадру",
+            subtitle="Внимательно изучите кадр и отправьте название тайтла в чат",
+            badge_text="45 СЕКУНД",
+            badge_type="running",
+        )
+        game_msg = await client.send_file(chat_id, file=quiz_card, caption=caption)
 
         # Initialize session & start 45s countdown timer
         session = QuizSession(

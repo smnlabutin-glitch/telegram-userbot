@@ -378,3 +378,251 @@ def render_card(
     output.seek(0)
     output.name = "report.png"
     return output
+
+def render_quiz_card(
+    frame_bytes: Optional[bytes],
+    masked_hint: str,
+    genres: str,
+    year_season: str,
+    title: str = "Угадай аниме по кадру",
+    subtitle: str = "Внимательно изучите кадр и отправьте название тайтла в чат",
+    badge_text: str = "45 СЕКУНД",
+    badge_type: str = "running",
+) -> io.BytesIO:
+    """
+    Renders an anime quiz question card with the anime screenshot frame embedded
+    inside the dark frosted glass container, matching the userbot design aesthetic.
+    Uses 2x supersampling for ultra-crisp output.
+    """
+    scale = 2
+    target_width = 1040
+    target_height = 800
+    w = target_width * scale
+    h = target_height * scale
+
+    # Load system fonts
+    font_bold_path = _find_font(bold=True)
+    font_reg_path = _find_font(bold=False)
+    font_mono_path = _find_font(mono=True)
+
+    f_category = _load_font(font_bold_path, 12 * scale)
+    f_badge = _load_font(font_bold_path, 12 * scale)
+    f_title = _load_font(font_bold_path, 28 * scale)
+    f_subtitle = _load_font(font_reg_path, 15 * scale)
+    f_stat_label = _load_font(font_bold_path, 11 * scale)
+    f_stat_val = _load_font(font_mono_path or font_bold_path, 17 * scale)
+    f_stat_val_mono = _load_font(font_mono_path or font_bold_path, 20 * scale)
+    f_footer = _load_font(font_reg_path, 12 * scale)
+
+    # 0. Base wallpaper / dark background
+    anime_bg_path = os.path.join(ASSETS_FONT_DIR, "..", "anime_bg.jpg")
+    anime_bg_path = os.path.normpath(anime_bg_path)
+    if os.path.isfile(anime_bg_path):
+        try:
+            with Image.open(anime_bg_path) as raw_bg:
+                bg_w, bg_h = raw_bg.size
+                ratio = max(w / bg_w, h / bg_h)
+                new_w = int(bg_w * ratio)
+                new_h = int(bg_h * ratio)
+                resized_bg = raw_bg.resize((new_w, new_h), Image.Resampling.LANCZOS)
+                left = (new_w - w) // 2
+                top = (new_h - h) // 2
+                img = resized_bg.crop((left, top, left + w, top + h)).convert("RGBA")
+                resized_bg.close()
+        except Exception:
+            img = Image.new("RGBA", (w, h), COLOR_BG)
+    else:
+        img = Image.new("RGBA", (w, h), COLOR_BG)
+
+    # Outer container with rounded corners and subtle border
+    card_inset = 20 * scale
+    card_rect = [card_inset, card_inset, w - card_inset, h - card_inset]
+    card_radius = 18 * scale
+
+    # Dark Frosted Glassmorphism card surface
+    glass_overlay = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+    glass_draw = ImageDraw.Draw(glass_overlay)
+    GLASS_SURFACE = (11, 14, 21, 230)
+    GLASS_BORDER = (75, 92, 125, 185)
+    glass_draw.rounded_rectangle(card_rect, radius=card_radius, fill=GLASS_SURFACE, outline=GLASS_BORDER, width=2 * scale)
+
+    # Decorative top accent hairline
+    accent_theme = BADGE_THEMES.get(badge_type.lower(), BADGE_THEMES["running"])
+    accent_bar_len = 150 * scale
+    glass_draw.line(
+        [(card_inset + card_radius, card_inset), (card_inset + card_radius + accent_bar_len, card_inset)],
+        fill=accent_theme["dot"],
+        width=3 * scale,
+    )
+    img = Image.alpha_composite(img, glass_overlay)
+    glass_overlay.close()
+    draw = ImageDraw.Draw(img)
+
+    content_x = card_inset + (34 * scale)
+    content_y = card_inset + (30 * scale)
+    content_right = w - card_inset - (34 * scale)
+
+    # 1. Top row: Category tag + Status Pill
+    draw.text((content_x, content_y + 4 * scale), "ANIME QUIZ // MINI-GAME", font=f_category, fill=COLOR_TEXT_DIM)
+
+    # Badge pill on right
+    badge_label = badge_text.upper()
+    bbox = f_badge.getbbox(badge_label)
+    text_w = bbox[2] - bbox[0]
+    pill_padding_x = 15 * scale
+    pill_padding_y = 6 * scale
+    dot_radius = 4 * scale
+    dot_gap = 8 * scale
+    pill_w = text_w + (dot_radius * 2) + dot_gap + (pill_padding_x * 2)
+    pill_h = (bbox[3] - bbox[1]) + (pill_padding_y * 2)
+
+    pill_x2 = content_right
+    pill_x1 = pill_x2 - pill_w
+    pill_y1 = content_y
+    pill_y2 = pill_y1 + pill_h
+
+    pill_overlay = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+    pill_draw = ImageDraw.Draw(pill_overlay)
+    pill_draw.rounded_rectangle(
+        [pill_x1, pill_y1, pill_x2, pill_y2],
+        radius=pill_h // 2,
+        fill=accent_theme["bg"],
+        outline=accent_theme["border"],
+        width=1 * scale,
+    )
+    dot_center_x = pill_x1 + pill_padding_x + dot_radius
+    dot_center_y = pill_y1 + (pill_h // 2)
+    pill_draw.ellipse(
+        [dot_center_x - dot_radius, dot_center_y - dot_radius, dot_center_x + dot_radius, dot_center_y + dot_radius],
+        fill=accent_theme["dot"],
+    )
+    img = Image.alpha_composite(img, pill_overlay)
+    draw = ImageDraw.Draw(img)
+
+    text_pos_x = dot_center_x + dot_radius + dot_gap
+    text_pos_y = pill_y1 + pill_padding_y - bbox[1]
+    draw.text((text_pos_x, text_pos_y), badge_label, font=f_badge, fill=accent_theme["text"])
+
+    # 2. Main Title & Subtitle
+    title_y = content_y + (36 * scale)
+    draw.text((content_x, title_y), title, font=f_title, fill=COLOR_TEXT_WHITE)
+    sub_y = title_y + (40 * scale)
+    draw.text((content_x, sub_y), subtitle, font=f_subtitle, fill=COLOR_TEXT_MUTED)
+
+    divider_y = sub_y + (30 * scale)
+    draw.line([(content_x, divider_y), (content_right, divider_y)], fill=COLOR_BORDER, width=1 * scale)
+
+    # 3. Center: Anime Frame Container with rounded corners & clean crop
+    frame_x1 = content_x
+    frame_x2 = content_right
+    frame_y1 = divider_y + (16 * scale)
+    frame_width = frame_x2 - frame_x1
+    frame_height = 420 * scale  # 420px at 1x = 840px at 2x (classic 16:9 ratio)
+    frame_y2 = frame_y1 + frame_height
+    frame_radius = 12 * scale
+
+    if frame_bytes:
+        try:
+            with Image.open(io.BytesIO(frame_bytes)) as raw_frame:
+                rf = raw_frame.convert("RGBA")
+                fw, fh = rf.size
+                ratio = max(frame_width / fw, frame_height / fh)
+                scaled_w = int(fw * ratio)
+                scaled_h = int(fh * ratio)
+                resized_frame = rf.resize((scaled_w, scaled_h), Image.Resampling.LANCZOS)
+                rf.close()
+
+                crop_x = (scaled_w - frame_width) // 2
+                crop_y = (scaled_h - frame_height) // 2
+                cropped_frame = resized_frame.crop((crop_x, crop_y, crop_x + frame_width, crop_y + frame_height))
+                resized_frame.close()
+
+                # Mask with rounded corners
+                mask = Image.new("L", (frame_width, frame_height), 0)
+                mask_draw = ImageDraw.Draw(mask)
+                mask_draw.rounded_rectangle([0, 0, frame_width, frame_height], radius=frame_radius, fill=255)
+
+                img.paste(cropped_frame, (frame_x1, frame_y1), mask)
+                cropped_frame.close()
+                mask.close()
+        except Exception as e:
+            draw.rounded_rectangle([frame_x1, frame_y1, frame_x2, frame_y2], radius=frame_radius, fill=COLOR_BOX_BG)
+            draw.text((frame_x1 + 30 * scale, frame_y1 + (frame_height // 2) - 10 * scale), "Ошибка отображения кадра", font=f_subtitle, fill=COLOR_TEXT_MUTED)
+    else:
+        draw.rounded_rectangle([frame_x1, frame_y1, frame_x2, frame_y2], radius=frame_radius, fill=COLOR_BOX_BG)
+
+    # Hairline glowing border around the frame
+    draw.rounded_rectangle(
+        [frame_x1, frame_y1, frame_x2, frame_y2],
+        radius=frame_radius,
+        outline=COLOR_BORDER_LIGHT,
+        width=2 * scale,
+    )
+
+    # 4. Stat Grid below frame (Hint, Genres, Release)
+    curr_y = frame_y2 + (16 * scale)
+    stat_cards_h = 76 * scale
+    col_gap = 14 * scale
+
+    stats_data = [
+        ("ПОДСКАЗКА", masked_hint, True),
+        ("ЖАНРЫ", genres, False),
+        ("ГОД И СЕЗОН", year_season, False),
+    ]
+
+    total_w = content_right - content_x - (col_gap * 2)
+    w_hint = int(total_w * 0.44)
+    w_genre = int(total_w * 0.36)
+    w_rel = total_w - w_hint - w_genre
+
+    col_widths = [w_hint, w_genre, w_rel]
+    cx = content_x
+    for i, (label, val, is_mono) in enumerate(stats_data):
+        cw = col_widths[i]
+        cx1 = cx
+        cx2 = cx1 + cw
+        cy1 = curr_y
+        cy2 = cy1 + stat_cards_h
+        cx += cw + col_gap
+
+        draw.rounded_rectangle(
+            [cx1, cy1, cx2, cy2],
+            radius=10 * scale,
+            fill=COLOR_BOX_BG,
+            outline=COLOR_BORDER,
+            width=1 * scale,
+        )
+
+        draw.text((cx1 + 16 * scale, cy1 + 12 * scale), label, font=f_stat_label, fill=COLOR_TEXT_DIM)
+        val_str = str(val)[:28]
+        draw.text(
+            (cx1 + 16 * scale, cy1 + 36 * scale),
+            val_str,
+            font=f_stat_val_mono if is_mono else f_stat_val,
+            fill=COLOR_TEXT_WHITE,
+        )
+
+    # 5. Footer Bar
+    footer_y = h - card_inset - (38 * scale)
+    draw.line([(content_x, footer_y - (14 * scale)), (content_right, footer_y - (14 * scale))], fill=COLOR_BORDER, width=1 * scale)
+    draw.text((content_x, footer_y), "ANIME TRIVIA ENGINE // REAL-TIME LISTENER", font=f_footer, fill=COLOR_TEXT_DIM)
+
+    meta_r = "TIME LIMIT: 45s • TYPE IN CHAT"
+    bbox_r = f_footer.getbbox(meta_r)
+    w_r = bbox_r[2] - bbox_r[0]
+    draw.text((content_right - w_r, footer_y), meta_r, font=f_footer, fill=COLOR_TEXT_DIM)
+
+    # 6. Downsample 2x Lanczos -> 1x
+    final_img = img.resize((target_width, target_height), Image.Resampling.LANCZOS)
+    img.close()
+
+    output = io.BytesIO()
+    rgb_img = final_img.convert("RGB")
+    final_img.close()
+    rgb_img.save(output, format="PNG", optimize=True)
+    rgb_img.close()
+
+    output.seek(0)
+    output.name = "anime_quiz_card.png"
+    return output
+

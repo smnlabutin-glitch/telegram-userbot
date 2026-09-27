@@ -85,5 +85,17 @@ def generate_samples():
         f.write(card_ping.getvalue())
     print("Generated previews/sample_ping.png")
 
+    # 5. Anime Quiz Question Card
+    from card_engine import render_quiz_card
+    card_quiz = render_quiz_card(
+        frame_bytes=None,
+        masked_hint="А _ _ _ а   т _ _ _ _ в",
+        genres="Экшен, Драма, Фэнтези",
+        year_season="2013 (Весна 2013)",
+    )
+    with open("previews/sample_animequiz.png", "wb") as f:
+        f.write(card_quiz.getvalue())
+    print("Generated previews/sample_animequiz.png")
+
 if __name__ == "__main__":
     generate_samples()
