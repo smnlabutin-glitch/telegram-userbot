@@ -24,20 +24,40 @@ def generate_samples():
         f.write(card_purge.getvalue())
     print("Generated previews/sample_purge.png")
 
-    # 2. Help Card with items list
+    # 2. Plugins Dashboard Menu Card
+    card_plugins = render_card(
+        title="Центр управления плагинами",
+        subtitle="Каталог расширений и фоновых демонов Telegram юзербота",
+        badge_text="2/2 АКТИВНО",
+        badge_type="running",
+        items=[
+            (".online [on|off]", "Вечный онлайн [ВКЛ] — Удерживает статус 'В сети' 24/7"),
+            (".autoname [on|off]", "Время в никнейме [ВКЛ] — Обновляет время в имени каждую минуту"),
+        ],
+        meta_left="USERBOT EXTENSION ENGINE // 2 ACTIVE",
+        meta_right="PREFIX: '.'",
+        category="PLUGIN REGISTRY & DASHBOARD",
+    )
+    with open("previews/sample_plugins.png", "wb") as f:
+        f.write(card_plugins.getvalue())
+    print("Generated previews/sample_plugins.png")
+
+    # 3. Help Card with items list
     card_help = render_card(
         title="Справка по командам",
         subtitle="Доступные команды и параметры управления юзерботом",
         badge_text="РУКОВОДСТВО",
         badge_type="info",
         items=[
+            (".plugins", "Центр управления плагинами (каталог расширений)"),
+            (".online [on|off]", "Вечный онлайн (автоматический статус 'В сети' 24/7)"),
+            (".autoname [on|off]", "Динамическое время в никнейме (поминутно)"),
             (".delall", "Удалить все свои сообщения в текущем чате"),
-            (".delall <chat>", "Удалить все свои сообщения в указанном чате (@username / ID)"),
-            (".purge_me", "Синоним команды .delall"),
+            (".delall <chat>", "Удалить свои сообщения в указанном чате"),
             (".ping", "Проверить статус работы, задержку MTProto и аптайм"),
             (".help", "Показать эту графическую карточку помощи"),
         ],
-        meta_left="COMMAND REGISTRY // v1.2",
+        meta_left="COMMAND REGISTRY // v1.3",
         meta_right="PREFIX: '.'",
         category="SYSTEM DOCUMENTATION",
     )
@@ -45,19 +65,19 @@ def generate_samples():
         f.write(card_help.getvalue())
     print("Generated previews/sample_help.png")
 
-    # 3. System Status / Ping Card
+    # 4. System Status / Ping Card
     card_ping = render_card(
-        title="Система активна",
-        subtitle="Все шлюзы связи и клиент Telethon функционируют в штатном режиме",
+        title="Система активна 24/7",
+        subtitle="Шлюзы связи и Telethon работают стабильно на Linux Server",
         badge_text="ОНЛАЙН",
         badge_type="info",
         stats=[
             ("ПИНГ MTPROTO", "38 ms"),
-            ("ОПЕРАТОР", "User @smnla"),
+            ("ОПЕРАТИВНАЯ ПАМЯТЬ", "42.8 MB"),
             ("АПТАЙМ", "18h 42m"),
-            ("ВЕРСИЯ ЯДРА", "v1.2.0"),
+            ("ВЕРСИЯ ЯДРА", "v1.3.0"),
         ],
-        meta_left="HOST: WIN32 // DC 2 (AMSTERDAM)",
+        meta_left="HOST: LINUX SERVER // POLLING 24/7",
         meta_right="TELETHON 1.45.0",
         category="DIAGNOSTICS & TELEMETRY",
     )

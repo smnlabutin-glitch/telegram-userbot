@@ -114,9 +114,11 @@ def register_system_handlers(client: TelegramClient, prefix: str):
             badge_text="РУКОВОДСТВО",
             badge_type="info",
             items=[
+                (f"{prefix}plugins", "Центр управления плагинами (каталог расширений)"),
+                (f"{prefix}online [on|off]", "Вечный онлайн (автоматический статус 'В сети' 24/7)"),
+                (f"{prefix}autoname [on|off]", "Динамическое время в никнейме (поминутно)"),
                 (f"{prefix}delall", "Удалить все свои сообщения в текущем чате"),
-                (f"{prefix}delall <chat>", "Удалить свои сообщения в указанном чате (@username / ID)"),
-                (f"{prefix}purge_me", "Синоним команды удаления сообщений"),
+                (f"{prefix}delall <chat>", "Удалить свои сообщения в указанном чате"),
                 (f"{prefix}ping", "Проверить статус работы, задержку MTProto, RAM и аптайм"),
                 (f"{prefix}help", "Показать эту графическую карточку справки"),
             ],

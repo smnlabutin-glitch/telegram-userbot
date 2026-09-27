@@ -7,3 +7,4 @@ previews/
 logs/
 venv/
 .venv/
+plugins_state.json

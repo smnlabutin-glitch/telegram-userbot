@@ -19,6 +19,9 @@ from config import (
 )
 from handlers.purge import register_purge_handlers
 from handlers.system import register_system_handlers
+from handlers.plugins_handler import register_plugins_handlers
+from plugins.always_online import register_always_online, stop_always_online
+from plugins.time_name import register_time_name, stop_autoname
 
 # Configure logging with RotatingFileHandler for 24/7 operation
 os.makedirs(LOG_DIR, exist_ok=True)
@@ -63,9 +66,12 @@ async def run_userbot(api_id: int, api_hash: str, stop_event: asyncio.Event):
         auto_reconnect=True,
     )
 
-    # Register handlers
+    # Register handlers and plugins
     register_purge_handlers(client, COMMAND_PREFIX)
     register_system_handlers(client, COMMAND_PREFIX)
+    register_plugins_handlers(client, COMMAND_PREFIX)
+    register_always_online(client, COMMAND_PREFIX)
+    register_time_name(client, COMMAND_PREFIX)
 
     retry_delay = 5
     max_retry_delay = 60
@@ -106,6 +112,8 @@ async def run_userbot(api_id: int, api_hash: str, stop_event: asyncio.Event):
 
             if stop_event.is_set():
                 logger.info("Stop event received. Disconnecting gracefully...")
+                stop_always_online()
+                await stop_autoname(client)
                 await client.disconnect()
                 break
 
@@ -126,7 +134,9 @@ async def run_userbot(api_id: int, api_hash: str, stop_event: asyncio.Event):
             await asyncio.sleep(retry_delay)
             retry_delay = min(retry_delay * 2, max_retry_delay)
 
+    stop_always_online()
     if client.is_connected():
+        await stop_autoname(client)
         await client.disconnect()
     logger.info("Userbot session closed safely.")
 
