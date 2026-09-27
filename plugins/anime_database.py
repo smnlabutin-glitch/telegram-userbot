@@ -69,7 +69,8 @@ def generate_masked_hint(title: str) -> str:
     E.g. "Атака титанов" -> "А _ _ _ а   т _ _ _ _ в"
     Preserves first and last letter of each word of length >= 3.
     """
-    words = title.split()
+    base_title = re.sub(r"\s*\(.*?\)", "", title).strip() or title
+    words = base_title.split()
     masked_words = []
     for word in words:
         clean = re.sub(r"[^\w]", "", word)
