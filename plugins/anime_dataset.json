@@ -13,7 +13,6 @@
       "shingeki no kyojin",
       "snk",
       "титаны",
-      "атака на титанов",
       "эрен",
       "микаса",
       "леви",
@@ -42,7 +41,6 @@
     "season": "Весна 2019",
     "answers": [
       "клинок рассекающий демонов",
-      "клинок, рассекающий демонов",
       "demon slayer",
       "kimetsu no yaiba",
       "крд",
@@ -65,7 +63,8 @@
       "zabiják démonů",
       "شیطان کش",
       "귀멸의 칼날",
-      "истребитель демонов"
+      "истребитель демонов",
+      "клинок, рассекающий демонов"
     ]
   },
   {
@@ -110,7 +109,6 @@
       "дэт ноут",
       "лайт",
       "эль",
-      "рязанцев",
       "デスノート",
       "死亡笔记",
       "מחברת המוות",
@@ -136,7 +134,6 @@
       "mha",
       "деку",
       "бакуго",
-      "всемогущий",
       "bnha",
       "나의 히어로 아카데미아 1기",
       "나히아 1기",
@@ -160,11 +157,9 @@
     "season": "Осень 2011",
     "answers": [
       "хантер х хантер",
-      "хантер хэ хантер",
       "hunter x hunter",
       "hunterxhunter",
       "хантер",
-      "охотник х охотник",
       "гон",
       "киллуа",
       "hunter x hunter (2011)",
@@ -191,7 +186,6 @@
       "one punch man",
       "onepunchman",
       "сайтама",
-      "лысый плащ",
       "генос",
       "one-punch man",
       "opm",
@@ -220,7 +214,6 @@
       "onepiece",
       "луффи",
       "зоро",
-      "соломенная шляпа",
       "ワンピース",
       "海贼王",
       "וואן פיס",
@@ -247,7 +240,6 @@
       "гуль",
       "канеки",
       "дед инсайд",
-      "кен канеки",
       "tokyo kushu",
       "שדי טוקיו",
       "东京食种",
@@ -264,13 +256,11 @@
     "season": "Весна 2009",
     "answers": [
       "стальной алхимик",
-      "стальной алхимик братство",
       "fullmetal alchemist",
       "fma",
       "алхимик",
       "братство",
       "эдвард элрик",
-      "элрик",
       "fullmetal alchemist: brotherhood",
       "hagane no renkinjutsushi: fullmetal alchemist",
       "fmab",
@@ -298,7 +288,6 @@
       "naruto",
       "ураганные хроники",
       "шиппуден",
-      "шипуден",
       "саске",
       "итачи",
       "נארוטו",
@@ -320,7 +309,6 @@
       "sword art online",
       "sao",
       "сао",
-      "мастера меча",
       "кирито",
       "асуна",
       "s.a.o",
@@ -391,7 +379,6 @@
       "assassination classroom",
       "ansatsu kyoushitsu",
       "коро сенсей",
-      "коро-сенсей",
       "нагиса",
       "כיתת ההתנקשות",
       "فصل الاغتيال",
@@ -420,8 +407,8 @@
   },
   {
     "id": "anime_21355",
-    "title": "Жизнь с нуля в другом мире (Ре:Зеро)",
-    "canonical": "Жизнь с нуля в другом мире (Ре:Зеро)",
+    "title": "Re:Zero — Жизнь с нуля в другом мире",
+    "canonical": "Re:Zero — Жизнь с нуля в другом мире",
     "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/21355-f9SjOfEJMk5P.jpg",
     "genres": "Экшен, Приключения, Драма, Фэнтези",
     "year": "2016",
@@ -482,8 +469,8 @@
       "город в котором меня нет",
       "город в котором нет меня",
       "erased",
-      "boku dake ga inai machi",
       "сатору",
+      "boku dake ga inai machi",
       "bokumachi",
       "desaparecido",
       "miasto beze mnie",
@@ -506,7 +493,6 @@
       "штайн",
       "калитка",
       "окабэ",
-      "курусу",
       "маюри",
       "s;g",
       "סטיינס;גייט",
@@ -528,7 +514,6 @@
       "black clover",
       "аста",
       "юно",
-      "ями",
       "תלתן שחור",
       "แบล็กโคลเวอร์"
     ]
@@ -570,7 +555,6 @@
       "bunny girl senpai",
       "глупый свин",
       "май сакурадзима",
-      "сакурадзима",
       "rascal does not dream of bunny girl senpai",
       "seishun buta yarou wa bunny girl senpai no yume wo minai",
       "aobuta",
@@ -595,8 +579,7 @@
       "spyxfamily",
       "аня форджер",
       "лойд форджер",
-      "йор форджер",
-      "аня",
+      "йор",
       "spy×family",
       "sxf",
       "스파이 패밀리",
@@ -620,7 +603,6 @@
       "кагуя",
       "в любви как на войне",
       "сироганэ",
-      "чика фудзивара",
       "kaguya-sama: love is war",
       "kaguya-sama wa kokurasetai: tensaitachi no renai zunousen",
       "kaguya wants to be confessed to: the geniuses' war of love and brains",
@@ -668,7 +650,6 @@
       "вайолет эвергарден",
       "violet evergarden",
       "вайолет",
-      "эвергарден",
       "ויולט אברגרדן",
       "فيوليت",
       "紫罗兰永恒花园"
@@ -688,7 +669,6 @@
       "винланд",
       "торфинн",
       "аскеладд",
-      "торкель",
       "סאגת וינלנד",
       "فينلاند ساغا",
       "สงครามคนทมิฬ"
@@ -724,7 +704,6 @@
       "toradora",
       "тайга",
       "карманный тигр",
-      "рюдзи",
       "toradora!",
       "tiger x dragon",
       "龙与虎",
@@ -743,11 +722,9 @@
     "season": "Весна 2014",
     "answers": [
       "нет игры нет жизни",
-      "нет игры - нет жизни",
       "no game no life",
       "ngnl",
       "сора и широ",
-      "пустые",
       "no game, no life",
       "no game no life游戏人生",
       "游戏人生",
@@ -770,8 +747,6 @@
       "убийца акаме",
       "akame ga kill",
       "акаме",
-      "ночной рейд",
-      "татсуми",
       "эсдес",
       "akame ga kill!",
       "akame ga kiru!",
@@ -794,7 +769,6 @@
       "норагами",
       "ято",
       "хиёри",
-      "юкине",
       "stray god",
       "野良神",
       "โนรางามิ เทวดาขาจร ภาค 1"
@@ -815,7 +789,6 @@
       "грехи",
       "мелиодас",
       "эсканор",
-      "бан",
       "the seven deadly sins",
       "七大罪",
       "ศึกตำนาน 7 อัศวิน",
@@ -834,9 +807,7 @@
       "блич",
       "bleach",
       "ичиго",
-      "чиго",
       "айзен",
-      "рукия",
       "ブリーチ",
       "'בליץ",
       "เทพมรณะ",
@@ -858,7 +829,6 @@
       "кадзума",
       "мегумин",
       "аква",
-      "даркнесс",
       "konosuba -god's blessing on this wonderful world!",
       "kono subarashii sekai ni shukufuku wo!",
       "kono subarashii sekai ni syukufuku wo!",
@@ -883,10 +853,7 @@
       "код гиас",
       "code geass",
       "лелуш",
-      "гиас",
       "зеро",
-      "сузаку",
-      "сс",
       "code geass: lelouch of the rebellion",
       "code geass: hangyaku no lelouch",
       "code geass: lelouch de la rebelión",
@@ -905,7 +872,6 @@
       "паразит",
       "паразит учение о жизни",
       "parasyte",
-      "kiseijuu",
       "миги",
       "синъити",
       "parasyte -the maxim-",
@@ -951,7 +917,6 @@
       "аска",
       "рэй",
       "нге",
-      "неон генезис",
       "neon genesis evangelion",
       "shin seiki evangelion",
       "nge",
@@ -969,11 +934,9 @@
     "season": "Лето 2019",
     "answers": [
       "пламенная бригада пожарных",
-      "пламенные пожарные",
       "fire force",
-      "enen no shouboutai",
       "синра",
-      "артур",
+      "enen no shouboutai",
       "หน่วยผจญคนไฟลุก",
       "כוח האש",
       "полум'яні вогнеборці",
@@ -992,9 +955,7 @@
       "фрирен",
       "frieren",
       "провожающая в последний путь фрирен",
-      "провожающая фрирен",
       "ферн",
-      "старк",
       "frieren: beyond journey’s end",
       "sousou no frieren",
       "frieren at the funeral",
@@ -1026,9 +987,6 @@
       "джоджо",
       "jojo",
       "невероятные приключения джоджо",
-      "jojos bizarre adventure",
-      "джонатан",
-      "джозеф",
       "джотаро",
       "дио",
       "jojo's bizarre adventure (tv)",
@@ -1063,7 +1021,6 @@
       "cowboy bebop",
       "бибоп",
       "спайк",
-      "спайк шпигель",
       "카우보이 비밥",
       "קאובוי ביבופ",
       "คาวบอย บีบ๊อป",
@@ -1083,7 +1040,6 @@
       "парад смерти",
       "death parade",
       "деким",
-      "квиндецим",
       "תהלוכת המוות"
     ]
   },
@@ -1099,9 +1055,7 @@
       "о моем перерождении в слизь",
       "слизь",
       "slime",
-      "tensei shitara slime",
       "римуру",
-      "римуру темпест",
       "that time i got reincarnated as a slime",
       "tensei shitara slime datta ken",
       "転スラ",
@@ -1130,10 +1084,8 @@
       "восхождение героя щита",
       "герой щита",
       "shield hero",
-      "tate no yuusha",
       "наофуми",
       "рафталия",
-      "фило",
       "the rising of the shield hero",
       "tate no yuusha no nariagari",
       "盾之勇者成名录",
@@ -1151,10 +1103,8 @@
     "answers": [
       "синий экзорцист",
       "blue exorcist",
-      "ao no exorcist",
       "рин окумура",
-      "юкио",
-      "экзорцист",
+      "ao no exorcist",
       "ao no futsumashi",
       "اللهب الأزرق",
       "ο γαλάζιος εξορκιστής"
@@ -1172,9 +1122,6 @@
       "реинкарнация безработного",
       "mushoku tensei",
       "рудеус",
-      "эрис",
-      "сильфиетта",
-      "рокси",
       "mushoku tensei: jobless reincarnation",
       "mushoku tensei: isekai ittara honki dasu",
       "jobless reincarnation: i will seriously try if i go to another world",
@@ -1194,40 +1141,11 @@
     "answers": [
       "безумный азарт",
       "kakegurui",
-      "какегуруи",
-      "юмеко",
       "юмеко джабами",
-      "мэри",
       "kakegurui - compulsive gambler",
       "kakegurui: das leben ist ein spiel",
       "gambling school",
       "โคตรเซียนโรงเรียนพนัน"
-    ]
-  },
-  {
-    "id": "anime_98659",
-    "title": "Класс превосходства",
-    "canonical": "Класс превосходства",
-    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/98659-u46B5RCNl9il.jpg",
-    "genres": "Драма, Психологическое",
-    "year": "2017",
-    "season": "Лето 2017",
-    "answers": [
-      "класс превосходства",
-      "classroom of the elite",
-      "аянокоджи",
-      "аянокодзи",
-      "cote",
-      "хорикита",
-      "youkoso jitsuryoku shijou shugi no kyoushitsu e",
-      "youjitsu",
-      "you-zitsu",
-      "ขอต้อนรับสู่ห้องเรียนนิยม (เฉพาะ) ยอดคน",
-      "歡迎來到實力至上主義的教室",
-      "добро пожаловать в класс для особо одарённых",
-      "فصل النخبة",
-      "chào mừng đến với lớp học đề cao thực lực",
-      "chào mừng tới lớp học biết tuốt"
     ]
   },
   {
@@ -1244,7 +1162,6 @@
       "соло левелинг",
       "сунь джин ву",
       "джинву",
-      "теневой монарх",
       "ore dake level up na ken",
       "나 혼자만 레벨업",
       "na honjaman level up",
@@ -1264,7 +1181,6 @@
       "tokyo revengers",
       "майки",
       "такемичи",
-      "дракен",
       "重生之道",
       "โตเกียวรีเวนเจอร์ส",
       "โตเกียว卍รีเวนเจอร์ส",
@@ -1285,8 +1201,6 @@
       "ангельские ритмы",
       "angel beats",
       "канаде",
-      "отонаси",
-      "юри",
       "angel beats!",
       "エンジェルビーツ",
       "פעימות מלאך",
@@ -1304,8 +1218,7 @@
     "answers": [
       "шарлотта",
       "charlotte",
-      "юу отосака",
-      "нао томори"
+      "юу отосака"
     ]
   },
   {
@@ -1321,8 +1234,6 @@
       "mirai nikki",
       "гасай юно",
       "юно",
-      "юкки",
-      "амано",
       "the future diary",
       "未来日记",
       "יומן העתיד"
@@ -1342,7 +1253,6 @@
       "my dress up darling",
       "марин китагава",
       "годзё",
-      "китагава",
       "my dress-up darling",
       "sono bisque doll wa koi wo suru",
       "sono kisekae ningyou wa koi wo suru",
@@ -1371,8 +1281,6 @@
       "бродячие псы",
       "bsd",
       "дазай",
-      "ацуши",
-      "чуя",
       "bungo stray dogs",
       "văn hào lưu lạc",
       "คณะประพันธกรจรจัด",
@@ -1392,8 +1300,6 @@
       "килл ла килл",
       "убей или умри",
       "рюко матой",
-      "матой",
-      "сацуки",
       "kiru ra kiru",
       "klk"
     ]
@@ -1412,7 +1318,6 @@
       "бездна",
       "рико",
       "рег",
-      "наначи",
       "صنع في الهاوية",
       "ผ่าเหวนรก",
       "นักบุกเบิกหลุมยักษ์",
@@ -1433,8 +1338,6 @@
       "владыка",
       "overlord",
       "аинз",
-      "аинз оал гоун",
-      "альбедо",
       "over lord",
       "โอเวอร์ลอร์ด",
       "โอเวอร์ ลอร์ด จอมมารพิชิตโลก"
@@ -1452,11 +1355,9 @@
       "кулинарные поединки сомы",
       "повар сома",
       "food wars",
-      "shokugeki no souma",
       "сома",
-      "сома юкихира",
-      "эрина",
       "food wars!",
+      "shokugeki no souma",
       "لا سلام على طعام",
       "food wars! the first plate",
       "食戟之灵",
@@ -1477,7 +1378,6 @@
       "danmachi",
       "белл кранел",
       "гестия",
-      "айз",
       "is it wrong to try to pick up girls in a dungeon?",
       "dungeon ni deai wo motomeru no wa machigatteiru darou ka",
       "dungeon ni deai o motomeru no wa machigatte iru darouka: familia myth",
@@ -1502,9 +1402,7 @@
     "answers": [
       "сатана на подработке",
       "the devil is a part timer",
-      "hataraku maou sama",
       "мао садао",
-      "эми юса",
       "the devil is a part-timer!",
       "hataraku maou-sama!",
       "ผู้กล้าซึนซ่าส์กับจอมมารสู้ชีวิต",
@@ -1525,7 +1423,6 @@
       "анохана",
       "anohana",
       "менма",
-      "дзинта",
       "anohana: the flower we saw that day",
       "ano hi mita hana no namae wo bokutachi wa mada shiranai.",
       "we still don't know the name of the flower we saw that day.",
@@ -1547,10 +1444,7 @@
     "answers": [
       "пожиратель душ",
       "soul eater",
-      "соул итер",
       "мака албарн",
-      "соул",
-      "дэт зе кид",
       "אכלן הנשמות",
       "סול איטר",
       "пожирач душ"
@@ -1569,7 +1463,6 @@
       "dandadan",
       "окарун",
       "момо аясэ",
-      "турбобабка",
       "dan da dan",
       "ดันดาดัน",
       "膽大黨",
@@ -1587,9 +1480,7 @@
     "answers": [
       "иная",
       "another",
-      "мисаки мэй",
-      "мэй мисаки",
-      "сакакибара"
+      "мисаки мэй"
     ]
   },
   {
@@ -1604,10 +1495,8 @@
       "орегайру",
       "oregairu",
       "моя школьная жизнь не задалась",
-      "розовая пора",
       "хатиман",
       "юкино",
-      "юи",
       "my teen romantic comedy snafu",
       "yahari ore no seishun love come wa machigatteiru.",
       "my youth romantic comedy is wrong as i expected.",
@@ -1628,10 +1517,9 @@
       "гуррен лаганн",
       "гуррен-лаганн",
       "gurren lagann",
-      "tengen toppa gurren lagann",
       "камина",
       "симон",
-      "йоко",
+      "tengen toppa gurren lagann",
       "heavenly breakthrough gurren lagann",
       "ttgl",
       "sfondamento dei cieli gurren lagann",
@@ -1653,7 +1541,6 @@
       "fairy tail",
       "фейри тейл",
       "нацу",
-      "нацу драгнил",
       "люси",
       "эрза",
       "грей",
@@ -1674,8 +1561,7 @@
     "answers": [
       "дороро",
       "dororo",
-      "хяккимару",
-      "тахомару"
+      "хяккимару"
     ]
   },
   {
@@ -1708,11 +1594,9 @@
     "answers": [
       "психопаспорт",
       "psycho pass",
-      "psycho-pass",
       "когами",
-      "шинья когами",
       "аканэ",
-      "макишима"
+      "psycho-pass"
     ]
   },
   {
@@ -1728,7 +1612,6 @@
       "чунибье",
       "chunibyo",
       "рикка таканаси",
-      "юта",
       "love, chunibyo & other delusions",
       "chuunibyou demo koi ga shitai!",
       "chu-2 byo demo koi ga shitai!",
@@ -1750,8 +1633,6 @@
       "хека",
       "hyouka",
       "хотаро ореки",
-      "чиганда",
-      "ореки",
       "hyouka: forbidden secrets",
       "เฮียวกะปริศนาความทรงจำ"
     ]
@@ -1770,8 +1651,6 @@
       "судьба начало",
       "кирицугу",
       "сейбер",
-      "гильгамеш",
-      "арчер",
       "fate/zero",
       "フェイト/ゼロ",
       "f/z",
@@ -1793,8 +1672,6 @@
       "monster",
       "йохан либерт",
       "доктор тенма",
-      "тенма",
-      "йохан",
       "モンスター",
       "מונסטר",
       "מפלצת",
@@ -1816,7 +1693,6 @@
       "bakemonogatari",
       "арараги",
       "сендзёгахара",
-      "синобу",
       "monster tale",
       "化物语",
       "ปกรณัมของเหล่าภูต",
@@ -1834,14 +1710,13 @@
     "answers": [
       "башня бога",
       "tower of god",
-      "kami no tou",
       "баам",
       "рахэль",
-      "кун",
       "kami no tou: tower of god",
       "タワーオブ・ゴッド",
       "신의 탑",
       "sinui tap",
+      "kami no tou",
       "tog"
     ]
   },
@@ -1859,7 +1734,6 @@
       "oshi no ko",
       "ай хосино",
       "аква",
-      "руби",
       "[oshi no ko]",
       "favorite girl",
       "my idol's child",
@@ -1884,12 +1758,10 @@
     "season": "Зима 2017",
     "answers": [
       "дракон горничная",
-      "дракон-горничная",
       "дракон-горничная госпожи кобаяси",
       "miss kobayashis dragon maid",
       "тоору",
       "канна",
-      "кобаяси",
       "miss kobayashi's dragon maid",
       "kobayashi-san chi no maidragon",
       "kobayashi-san chi no maid dragon",
@@ -1910,10 +1782,9 @@
     "answers": [
       "последний серафим",
       "seraph of the end",
-      "owari no seraph",
       "юичиро",
-      "микаэла",
       "seraph of the end: vampire reign",
+      "owari no seraph",
       "owasera",
       "seraph of the end: el reino de los vampiros",
       "เทวทูตแห่งโลกมืด"
@@ -1932,7 +1803,6 @@
       "wotakoi",
       "вотакой",
       "наруми",
-      "хиротака",
       "wotakoi: love is hard for otaku",
       "wotaku ni koi wa muzukashii",
       "otaku ni koi wa muzukashii",
@@ -1960,9 +1830,8 @@
     "answers": [
       "монолог фармацевта",
       "the apothecary diaries",
-      "kusuriya no hitorigoto",
       "маомао",
-      "джинши",
+      "kusuriya no hitorigoto",
       "drugstore soliloquy",
       "les carnets de l'apothicaire",
       "zapiski zielarki",
@@ -1992,7 +1861,6 @@
       "девочка волшебница мадока",
       "madoka magica",
       "хомура",
-      "кюбей",
       "puella magi madoka magica",
       "mahou shoujo madoka☆magica",
       "mahou shoujo madoka magika",
@@ -2019,8 +1887,6 @@
       "блю лок",
       "blue lock",
       "исаги",
-      "бачира",
-      "рин итоши",
       "blue lock ขังดวลแข้ง",
       "بلو لوك"
     ]
@@ -2039,7 +1905,6 @@
       "eighty six",
       "шин",
       "лена",
-      "нозен",
       "86 eighty-six",
       "86: eighty six",
       "86--eighty-six",
@@ -2061,10 +1926,7 @@
       "the quintessential quintuplets",
       "мику",
       "нино",
-      "ичика",
-      "йоцуба",
       "ицуки",
-      "футаро",
       "go-toubun no hanayome",
       "5-toubun no hanayome",
       "the five wedded brides",
@@ -2089,7 +1951,6 @@
       "коми сан",
       "komi cant communicate",
       "коми",
-      "тадано",
       "komi can’t communicate",
       "komi-san wa, komyushou desu.",
       "comi san ha comyusho desu",
@@ -2115,8 +1976,8 @@
     "answers": [
       "для тебя бессмертный",
       "to your eternity",
-      "fumetsu no anata e",
       "фуши",
+      "fumetsu no anata e",
       "to you, the immortal",
       "uma vida imortal",
       "致不灭的你",
@@ -2141,8 +2002,6 @@
       "the eminence in shadow",
       "сид кагено",
       "тень",
-      "шедоу",
-      "альфа",
       "kage no jitsuryokusha ni naritakute!",
       "to be a power in the shadows!",
       "ชีวิตไม่ต้องเด่น ขอแค่เป็นเทพในเงา",
@@ -2166,7 +2025,6 @@
       "high school dxd",
       "иссэй",
       "риас гремори",
-      "акено",
       "תיכון די אקס די",
       "highschool dxd"
     ]
@@ -2183,8 +2041,6 @@
       "корзинка фруктов",
       "fruits basket",
       "тору хонда",
-      "кё",
-      "юки сома",
       "fruits basket (2019)",
       "fruits basket: 1st season",
       "fruits basket (zenpen)",
@@ -2208,7 +2064,6 @@
       "банановая рыба",
       "banana fish",
       "эш линкс",
-      "эйдзи",
       "バナナフィッシュ",
       "香蕉鱼"
     ]
@@ -2224,10 +2079,7 @@
     "answers": [
       "девушка на час",
       "rent a girlfriend",
-      "kanojo okarishimasu",
       "чизуру",
-      "кадзуя",
-      "рука",
       "rent-a-girlfriend",
       "kanojo, okarishimasu",
       "i'd like to borrow a girlfriend",
@@ -2247,7 +2099,6 @@
     "answers": [
       "убийца гоблинов",
       "goblin slayer",
-      "жрица",
       "ก็อบลิน สเลเยอร์"
     ]
   },
@@ -2263,8 +2114,7 @@
       "кланнад",
       "clannad",
       "нагиса",
-      "томоя",
-      "усио"
+      "томоя"
     ]
   },
   {
@@ -2279,7 +2129,6 @@
       "бог старшей школы",
       "the god of high school",
       "джин мори",
-      "хан дэви",
       "goh",
       "갓 오브 하이스쿨"
     ]
@@ -2296,9 +2145,6 @@
       "гинтама",
       "gintama",
       "гинтоки",
-      "саката гинтоки",
-      "шимпачи",
-      "кагура",
       "gin tama",
       "silver soul",
       "גינטאמה"
@@ -2317,8 +2163,6 @@
       "durarara",
       "шизуо",
       "изая",
-      "селлти",
-      "микадо",
       "durarara!!",
       "drrr!!",
       "דורארארה!!"
@@ -2335,11 +2179,8 @@
     "answers": [
       "эхо террора",
       "terror in resonance",
-      "zankyou no terror",
       "девятый и двенадцатый",
-      "девятый",
-      "двенадцатый",
-      "сфинкс",
+      "zankyou no terror",
       "terror in tokyo",
       "zagadkowi terroryści"
     ]
@@ -2357,8 +2198,6 @@
       "мэшл",
       "mashle",
       "мэш",
-      "мэш берндед",
-      "профитроли",
       "mashle: magic and muscles",
       "mashle ศึกโลกเวทมนตร์คนพลังกล้าม",
       "mashle: magia e músculos",
@@ -2376,11 +2215,8 @@
     "answers": [
       "президент студсовета горничная",
       "maid sama",
-      "kaichou wa maid sama",
       "мисаки",
-      "мисаки аюдзава",
       "усуи",
-      "такуми усуи",
       "maid-sama!",
       "kaichou wa maid-sama!",
       "kaicho wa maidsama",
@@ -2400,8 +2236,6 @@
       "школа мертвецов",
       "high school of the dead",
       "hsotd",
-      "такаши",
-      "саэко",
       "gakuen mokushiroku: highschool of the dead",
       "hotd",
       "high school of the dead: apocalipsis en el instituto"
@@ -2420,9 +2254,6 @@
       "kuroko no basket",
       "куроко",
       "кагами",
-      "поколение чудес",
-      "акаши",
-      "аомине",
       "kuroko's basketball",
       "kuroko no basuke",
       "the basketball which kuroko plays",
@@ -2442,13 +2273,4091 @@
       "приоритет чудо яйца",
       "wonder egg priority",
       "ай ото",
-      "нейру",
-      "рика",
       "wonegg",
       "wep",
       "奇蛋物语",
       "วันเดอร์เอ็ก ไพรออริตี",
       "приоритет чудо-яйца"
+    ]
+  },
+  {
+    "id": "anime_141391",
+    "title": "Песнь ночных сов",
+    "canonical": "Песнь ночных сов",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/141391-JErChZ8G3b49.jpg",
+    "genres": "Комедия, Психологическое, Романтика, Повседневность",
+    "year": "2022",
+    "season": "Лето 2022",
+    "answers": [
+      "песнь ночных сов",
+      "call of the night",
+      "yofukashi no uta",
+      "надзуна",
+      "ко ямори",
+      "song of the night walkers",
+      "night owl song",
+      "เพลงรักมนุษย์ค้างคาว",
+      "نداء الليل",
+      "zew nocy",
+      "il richiamo della notte",
+      "поклик ночі",
+      "el canto de la noche",
+      "canções da noite"
+    ]
+  },
+  {
+    "id": "anime_13759",
+    "title": "Кошечка из Сакурасо",
+    "canonical": "Кошечка из Сакурасо",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/n13759-nBjdu6f8aLbz.jpg",
+    "genres": "Комедия, Драма, Романтика, Повседневность",
+    "year": "2012",
+    "season": "Осень 2012",
+    "answers": [
+      "кошечка из сакурасо",
+      "the pet girl of sakurasou",
+      "sakurasou",
+      "масиро сиина",
+      "сората",
+      "sakurasou no pet na kanojo",
+      "sakura-sou no pet na kanojo",
+      "樱花庄的宠物女孩"
+    ]
+  },
+  {
+    "id": "anime_18897",
+    "title": "Притворная любовь",
+    "canonical": "Притворная любовь",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/18897-h3TRFmkGYLkd.jpg",
+    "genres": "Комедия, Романтика, Повседневность",
+    "year": "2014",
+    "season": "Зима 2014",
+    "answers": [
+      "притворная любовь",
+      "nisekoi",
+      "нисекой",
+      "раку",
+      "читогэ",
+      "nisekoi: false love",
+      "รักลวงป่วนใจ"
+    ]
+  },
+  {
+    "id": "anime_120697",
+    "title": "Не издевайся, Нагаторо",
+    "canonical": "Не издевайся, Нагаторо",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/120697-EuMfBYXLANeS.jpg",
+    "genres": "Комедия, Романтика, Повседневность",
+    "year": "2021",
+    "season": "Весна 2021",
+    "answers": [
+      "не издевайся нагаторо",
+      "нагаторо",
+      "nagatoro",
+      "семпай",
+      "don't toy with me, miss nagatoro",
+      "ijiranaide, nagatoro-san",
+      "不要欺负我、长瀞同学",
+      "arrête de me chauffer, nagatoro!",
+      "ยัยตัวแสบแอบน่ารัก นางาโทโระ",
+      "не издевайся надо мной, нагаторо",
+      "괴롭히지 말아요, 나가토로 양",
+      "jangan main-main denganku, nona nagatoro serangan ke-2",
+      "no me rayes, nagatoro"
+    ]
+  },
+  {
+    "id": "anime_17895",
+    "title": "Золотая пора",
+    "canonical": "Золотая пора",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/17895.jpg",
+    "genres": "Драма, Романтика",
+    "year": "2013",
+    "season": "Осень 2013",
+    "answers": [
+      "золотая пора",
+      "golden time",
+      "банда тада",
+      "коко кага"
+    ]
+  },
+  {
+    "id": "anime_14227",
+    "title": "Чудовище за соседней партой",
+    "canonical": "Чудовище за соседней партой",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/14227-X5LpJ40O61qu.jpg",
+    "genres": "Комедия, Романтика, Повседневность",
+    "year": "2012",
+    "season": "Осень 2012",
+    "answers": [
+      "чудовище за соседней партой",
+      "my little monster",
+      "сидзуку",
+      "хару",
+      "tonari no kaibutsu-kun",
+      "tonari no kaibutsukun",
+      "the monster next door",
+      "my neighbor monster-kun",
+      "le garçon d'à coté",
+      "bestia z ławki obok"
+    ]
+  },
+  {
+    "id": "anime_20872",
+    "title": "Пластиковые воспоминания",
+    "canonical": "Пластиковые воспоминания",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/20872-RlrRw6pnwLWK.jpg",
+    "genres": "Драма, Романтика, Фантастика, Повседневность",
+    "year": "2015",
+    "season": "Весна 2015",
+    "answers": [
+      "пластиковые воспоминания",
+      "plastic memories",
+      "айла",
+      "цукаса",
+      "plamemo"
+    ]
+  },
+  {
+    "id": "anime_107660",
+    "title": "Выдающиеся звери",
+    "canonical": "Выдающиеся звери",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/107660-AxwrzHkXzYYN.jpg",
+    "genres": "Драма, Детектив, Психологическое, Романтика",
+    "year": "2019",
+    "season": "Осень 2019",
+    "answers": [
+      "выдающиеся звери",
+      "beastars",
+      "бистарз",
+      "легоси",
+      "хару",
+      "ビースターズ",
+      "beastars - o lobo bom",
+      "חייתיים",
+      "บีสตาร์",
+      "براءة ذئب",
+      "비스타즈"
+    ]
+  },
+  {
+    "id": "anime_853",
+    "title": "Клуб свиданий старшей школы Оран",
+    "canonical": "Клуб свиданий старшей школы Оран",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/853-03VYT300hMaf.jpg",
+    "genres": "Комедия, Драма, Романтика, Повседневность",
+    "year": "2006",
+    "season": "Весна 2006",
+    "answers": [
+      "хост клуб",
+      "клуб свиданий",
+      "оран",
+      "ouran high school host club",
+      "харухи",
+      "тамаки",
+      "ouran koukou host club",
+      "ohran koko host club",
+      "ouran koukou hosutobu",
+      "host club - amore in affitto",
+      "hostclub ở trường ouran"
+    ]
+  },
+  {
+    "id": "anime_6045",
+    "title": "Дотянуться до тебя",
+    "canonical": "Дотянуться до тебя",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/6045-PHiyDpX2gc5D.jpg",
+    "genres": "Комедия, Драма, Романтика, Повседневность",
+    "year": "2009",
+    "season": "Осень 2009",
+    "answers": [
+      "дотянуться до тебя",
+      "kimi ni todoke",
+      "савако",
+      "казехая",
+      "kimi ni todoke: from me to you",
+      "reaching you",
+      "arrivare a te",
+      "llegando a ti",
+      "kimi ni todoke: que chegue a você"
+    ]
+  },
+  {
+    "id": "anime_15583",
+    "title": "Рандеву с жизнью",
+    "canonical": "Рандеву с жизнью",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/15583.jpg",
+    "genres": "Экшен, Комедия, Ecchi, Фэнтези",
+    "year": "2013",
+    "season": "Весна 2013",
+    "answers": [
+      "рандеву с жизнью",
+      "date a live",
+      "шидо",
+      "тока",
+      "куруми",
+      "พิชิตรัก พิทักษ์โลก"
+    ]
+  },
+  {
+    "id": "anime_116267",
+    "title": "Унеси меня на Луну",
+    "canonical": "Унеси меня на Луну",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/116267-xQRslGT0tMTS.jpg",
+    "genres": "Комедия, Романтика, Повседневность",
+    "year": "2020",
+    "season": "Осень 2020",
+    "answers": [
+      "унеси меня на луну",
+      "tonikawa",
+      "tonikaku kawaii",
+      "наса",
+      "цукаса",
+      "tonikawa: over the moon for you",
+      "fly me to the moon",
+      "tonikaku cawaii",
+      "generally cute",
+      "总之就是非常可爱",
+      "จะยังไงภรรยาของผมก็น่ารัก",
+      "красавица: унеси меня на луну"
+    ]
+  },
+  {
+    "id": "anime_98436",
+    "title": "Невеста чародея",
+    "canonical": "Невеста чародея",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/98436-mipAtJXRUCgx.jpg",
+    "genres": "Драма, Фэнтези, Романтика, Повседневность",
+    "year": "2017",
+    "season": "Осень 2017",
+    "answers": [
+      "невеста чародея",
+      "the ancient magus bride",
+      "mahoutsukai no yome",
+      "чисе",
+      "элиас",
+      "the ancient magus' bride",
+      "mahou tsukai no yome",
+      "mahoyome",
+      "เจ้าสาวผมแดงกับจอมเวทอสูร"
+    ]
+  },
+  {
+    "id": "anime_21092",
+    "title": "Доблесть рыцаря-неудачника",
+    "canonical": "Доблесть рыцаря-неудачника",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/n21092-WTe5Lx5sLQy1.jpg",
+    "genres": "Экшен, Ecchi, Фэнтези, Романтика",
+    "year": "2015",
+    "season": "Осень 2015",
+    "answers": [
+      "доблесть рыцаря неудачника",
+      "chivalry of a failed knight",
+      "икки",
+      "стелла",
+      "rakudai kishi no cavalry",
+      "rakudai kishi no eiyuutan",
+      "a tale of worst one",
+      "เจ้าหญิงสีชาดกับอัศวินดาบไร้เทียมทาน"
+    ]
+  },
+  {
+    "id": "anime_20596",
+    "title": "Дорога юности",
+    "canonical": "Дорога юности",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/20596.jpg",
+    "genres": "Драма, Романтика, Повседневность",
+    "year": "2014",
+    "season": "Лето 2014",
+    "answers": [
+      "дорога юности",
+      "blue spring ride",
+      "ao haru ride",
+      "футаба",
+      "ко",
+      "aoharaido"
+    ]
+  },
+  {
+    "id": "anime_21857",
+    "title": "Месть Масамунэ-куна",
+    "canonical": "Месть Масамунэ-куна",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/21857-k7r362xG7420.png",
+    "genres": "Комедия, Романтика, Повседневность",
+    "year": "2017",
+    "season": "Зима 2017",
+    "answers": [
+      "месть масамунэ куна",
+      "masamune kuns revenge",
+      "масамунэ",
+      "аки адагаки",
+      "masamune-kun's revenge",
+      "masamune-kun no revenge",
+      "การแก้แค้นของมาซามุเนะคุง",
+      "месть масамунэ"
+    ]
+  },
+  {
+    "id": "anime_10793",
+    "title": "Корона грешника",
+    "canonical": "Корона грешника",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/10793-xmJErpujAeD7.jpg",
+    "genres": "Экшен, Драма, Меха, Психологическое",
+    "year": "2011",
+    "season": "Осень 2011",
+    "answers": [
+      "корона грешника",
+      "guilty crown",
+      "сю",
+      "инори",
+      "المُلك المُدان"
+    ]
+  },
+  {
+    "id": "anime_21647",
+    "title": "Апельсин (Орендж)",
+    "canonical": "Апельсин (Орендж)",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/21647-jpWsvCBJO1q5.jpg",
+    "genres": "Драма, Романтика, Сверхъестественное",
+    "year": "2016",
+    "season": "Лето 2016",
+    "answers": [
+      "апельсин",
+      "орендж",
+      "orange",
+      "нахо",
+      "какэру",
+      "オレンジ"
+    ]
+  },
+  {
+    "id": "anime_103139",
+    "title": "Домашняя девушка",
+    "canonical": "Домашняя девушка",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/n103139-SYU7CHGiubmn.jpg",
+    "genres": "Драма, Ecchi, Романтика",
+    "year": "2019",
+    "season": "Зима 2019",
+    "answers": [
+      "домашняя девушка",
+      "domestic girlfriend",
+      "domestic na kanojo",
+      "нацуо",
+      "руи",
+      "хина",
+      "domekano",
+      "บทเรียนรักเส้นทางหัวใจ"
+    ]
+  },
+  {
+    "id": "anime_20668",
+    "title": "Ежемесячное сёдзё Нодзаки-куна",
+    "canonical": "Ежемесячное сёдзё Нодзаки-куна",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/20668-hmoK9pH09pWT.jpg",
+    "genres": "Комедия, Романтика, Повседневность",
+    "year": "2014",
+    "season": "Лето 2014",
+    "answers": [
+      "ежемесячное сёдзё нодзаки куна",
+      "monthly girls nozaki kun",
+      "нодзаки",
+      "чиё сакура",
+      "monthly girls' nozaki-kun",
+      "gekkan shoujo nozaki-kun",
+      "revista mensual para chicas nozaki",
+      "月刊少女野崎君"
+    ]
+  },
+  {
+    "id": "anime_20770",
+    "title": "Иона на заре",
+    "canonical": "Иона на заре",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/20770-tZZMsglzAUAe.jpg",
+    "genres": "Экшен, Приключения, Комедия, Драма",
+    "year": "2014",
+    "season": "Осень 2014",
+    "answers": [
+      "иона на заре",
+      "yona of the dawn",
+      "akatsuki no yona",
+      "йона",
+      "хак",
+      "akayona",
+      "йона на заре",
+      "ёна на заре",
+      "рассвет йоны",
+      "yona, princesse de l'aube"
+    ]
+  },
+  {
+    "id": "anime_127911",
+    "title": "Моя девушка не только милая",
+    "canonical": "Моя девушка не только милая",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/127911-YRSP7vuUy801.jpg",
+    "genres": "Комедия, Романтика, Повседневность",
+    "year": "2022",
+    "season": "Весна 2022",
+    "answers": [
+      "моя девушка не только милая",
+      "shikimoris not just a cutie",
+      "сикимори",
+      "идзуми",
+      "shikimori's not just a cutie",
+      "kawaii dake ja nai shikimori-san",
+      "คุณชิกิโมริไม่ได้น่ารักแค่อย่างเดียวนะ",
+      "shikimori n'est pas juste mignonne",
+      "shikimori không chỉ dễ thương thôi đâu",
+      "shikimori tidak hanya manis",
+      "моя девушка не просто милашка"
+    ]
+  },
+  {
+    "id": "anime_181444",
+    "title": "Душистый цветок расцветает с достоинством",
+    "canonical": "Душистый цветок расцветает с достоинством",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/181444-SBhwJNPxjHrr.jpg",
+    "genres": "Комедия, Драма, Романтика",
+    "year": "2025",
+    "season": "Лето 2025",
+    "answers": [
+      "душистый цветок расцветает с достоинством",
+      "the fragrant flower blooms with dignity",
+      "ринтаро",
+      "вагури",
+      "kaoru hana wa rin to saku",
+      "kaoru i rin: rozkwitając z tobą",
+      "bloom",
+      "благоухающий цветок расцветает с достоинством",
+      "la nobleza de las flores",
+      "kaoru und rin",
+      "güzel kokulu çiçekler zarafetle açar"
+    ]
+  },
+  {
+    "id": "anime_108430",
+    "title": "Дарованный",
+    "canonical": "Дарованный",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/108430-L8rZPUpXjDzv.jpg",
+    "genres": "Драма, Музыка, Романтика, Повседневность",
+    "year": "2019",
+    "season": "Лето 2019",
+    "answers": [
+      "дарованный",
+      "given",
+      "мафую",
+      "уэнояма"
+    ]
+  },
+  {
+    "id": "anime_877",
+    "title": "Нана",
+    "canonical": "Нана",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/877-5yVMHXHApFzf.jpg",
+    "genres": "Драма, Музыка, Романтика, Повседневность",
+    "year": "2006",
+    "season": "Весна 2006",
+    "answers": [
+      "нана",
+      "nana",
+      "нана осаки",
+      "нана комацу"
+    ]
+  },
+  {
+    "id": "anime_154965",
+    "title": "Моя любовь 999 уровня к Ямаде",
+    "canonical": "Моя любовь 999 уровня к Ямаде",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/154965-9AwJG3nVokqG.jpg",
+    "genres": "Комедия, Драма, Романтика",
+    "year": "2023",
+    "season": "Весна 2023",
+    "answers": [
+      "моя любовь 999 уровня к ямаде",
+      "my love story with yamada kun at lv999",
+      "ямада",
+      "аканэ",
+      "my love story with yamada-kun at lv999",
+      "yamada-kun to lv999 no koi wo suru",
+      "loving yamada at lv999!",
+      "my lv999 love for yamada-kun",
+      "minha história de amor com yamada-kun nível 999",
+      "รักสุดฟินเลเวล 999 กับยามาดะคุง",
+      "和山田进行lv.999的恋爱",
+      "моя любовь к ямаде 999 уровня",
+      "mon histoire d'amour avec yamada à lv999",
+      "和山田談場 lv999 的戀愛",
+      "kocham yamadę na 999 poziomie!"
+    ]
+  },
+  {
+    "id": "anime_162804",
+    "title": "Аля иногда кокетничает со мной по-русски",
+    "canonical": "Аля иногда кокетничает со мной по-русски",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/162804-NwvD3Lya8IZp.jpg",
+    "genres": "Комедия, Романтика, Повседневность",
+    "year": "2024",
+    "season": "Лето 2024",
+    "answers": [
+      "аля иногда кокетничает со мной по русски",
+      "аля",
+      "alya sometimes hides her feelings in russian",
+      "масачика",
+      "алиса михайловна",
+      "tokidoki bosotto rossiya-go de dereru tonari no alya-san",
+      "roshidere",
+      "ロシデレ",
+      "คุณอาเรียโต๊ะข้างๆพูดรัสเซียหวานใส่ซะหัวใจจะวาย",
+      "иногда аля внезапно кокетничает по-русски",
+      "不時輕聲地以俄語遮羞的鄰座艾莉同學"
+    ]
+  },
+  {
+    "id": "anime_1210",
+    "title": "Добро пожаловать в N.H.K.",
+    "canonical": "Добро пожаловать в N.H.K.",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/1210-M5oFyKfKm2zT.jpg",
+    "genres": "Комедия, Драма, Психологическое, Романтика",
+    "year": "2006",
+    "season": "Лето 2006",
+    "answers": [
+      "добро пожаловать в nhk",
+      "welcome to the nhk",
+      "сато",
+      "мисаки",
+      "welcome to the n-h-k",
+      "nhk ni youkoso!",
+      "welcome to the n.h.k.",
+      "欢迎加入nhk！",
+      "bienvenue dans la nhk"
+    ]
+  },
+  {
+    "id": "anime_21421",
+    "title": "Кизнайвер",
+    "canonical": "Кизнайвер",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/21421-FmiHiyoRPDOp.png",
+    "genres": "Драма, Романтика, Фантастика",
+    "year": "2016",
+    "season": "Весна 2016",
+    "answers": [
+      "кизнайвер",
+      "kiznaiver",
+      "кацухира",
+      "норико"
+    ]
+  },
+  {
+    "id": "anime_20631",
+    "title": "Тринити: Семеро магов",
+    "canonical": "Тринити: Семеро магов",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/20631-JsRVj8iDf21B.jpg",
+    "genres": "Экшен, Комедия, Ecchi, Фэнтези",
+    "year": "2014",
+    "season": "Осень 2014",
+    "answers": [
+      "тринити семеро магов",
+      "trinity seven",
+      "арата",
+      "trinity seven: 7-nin no mahoutsukai",
+      "trinity seven: shichinin no mahoutsukai"
+    ]
+  },
+  {
+    "id": "anime_11887",
+    "title": "Связь сердец",
+    "canonical": "Связь сердец",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/11887-DWtqKSd0DBFF.jpg",
+    "genres": "Драма, Романтика, Повседневность, Сверхъестественное",
+    "year": "2012",
+    "season": "Лето 2012",
+    "answers": [
+      "связь сердец",
+      "kokoro connect",
+      "тайчи",
+      "инаба",
+      "kokoroco"
+    ]
+  },
+  {
+    "id": "anime_20966",
+    "title": "Ямада и семь ведьм",
+    "canonical": "Ямада и семь ведьм",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/20966-0KwHGdCF9Ie1.jpg",
+    "genres": "Комедия, Детектив, Романтика, Сверхъестественное",
+    "year": "2015",
+    "season": "Весна 2015",
+    "answers": [
+      "ямада и семь ведьм",
+      "yamada kun and the seven witches",
+      "ямада",
+      "сираиси",
+      "yamada and the seven witches",
+      "yamada-kun to 7-nin no majo",
+      "yamadakun to nananin no majo",
+      "yamajo",
+      "ยามาดะคุงกับแม่มดทั้ง 7"
+    ]
+  },
+  {
+    "id": "anime_356",
+    "title": "Судьба: Ночь схватки",
+    "canonical": "Судьба: Ночь схватки",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/356-0VzS7BcObayT.jpg",
+    "genres": "Экшен, Фэнтези, Романтика, Сверхъестественное",
+    "year": "2006",
+    "season": "Зима 2006",
+    "answers": [
+      "судьба ночь схватки",
+      "fate stay night",
+      "широ",
+      "сейбер",
+      "рин тосака",
+      "fate/stay night",
+      "フェイト/ステイナイト",
+      "судьба/ночь схватки"
+    ]
+  },
+  {
+    "id": "anime_114232",
+    "title": "Я побрился и привёл домой старшеклассницу",
+    "canonical": "Я побрился и привёл домой старшеклассницу",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/114232-lWTVDRDLqAH1.jpg",
+    "genres": "Драма, Романтика, Повседневность",
+    "year": "2021",
+    "season": "Весна 2021",
+    "answers": [
+      "я побрился и привел домой старшеклассницу",
+      "higehiro",
+      "саю",
+      "йошида",
+      "higehiro: after being rejected, i shaved and took in a high school runaway",
+      "hige wo soru. soshite joshikousei wo hirou.",
+      "i shaved my beard then picked up a high school girl.",
+      "剃须。然后捡到女高中生。",
+      "刮掉鬍子的我與撿到的女高中生",
+      "โกนหนวดไปทำงาน แล้วกลับบ้านมาพบเธอ",
+      "я побрился. и приютил школьницу",
+      "higehiro: kucukur janggut, siswi sma kupungut"
+    ]
+  },
+  {
+    "id": "anime_21685",
+    "title": "Эроманга-сэнсэй",
+    "canonical": "Эроманга-сэнсэй",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/21685-7qhjceISmSsv.jpg",
+    "genres": "Комедия, Драма, Ecchi, Романтика",
+    "year": "2017",
+    "season": "Весна 2017",
+    "answers": [
+      "эроманга сэнсэй",
+      "эроманга сенсей",
+      "eromanga sensei",
+      "сагири",
+      "масамунэ",
+      "ero manga sensei",
+      "情色漫画老师",
+      "น้องสาวของผมคืออาจารย์เอโรมังงะ",
+      "埃罗芒阿老师"
+    ]
+  },
+  {
+    "id": "anime_100112",
+    "title": "Внук мудреца",
+    "canonical": "Внук мудреца",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/100112-QIFhGfuiKZ3Y.jpg",
+    "genres": "Экшен, Комедия, Фэнтези, Романтика",
+    "year": "2019",
+    "season": "Весна 2019",
+    "answers": [
+      "внук мудреца",
+      "wise mans grandchild",
+      "шин",
+      "сицилия",
+      "wise man’s grandchild",
+      "kenja no mago",
+      "the wise grandson",
+      "the sage's grandson",
+      "philosopher's grandson",
+      "magi's grandson",
+      "หลานจอมปราชญ์"
+    ]
+  },
+  {
+    "id": "anime_21701",
+    "title": "Тайные желания отвергнутых",
+    "canonical": "Тайные желания отвергнутых",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/21701-0YTCNADc8mzB.jpg",
+    "genres": "Драма, Ecchi, Психологическое, Романтика",
+    "year": "2017",
+    "season": "Зима 2017",
+    "answers": [
+      "тайные желания отвергнутых",
+      "scums wish",
+      "ханаби",
+      "муги",
+      "scum's wish",
+      "kuzu no honkai",
+      "desejos proibidos",
+      "el deseo de la escoria"
+    ]
+  },
+  {
+    "id": "anime_2966",
+    "title": "Волчица и пряности",
+    "canonical": "Волчица и пряности",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/2966-h1ZiL7o7oYPs.jpg",
+    "genres": "Приключения, Фэнтези, Романтика, Повседневность",
+    "year": "2008",
+    "season": "Зима 2008",
+    "answers": [
+      "волчица и пряности",
+      "spice and wolf",
+      "голо",
+      "хоро",
+      "лоуренс",
+      "ookami to koushinryou",
+      "สาวหมาป่ากับนายเครื่องเทศ"
+    ]
+  },
+  {
+    "id": "anime_21058",
+    "title": "Красноволосая принцесса Белоснежка",
+    "canonical": "Красноволосая принцесса Белоснежка",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/21058-Kxl8fq3kEgeH.png",
+    "genres": "Драма, Фэнтези, Романтика",
+    "year": "2015",
+    "season": "Лето 2015",
+    "answers": [
+      "красноволосая принцесса белоснежка",
+      "snow white with the red hair",
+      "сираюки",
+      "дзен",
+      "akagami no shirayuki-hime",
+      "shirayuki aux cheveux rouges",
+      "สโนว์ไวท์ผมแดง",
+      "красноволосая белоснежка",
+      "die rothaarige schneeprinzessin",
+      "blancanieves pelirroja",
+      "shirayuki: śnieżka o czerwonych włosach"
+    ]
+  },
+  {
+    "id": "anime_20657",
+    "title": "Как воспитать героиню из проходной девушки",
+    "canonical": "Как воспитать героиню из проходной девушки",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/20657-rGBsbYGeLLzw.png",
+    "genres": "Комедия, Романтика, Повседневность",
+    "year": "2015",
+    "season": "Зима 2015",
+    "answers": [
+      "как воспитать героиню из проходной девушки",
+      "saekano",
+      "томоя",
+      "мэгуми",
+      "saekano: how to raise a boring girlfriend",
+      "saenai heroine no sodatekata",
+      "路人女主的养成方法",
+      "วิธีปั้นสาวบ้านให้มาเป็นนางเอกของผม"
+    ]
+  },
+  {
+    "id": "anime_151806",
+    "title": "Томо — девушка!",
+    "canonical": "Томо — девушка!",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/151806-1AmWChFo1Ogh.jpg",
+    "genres": "Комедия, Романтика, Повседневность",
+    "year": "2023",
+    "season": "Зима 2023",
+    "answers": [
+      "томо девушка",
+      "tomo chan is a girl",
+      "томо",
+      "дзюн",
+      "tomo-chan is a girl!",
+      "tomo-chan wa onnanoko!",
+      "tomo-chan wa onna no ko!",
+      "小智是女孩啦！",
+      "томо — девушка!"
+    ]
+  },
+  {
+    "id": "anime_97766",
+    "title": "Геймеры!",
+    "canonical": "Геймеры!",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/97766-lgzaojRYIWSR.jpg",
+    "genres": "Комедия, Драма, Романтика, Повседневность",
+    "year": "2017",
+    "season": "Лето 2017",
+    "answers": [
+      "геймеры",
+      "gamers",
+      "кэйта",
+      "карэн",
+      "gamers!",
+      "gamers! amano keita to seishun continue",
+      "gamers! keita amano and youth continue"
+    ]
+  },
+  {
+    "id": "anime_143338",
+    "title": "Ангел по соседству балует меня насквозь",
+    "canonical": "Ангел по соседству балует меня насквозь",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/143338-d0AqJzRUQCgk.jpg",
+    "genres": "Романтика, Повседневность",
+    "year": "2023",
+    "season": "Зима 2023",
+    "answers": [
+      "ангел по соседству балует меня насквозь",
+      "the angel next door spoils me rotten",
+      "махиру",
+      "амэмия",
+      "шиина",
+      "otonari no tenshi-sama ni itsunomanika dame ningen ni sareteita ken",
+      "ขาดคุณนางฟ้าข้างห้องไป ผมคงมีชีวิตต่อไปไม่ได้อีกแล้ว",
+      "meu anjo de vizinha me mima demais",
+      "chouchouté par l’ange d’à côté",
+      "ангел по соседству меня балует",
+      "關於我在無意間被隔壁的天使變成廢柴這件事",
+      "aku dimanjakan tetanggaku yang seperti malaikat",
+      "thiên sứ nhà bên"
+    ]
+  },
+  {
+    "id": "anime_249",
+    "title": "Инуяша",
+    "canonical": "Инуяша",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/249-9ufXhmXxncry.jpg",
+    "genres": "Экшен, Приключения, Комедия, Фэнтези",
+    "year": "2000",
+    "season": "Осень 2000",
+    "answers": [
+      "инуяша",
+      "inuyasha",
+      "кагомэ",
+      "inu yasha",
+      "이누야샤",
+      "אינויאשה",
+      "อินุยาฉะ เทพอสูรจิ้งจอกเงิน"
+    ]
+  },
+  {
+    "id": "anime_21093",
+    "title": "Повседневная жизнь с девушками-монстрами",
+    "canonical": "Повседневная жизнь с девушками-монстрами",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/21093-C8tuv3TH9I5c.jpg",
+    "genres": "Комедия, Ecchi, Фэнтези, Романтика",
+    "year": "2015",
+    "season": "Лето 2015",
+    "answers": [
+      "повседневная жизнь с девушками монстрами",
+      "monster musume",
+      "миа",
+      "курусу",
+      "monster musume: everyday life with monster girls",
+      "monster musume no iru nichijou",
+      "monmusu",
+      "die monster mädchen",
+      "บันทึกอุ่นรักสาวมอนสเตอร์"
+    ]
+  },
+  {
+    "id": "anime_14713",
+    "title": "Очень приятно, Бог",
+    "canonical": "Очень приятно, Бог",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/14713-t6RcaL0IqwlW.jpg",
+    "genres": "Комедия, Фэнтези, Романтика, Сверхъестественное",
+    "year": "2012",
+    "season": "Осень 2012",
+    "answers": [
+      "очень приятно бог",
+      "kamisama kiss",
+      "kamisama hajimemashita",
+      "нанами",
+      "томоэ",
+      "kami-sama hajimemashita",
+      "kami-sama kiss",
+      "soy una diosa ¿y ahora qué?",
+      "приємно познайомитись, бог",
+      "очень приятно, бог",
+      "the girl in the world of spirit",
+      "jak zostałam bóstwem!?"
+    ]
+  },
+  {
+    "id": "anime_99468",
+    "title": "Озорная Такаги",
+    "canonical": "Озорная Такаги",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/99468-WdWcFGyIeunj.jpg",
+    "genres": "Комедия, Романтика, Повседневность",
+    "year": "2018",
+    "season": "Зима 2018",
+    "answers": [
+      "озорная такаги",
+      "teasing master takagi san",
+      "такаги",
+      "нисиката",
+      "teasing master takagi-san",
+      "karakai jouzu no takagi-san",
+      "skilled teaser takagi-san",
+      "takagi-san: experta en bromas pesadas",
+      "טאקאגי-סאן אלופת ההקנטות",
+      "擅长捉弄的高木同学",
+      "سيد الدعابة تاكاجي-سان",
+      "nhất quỷ nhì ma, thứ ba takagi",
+      "nicht schon wieder, takagi-san",
+      "แกล้งนัก รักนะ รู้ยัง",
+      "τακάγκι-σαν, το αρχιπειραχτήρι"
+    ]
+  },
+  {
+    "id": "anime_141949",
+    "title": "Больше чем пара, меньше чем любовники",
+    "canonical": "Больше чем пара, меньше чем любовники",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/141949-37BoBF129jLT.jpg",
+    "genres": "Комедия, Драма, Ecchi, Романтика",
+    "year": "2022",
+    "season": "Осень 2022",
+    "answers": [
+      "больше чем пара меньше чем любовники",
+      "more than a married couple",
+      "дзиро",
+      "акари",
+      "more than a married couple, but not lovers.",
+      "fuufu ijou, koibito miman.",
+      "more than a couple, less than lovers.",
+      "แผนสมรสไม่สมเลิฟ",
+      "presque mariés, loin d'être amoureux.",
+      "больше чем пара, меньше чем любовники",
+      "fuukoi",
+      "ふうこい"
+    ]
+  },
+  {
+    "id": "anime_10719",
+    "title": "У меня мало друзей",
+    "canonical": "У меня мало друзей",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/10719-d6DYjUtuSmdg.jpg",
+    "genres": "Комедия, Ecchi, Романтика, Повседневность",
+    "year": "2011",
+    "season": "Осень 2011",
+    "answers": [
+      "у меня мало друзей",
+      "haganai",
+      "кодака",
+      "ёзора",
+      "сэна",
+      "boku wa tomodachi ga sukunai",
+      "i don't have many friends",
+      "boku ha tomodachi ga sukunai",
+      "我的朋友很少"
+    ]
+  },
+  {
+    "id": "anime_153845",
+    "title": "Кубо не прощает меня — моба",
+    "canonical": "Кубо не прощает меня — моба",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/153845-qcUXgT0toF1J.jpg",
+    "genres": "Экшен, Приключения, Фэнтези, Романтика",
+    "year": "2023",
+    "season": "Весна 2023",
+    "answers": [
+      "кубо не прощает меня моба",
+      "kubo wont let me be invisible",
+      "нагиса кубо",
+      "сираиси",
+      "i got a cheat skill in another world and became unrivaled in the real world, too",
+      "isekai de cheat skill wo te ni shita ore wa, genjitsu sekai wo mo musou suru: level up wa jinsei wo kaeta",
+      "i got a cheat ability in a different world, and became extraordinary even in the real world",
+      "isekai de cheat nouryoku ote ni shita ore wa, genjitsu sekai o mo musou suru",
+      "สกิลโกงไร้เทียมทาน สร้างตำนานในสองโลก: ชีวิตพลิกผันด้วยการอัปเลเวล",
+      "ganhei um poder apelão em outro mundo e agora sou imbatível no mundo real",
+      "iseleve",
+      "在异世界获得超强能力的我，在现实世界照样无敌～等级提升改变人生命运",
+      "いせれべ",
+      "skill nge-cheat yang kudapat di dunia lain juga membuatku tanpa tanding di dunia asal"
+    ]
+  },
+  {
+    "id": "anime_101573",
+    "title": "Окончание единения (Цветут в тебя)",
+    "canonical": "Окончание единения (Цветут в тебя)",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/101573-yaDZ76cLeMBU.jpg",
+    "genres": "Драма, Романтика, Повседневность",
+    "year": "2018",
+    "season": "Осень 2018",
+    "answers": [
+      "цветут в тебя",
+      "bloom into you",
+      "юу",
+      "тоуко",
+      "yagate kimi ni naru",
+      "yagakimi",
+      "สุดท้ายก็คือเธอ"
+    ]
+  },
+  {
+    "id": "anime_11499",
+    "title": "Санка Рэа",
+    "canonical": "Санка Рэа",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/11499-etOfsgdjZY4L.jpg",
+    "genres": "Комедия, Ecchi, Ужасы, Романтика",
+    "year": "2012",
+    "season": "Весна 2012",
+    "answers": [
+      "санка рэа",
+      "sankarea",
+      "рэа",
+      "чихиро",
+      "sankarea: undying love"
+    ]
+  },
+  {
+    "id": "anime_18153",
+    "title": "За гранью",
+    "canonical": "За гранью",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/18153-Pw3uKfv6ZNqP.jpg",
+    "genres": "Экшен, Драма, Фэнтези, Повседневность",
+    "year": "2013",
+    "season": "Осень 2013",
+    "answers": [
+      "за гранью",
+      "beyond the boundary",
+      "kyoukai no kanata",
+      "акихито",
+      "мирай курияма",
+      "beyond the horizon",
+      "境界的彼方"
+    ]
+  },
+  {
+    "id": "anime_20458",
+    "title": "Непутёвый ученик в школе магии",
+    "canonical": "Непутёвый ученик в школе магии",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/20458-6sHThFCwyd1T.jpg",
+    "genres": "Экшен, Романтика, Фантастика, Сверхъестественное",
+    "year": "2014",
+    "season": "Весна 2014",
+    "answers": [
+      "непутевый ученик в школе магии",
+      "the irregular at magic high school",
+      "тацуя",
+      "миюки",
+      "mahouka koukou no rettousei",
+      "พี่น้องปริศนาโรงเรียนมหาเวท",
+      "непутёвый ученик в школе магии"
+    ]
+  },
+  {
+    "id": "anime_129898",
+    "title": "Лучший в мире ассасин перерождается аристократом",
+    "canonical": "Лучший в мире ассасин перерождается аристократом",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/129898-Qp41lxD3wU9e.jpg",
+    "genres": "Экшен, Приключения, Драма, Фэнтези",
+    "year": "2021",
+    "season": "Осень 2021",
+    "answers": [
+      "лучший в мире ассасин",
+      "the worlds finest assassin",
+      "луг",
+      "the world's finest assassin gets reincarnated in another world as an aristocrat",
+      "sekai saikou no ansatsusha, isekai kizoku ni tensei suru",
+      "ansatsu kizoku",
+      "สุดยอดมือสังหาร อวตารมาต่างโลก",
+      "世界顶尖的暗杀者转生为异世界贵族",
+      "pembunuh terhebat di dunia reinkarnasi menjadi bangsawan dunia lain",
+      "המתנקש הטוב ביותר נולד מחדש בעולם אחר בתור אריסטוקרט",
+      "лучший в мире ассасин переродился в другом мире аристократом"
+    ]
+  },
+  {
+    "id": "anime_107201",
+    "title": "Ложные выводы",
+    "canonical": "Ложные выводы",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/107201-XZHSg0HdC9kR.jpg",
+    "genres": "Комедия, Детектив, Романтика, Сверхъестественное",
+    "year": "2020",
+    "season": "Зима 2020",
+    "answers": [
+      "ложные выводы",
+      "in spectre",
+      "kyokou suiri",
+      "котоко",
+      "куро",
+      "in/spectre",
+      "虚构推理",
+      "ไขปมปริศนาภูต"
+    ]
+  },
+  {
+    "id": "anime_20678",
+    "title": "По велению адской сестры",
+    "canonical": "По велению адской сестры",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/20678-OJNSBFQsH20P.png",
+    "genres": "Экшен, Ecchi, Фэнтези, Романтика",
+    "year": "2015",
+    "season": "Зима 2015",
+    "answers": [
+      "по велению адской сестры",
+      "the testament of sister new devil",
+      "басара",
+      "мио",
+      "shinmai maou no testament",
+      "shinmai maou no keiyakusha"
+    ]
+  },
+  {
+    "id": "anime_20946",
+    "title": "Моя история!!",
+    "canonical": "Моя история!!",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/20946-r4wJYuCgFO1z.jpg",
+    "genres": "Комедия, Романтика",
+    "year": "2015",
+    "season": "Весна 2015",
+    "answers": [
+      "моя история",
+      "my love story",
+      "ore monogatari",
+      "такео",
+      "ямато",
+      "my love story!!",
+      "ore monogatari!!",
+      "mon histoire"
+    ]
+  },
+  {
+    "id": "anime_21131",
+    "title": "Боевая академия города Астериск",
+    "canonical": "Боевая академия города Астериск",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/21131-NuvCaPakVhMS.jpg",
+    "genres": "Экшен, Комедия, Ecchi, Фэнтези",
+    "year": "2015",
+    "season": "Осень 2015",
+    "answers": [
+      "академия астериск",
+      "the asterisk war",
+      "аято",
+      "джулис",
+      "gakusen toshi asterisk",
+      "academy battle city asterisk"
+    ]
+  },
+  {
+    "id": "anime_98491",
+    "title": "В другом мире со смартфоном",
+    "canonical": "В другом мире со смартфоном",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/98491-6ot86unqGUj4.jpg",
+    "genres": "Приключения, Комедия, Фэнтези, Романтика",
+    "year": "2017",
+    "season": "Лето 2017",
+    "answers": [
+      "в другом мире со смартфоном",
+      "in another world with my smartphone",
+      "тоя",
+      "isekai wa smartphone to tomo ni.",
+      "isesuma",
+      "ไปต่างโลก! ก็ต้องไปกับสมาร์ทโฟนสิ!!!",
+      "帶著智慧型手機闖蕩異世界。"
+    ]
+  },
+  {
+    "id": "anime_1195",
+    "title": "Подручный Луизы-Нулизы",
+    "canonical": "Подручный Луизы-Нулизы",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/1195-IgKkWPVvWHmf.jpg",
+    "genres": "Экшен, Приключения, Комедия, Ecchi",
+    "year": "2006",
+    "season": "Лето 2006",
+    "answers": [
+      "подручный луизы нулизы",
+      "the familiar of zero",
+      "сайто",
+      "луиза",
+      "zero no tsukaima",
+      "zero's familiar",
+      "la magia de zero"
+    ]
+  },
+  {
+    "id": "anime_14289",
+    "title": "Скажи: «Я люблю тебя»",
+    "canonical": "Скажи: «Я люблю тебя»",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/14289-QSuorl0srSNZ.jpg",
+    "genres": "Драма, Романтика",
+    "year": "2012",
+    "season": "Осень 2012",
+    "answers": [
+      "скажи я люблю тебя",
+      "say i love you",
+      "мей",
+      "ямато",
+      "say \"i love you\".",
+      "sukitte ii na yo.",
+      "sukinayo"
+    ]
+  },
+  {
+    "id": "anime_115113",
+    "title": "Узаки хочет тусоваться!",
+    "canonical": "Узаки хочет тусоваться!",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/115113-wIWyzBlDR5Kt.jpg",
+    "genres": "Комедия, Ecchi, Романтика, Повседневность",
+    "year": "2020",
+    "season": "Лето 2020",
+    "answers": [
+      "узаки хочет тусоваться",
+      "uzaki chan wants to hang out",
+      "узаки",
+      "сакурай",
+      "uzaki-chan wants to hang out!",
+      "uzaki-chan wa asobitai!",
+      "宇崎学妹想要玩！",
+      "รุ่นน้องตัวป่วน อยากชวนเที่ยวเล่น"
+    ]
+  },
+  {
+    "id": "anime_7785",
+    "title": "Сказ о четырех с половиной татами",
+    "canonical": "Сказ о четырех с половиной татами",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/7785.jpg",
+    "genres": "Комедия, Детектив, Психологическое, Романтика",
+    "year": "2010",
+    "season": "Весна 2010",
+    "answers": [
+      "сказ о четырех с половиной татами",
+      "the tatami galaxy",
+      "ватаси",
+      "yojouhan shinwa taikei",
+      "yojo-han shinwa taikei",
+      "yojou-han shinwa taikei",
+      "yojohan shinwa taikei",
+      "四叠半神话大系",
+      "4½ tatami mythological chronicles"
+    ]
+  },
+  {
+    "id": "anime_104647",
+    "title": "Моя реинкарнация в отомэ-игре в качестве злодейки",
+    "canonical": "Моя реинкарнация в отомэ-игре в качестве злодейки",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/104647-emIYPiyZZJnl.jpg",
+    "genres": "Комедия, Фэнтези, Романтика, Повседневность",
+    "year": "2020",
+    "season": "Весна 2020",
+    "answers": [
+      "моя реинкарнация в отоме игре",
+      "my next life as a villainess",
+      "бакарина",
+      "катарина",
+      "my next life as a villainess: all routes lead to doom!",
+      "otome game no hametsu flag shika nai akuyaku reijou ni tensei shiteshimatta…",
+      "i reincarnated into an otome game as a villainess with only destruction flags..",
+      "hamefura",
+      "hamehura",
+      "bakarina",
+      "转生成为了只有乙女游戏破灭flag的邪恶大小姐…",
+      "เกิดใหม่เป็นนางร้ายจะเลือกทางไหนก็หายนะ"
+    ]
+  },
+  {
+    "id": "anime_17729",
+    "title": "Плод Грисайи",
+    "canonical": "Плод Грисайи",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/17729-9jx6Kk3Etn3N.jpg",
+    "genres": "Драма, Ecchi, Психологическое, Романтика",
+    "year": "2014",
+    "season": "Осень 2014",
+    "answers": [
+      "плод грисайи",
+      "the fruit of grisaia",
+      "юуджи",
+      "grisaia no kajitsu",
+      "le fruit de la grisaia"
+    ]
+  },
+  {
+    "id": "anime_21290",
+    "title": "А ты думал, что твоя жена в онлайн-игре на самом деле не девушка?",
+    "canonical": "А ты думал, что твоя жена в онлайн-игре на самом деле не девушка?",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/21290-5iCk1VGFb5km.jpg",
+    "genres": "Комедия, Ecchi, Романтика",
+    "year": "2016",
+    "season": "Весна 2016",
+    "answers": [
+      "а ты думал что твоя жена в онлайн игре",
+      "and you thought there is never a girl online",
+      "ако",
+      "хидеки",
+      "and you thought there is never a girl online?",
+      "netoge no yome wa onnanoko ja nai to omotta?",
+      "netoyome",
+      "netgame no yome wa onna no ko ja nai to omotta?",
+      "ถามหน่อยครับ คิดว่าเจ้าสาวผมในเกมออนไลน์เป็นผู้หญิงจริงหรือเปล่า?"
+    ]
+  },
+  {
+    "id": "anime_97832",
+    "title": "Цитрус",
+    "canonical": "Цитрус",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/97832-XlWSnm19Vv3w.png",
+    "genres": "Драма, Романтика",
+    "year": "2018",
+    "season": "Зима 2018",
+    "answers": [
+      "цитрус",
+      "citrus",
+      "юдзу",
+      "мей"
+    ]
+  },
+  {
+    "id": "anime_112443",
+    "title": "Низкоуровневый персонаж Томодзаки",
+    "canonical": "Низкоуровневый персонаж Томодзаки",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/112443-w44XlUOHN5kh.jpg",
+    "genres": "Комедия, Драма, Романтика, Повседневность",
+    "year": "2021",
+    "season": "Зима 2021",
+    "answers": [
+      "низкоуровневый персонаж томодзаки",
+      "bottom tier character tomozaki",
+      "томодзаки",
+      "аой",
+      "bottom-tier character tomozaki",
+      "jaku-chara tomozaki-kun",
+      "เกมพลิกโฉมนายกระจอก",
+      "низкоуровневый томодзаки"
+    ]
+  },
+  {
+    "id": "anime_101168",
+    "title": "Грабитель",
+    "canonical": "Грабитель",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/101168-55dmHGtGlJOY.jpg",
+    "genres": "Экшен, Приключения, Комедия, Драма",
+    "year": "2020",
+    "season": "Зима 2020",
+    "answers": [
+      "грабитель",
+      "plunderer",
+      "лихт",
+      "хина"
+    ]
+  },
+  {
+    "id": "anime_126546",
+    "title": "Хроники иллюзорных духов",
+    "canonical": "Хроники иллюзорных духов",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/126546-eSjc83C90h24.jpg",
+    "genres": "Экшен, Драма, Фэнтези, Романтика",
+    "year": "2021",
+    "season": "Лето 2021",
+    "answers": [
+      "хроники иллюзорных духов",
+      "seirei gensouki",
+      "рио",
+      "харуто",
+      "seirei gensouki: spirit chronicles",
+      "精灵幻想记",
+      "ตำนานวิญญาณแฟนซี"
+    ]
+  },
+  {
+    "id": "anime_117612",
+    "title": "Герой-рационал перестраивает королевство",
+    "canonical": "Герой-рационал перестраивает королевство",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/117612-MQ8iXGt2NHkB.jpg",
+    "genres": "Экшен, Приключения, Фэнтези, Романтика",
+    "year": "2021",
+    "season": "Лето 2021",
+    "answers": [
+      "герой рационал перестраивает королевство",
+      "how a realist hero rebuilt the kingdom",
+      "сома кадзуя",
+      "genjitsu shugi yuusha no oukoku saikenki",
+      "genjitsushugisha no oukokukaizouki",
+      "a realist's kingdom reform chronicles",
+      "genkoku",
+      "ยุทธศาสตร์กู้ชาติของราชามือใหม่"
+    ]
+  },
+  {
+    "id": "anime_104464",
+    "title": "Да как меня можешь любить только ты?",
+    "canonical": "Да как меня можешь любить только ты?",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/104464-XbfWyamahIAu.jpg",
+    "genres": "Комедия, Драма, Ecchi, Романтика",
+    "year": "2019",
+    "season": "Осень 2019",
+    "answers": [
+      "да как меня можешь любить только ты",
+      "oresuki",
+      "джоро",
+      "панси",
+      "oresuki: are you the only one who loves me?",
+      "ore wo suki nano wa omae dake ka yo",
+      "อุตส่าห์มีคนมาชอบทั้งที ทำไมต้องเป็นยัยนี่ด้วยนะ"
+    ]
+  },
+  {
+    "id": "anime_16067",
+    "title": "Безоблачное завтра",
+    "canonical": "Безоблачное завтра",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/16067.jpg",
+    "genres": "Драма, Фэнтези, Романтика, Повседневность",
+    "year": "2013",
+    "season": "Осень 2013",
+    "answers": [
+      "безоблачное завтра",
+      "a lull in the sea",
+      "nagi no asukara",
+      "хикари",
+      "манака",
+      "nagiasu",
+      "nagi no asu kara: calmaria do mar",
+      "nagi no asukara: calma en el mar",
+      "from a calm tomorrow"
+    ]
+  },
+  {
+    "id": "anime_2034",
+    "title": "Трогательный комплекс",
+    "canonical": "Трогательный комплекс",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/2034-AL1Xtj5GqKu3.jpg",
+    "genres": "Комедия, Романтика, Повседневность",
+    "year": "2007",
+    "season": "Весна 2007",
+    "answers": [
+      "трогательный комплекс",
+      "lovely complex",
+      "риса",
+      "отани",
+      "lovely★complex",
+      "love★com",
+      "love com"
+    ]
+  },
+  {
+    "id": "anime_99726",
+    "title": "Полноценная жизнь онлайн",
+    "canonical": "Полноценная жизнь онлайн",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/99726-f23J9Fuh6dgW.jpg",
+    "genres": "Комедия, Фэнтези, Романтика, Повседневность",
+    "year": "2017",
+    "season": "Осень 2017",
+    "answers": [
+      "полноценная жизнь онлайн",
+      "recovery of an mmo junkie",
+      "морико",
+      "сакураи",
+      "net-juu no susume",
+      "neto-juu no susume",
+      "netojuu no susume",
+      "recommendation of the wonderful virtual life",
+      "recommendation of the internet enhancement",
+      "netoju"
+    ]
+  },
+  {
+    "id": "anime_8525",
+    "title": "Одному лишь Богу ведомый мир",
+    "canonical": "Одному лишь Богу ведомый мир",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/8525-adOMqsr1Thrs.jpg",
+    "genres": "Комедия, Романтика, Сверхъестественное",
+    "year": "2010",
+    "season": "Осень 2010",
+    "answers": [
+      "одному лишь богу ведомый мир",
+      "the world god only knows",
+      "кэйма",
+      "элси",
+      "kami nomi zo shiru sekai",
+      "kaminomi",
+      "que sa volonté soit faite"
+    ]
+  },
+  {
+    "id": "anime_162694",
+    "title": "Сто девушек, которые очень любят тебя",
+    "canonical": "Сто девушек, которые очень любят тебя",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/162694-PzaToQuFdpsr.jpg",
+    "genres": "Комедия, Ecchi, Романтика",
+    "year": "2023",
+    "season": "Осень 2023",
+    "answers": [
+      "сто девушек",
+      "100 girlfriends",
+      "the 100 girlfriends who really, really, really, really, really love you",
+      "kimi no koto ga dai dai dai dai daisuki na 100-nin no kanojo",
+      "100 kanojo",
+      "100kano",
+      "hyakkano",
+      "100 namoradas que te amam muuuuuito",
+      "les 100 petites amies qui t'aiiiment à en mourir",
+      "100 pacar yang sungguh sangat amat benar-benar mencintaimu",
+      "100 девушек, которые очень-очень-очень-очень-очень сильно тебя любят",
+      "100 cô bạn gái yêu bạn rất rất rất rất rất nhiều"
+    ]
+  },
+  {
+    "id": "anime_6594",
+    "title": "Истории мечей",
+    "canonical": "Истории мечей",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/6594-lROEMKEwCESY.jpg",
+    "genres": "Экшен, Приключения, Романтика",
+    "year": "2010",
+    "season": "Зима 2010",
+    "answers": [
+      "истории мечей",
+      "katanagatari",
+      "ситика",
+      "тогамэ",
+      "sword story"
+    ]
+  },
+  {
+    "id": "anime_141911",
+    "title": "Долой безделье",
+    "canonical": "Долой безделье",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/141911-XqAZO540hFXw.jpg",
+    "genres": "Комедия, Романтика, Повседневность",
+    "year": "2023",
+    "season": "Весна 2023",
+    "answers": [
+      "долой безделье",
+      "skip and loafer",
+      "мицуми",
+      "сима",
+      "skip to loafer",
+      "จังหวะวัยรุ่น ว้าวุ่นหัวใจ",
+      "в лоферах вприпрыжку",
+      "躍動青春",
+      "スキロー"
+    ]
+  },
+  {
+    "id": "anime_9041",
+    "title": "Бесконечные небеса",
+    "canonical": "Бесконечные небеса",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/9041.jpg",
+    "genres": "Экшен, Комедия, Ecchi, Меха",
+    "year": "2011",
+    "season": "Зима 2011",
+    "answers": [
+      "бесконечные небеса",
+      "infinite stratos",
+      "ичика",
+      "хоки",
+      "is: infinite stratos",
+      "is ปฏิบัติการรักจักรกลทะยานฟ้า"
+    ]
+  },
+  {
+    "id": "anime_126192",
+    "title": "Мои девушки",
+    "canonical": "Мои девушки",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/126192-BQvOYqBnotKx.jpg",
+    "genres": "Комедия, Ecchi, Романтика, Повседневность",
+    "year": "2021",
+    "season": "Лето 2021",
+    "answers": [
+      "мои девушки",
+      "girlfriend girlfriend",
+      "наоя",
+      "саки",
+      "girlfriend, girlfriend",
+      "kanojo mo kanojo",
+      "kanokano",
+      "she is also my girlfriend",
+      "จะคนไหนก็แฟนสาว",
+      "kupunya dia dan dirinya"
+    ]
+  },
+  {
+    "id": "anime_11759",
+    "title": "Ускоренный мир",
+    "canonical": "Ускоренный мир",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/11759-KUzlQmgCx275.jpg",
+    "genres": "Экшен, Романтика, Фантастика",
+    "year": "2012",
+    "season": "Весна 2012",
+    "answers": [
+      "ускоренный мир",
+      "accel world",
+      "харуюки",
+      "черноснежка",
+      "accelerated world"
+    ]
+  },
+  {
+    "id": "anime_171457",
+    "title": "Слишком много проигравших героинь!",
+    "canonical": "Слишком много проигравших героинь!",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/171457-VBH6gmvCKHwV.jpg",
+    "genres": "Комедия, Романтика, Повседневность",
+    "year": "2024",
+    "season": "Лето 2024",
+    "answers": [
+      "слишком много проигравших героинь",
+      "makeine",
+      "makeine: too many losing heroines!",
+      "make heroine ga oosugiru!",
+      "toooooo many losing heroines",
+      "マケイン",
+      "รักครั้งนี้มีคนนกเยอะไปมั้ย!",
+      "敗北女角太多了！"
+    ]
+  },
+  {
+    "id": "anime_14749",
+    "title": "Орешура",
+    "canonical": "Орешура",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/14749-8YRcYbni0vpv.jpg",
+    "genres": "Комедия, Романтика",
+    "year": "2013",
+    "season": "Зима 2013",
+    "answers": [
+      "орешура",
+      "oreshura",
+      "эйта",
+      "масудзу",
+      "ore no kanojo to osananajimi ga shuraba sugiru",
+      "my girlfriend and childhood friend fight too much",
+      "สมรภูมิรักแฟนสาวกับเพื่อนข้างบ้าน"
+    ]
+  },
+  {
+    "id": "anime_5630",
+    "title": "Восточный Эдем",
+    "canonical": "Восточный Эдем",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/5630-YgD37IwSdKlc.jpg",
+    "genres": "Драма, Детектив, Психологическое, Романтика",
+    "year": "2009",
+    "season": "Весна 2009",
+    "answers": [
+      "восточный эдем",
+      "eden of the east",
+      "такидзава",
+      "саки",
+      "higashi no eden"
+    ]
+  },
+  {
+    "id": "anime_20541",
+    "title": "Актёры города Мекаку",
+    "canonical": "Актёры города Мекаку",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/20541-n6cLsccx46Jp.jpg",
+    "genres": "Комедия, Романтика, Фантастика, Сверхъестественное",
+    "year": "2014",
+    "season": "Весна 2014",
+    "answers": [
+      "актеры города мекаку",
+      "mekakucity actors",
+      "синtaro",
+      "kagerou days",
+      "heat-haze days",
+      "mekaku city actors",
+      "kagerou project"
+    ]
+  },
+  {
+    "id": "anime_128712",
+    "title": "Детектив уже мертва",
+    "canonical": "Детектив уже мертва",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/128712-ten1GvlORgaw.jpg",
+    "genres": "Комедия, Драма, Детектив, Романтика",
+    "year": "2021",
+    "season": "Лето 2021",
+    "answers": [
+      "детектив уже мертва",
+      "the detective is already dead",
+      "сиеста",
+      "кимихико",
+      "tantei wa mou, shindeiru.",
+      "la detective esta muerta.",
+      "tanmoshi",
+      "侦探已经，死了",
+      "侦探已死",
+      "นักสืบตายแล้ว",
+      "детектив уже мёртв",
+      "si detektif sudah mati"
+    ]
+  },
+  {
+    "id": "anime_127401",
+    "title": "Платиновый исход",
+    "canonical": "Платиновый исход",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/127401-e27CVSLfGjnb.jpg",
+    "genres": "Драма, Детектив, Психологическое, Романтика",
+    "year": "2021",
+    "season": "Осень 2021",
+    "answers": [
+      "платиновый исход",
+      "platinum end",
+      "мирай",
+      "нассэ"
+    ]
+  },
+  {
+    "id": "anime_8425",
+    "title": "Госик",
+    "canonical": "Госик",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/8425-Lf6WLBHfOdRQ.jpg",
+    "genres": "Драма, Детектив, Романтика",
+    "year": "2011",
+    "season": "Зима 2011",
+    "answers": [
+      "госик",
+      "gosick",
+      "викторика",
+      "кадзуя",
+      "ゴシック"
+    ]
+  },
+  {
+    "id": "anime_21860",
+    "title": "Что ты будешь делать во время апокалипсиса?",
+    "canonical": "Что ты будешь делать во время апокалипсиса?",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/21860-oQ0YAYNOtGTU.jpg",
+    "genres": "Драма, Фэнтези, Детектив, Романтика",
+    "year": "2017",
+    "season": "Весна 2017",
+    "answers": [
+      "что ты будешь делать во время апокалипсиса",
+      "worldend",
+      "виллем",
+      "ктолли",
+      "worldend: what are you doing at the end of the world? are you busy? will you save us?",
+      "shuumatsu nani shitemasu ka? isogashii desu ka? sukutte moratte ii desu ka?",
+      "do you have what the end? are you busy? shall you save xxx?",
+      "sukasuka",
+      "末日时在做什么？有没有空？可以来拯救吗？",
+      "worldend: what do you do at the end of the world? are you busy? will you save us?",
+      "apa yang engkau lakukan saat akhir dunia? apakah engkau sibuk? bisakah engkau menolongku?",
+      "เวิลด์เอนด์: วันสิ้นโลกนี้ทำอะไร ยุ่งหรือเปล่า มาช่วยเราได้ไหม",
+      "конец человечества. что ты будешь делать после того, как людей не стало?"
+    ]
+  },
+  {
+    "id": "anime_14075",
+    "title": "Буря потерь",
+    "canonical": "Буря потерь",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/14075-BIU2xRpLnpZr.jpg",
+    "genres": "Экшен, Драма, Фэнтези, Детектив",
+    "year": "2012",
+    "season": "Осень 2012",
+    "answers": [
+      "буря потерь",
+      "blast of tempest",
+      "махиро",
+      "ёсино",
+      "аика",
+      "zetsuen no tempest",
+      "zetsuen no tempest: the civilization blaster",
+      "絶園のテンペスト ~the civilization blaster~",
+      "penghancuran peradaban"
+    ]
+  },
+  {
+    "id": "anime_10800",
+    "title": "Яркая Чихая",
+    "canonical": "Яркая Чихая",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/10800-hcHzj4rkDQzG.jpg",
+    "genres": "Драма, Романтика, Повседневность, Спорт",
+    "year": "2011",
+    "season": "Осень 2011",
+    "answers": [
+      "яркая чихая",
+      "chihayafuru",
+      "чихая",
+      "арата",
+      "таичи",
+      "chihayafull"
+    ]
+  },
+  {
+    "id": "anime_98005",
+    "title": "Сквозь бальный зал",
+    "canonical": "Сквозь бальный зал",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/98005-LYk3El5uGnnx.jpg",
+    "genres": "Драма, Романтика, Спорт",
+    "year": "2017",
+    "season": "Лето 2017",
+    "answers": [
+      "сквозь бальный зал",
+      "welcome to the ballroom",
+      "татара",
+      "сидзуку",
+      "ballroom e youkoso"
+    ]
+  },
+  {
+    "id": "anime_20510",
+    "title": "Первые шаги",
+    "canonical": "Первые шаги",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/n20510-9SKDDNdPJlx5.jpg",
+    "genres": "Романтика, Спорт",
+    "year": "2014",
+    "season": "Весна 2014",
+    "answers": [
+      "первые шаги",
+      "baby steps",
+      "маруо",
+      "нацу"
+    ]
+  },
+  {
+    "id": "anime_132171",
+    "title": "Танцуй свой танец, дансёр",
+    "canonical": "Танцуй свой танец, дансёр",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/132171-CZiw1HyGi5cf.jpg",
+    "genres": "Драма, Романтика, Повседневность, Спорт",
+    "year": "2022",
+    "season": "Весна 2022",
+    "answers": [
+      "танцуй свой танец дансер",
+      "dance dance danseur",
+      "дзюнпэй"
+    ]
+  },
+  {
+    "id": "anime_5941",
+    "title": "Перекрёстная игра",
+    "canonical": "Перекрёстная игра",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/5941-1VflQ6JuIkUA.jpg",
+    "genres": "Комедия, Драма, Романтика, Спорт",
+    "year": "2009",
+    "season": "Весна 2009",
+    "answers": [
+      "перекрестная игра",
+      "cross game",
+      "ко",
+      "аоба"
+    ]
+  },
+  {
+    "id": "anime_223",
+    "title": "Драконий жемчуг",
+    "canonical": "Драконий жемчуг",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/223-vyRuUBBYfcUb.jpg",
+    "genres": "Экшен, Приключения, Комедия, Фэнтези",
+    "year": "1986",
+    "season": "Зима 1986",
+    "answers": [
+      "драконий жемчуг",
+      "dragon ball",
+      "гоку",
+      "вегета",
+      "dragonball",
+      "bola de drac",
+      "דרגון בול",
+      "ดราก้อนบอล",
+      "bảy viên ngọc rồng"
+    ]
+  },
+  {
+    "id": "anime_813",
+    "title": "Драконий жемчуг Z",
+    "canonical": "Драконий жемчуг Z",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/813-03ZLvWJgR6Wd.jpg",
+    "genres": "Экшен, Приключения, Комедия, Фэнтези",
+    "year": "1989",
+    "season": "Весна 1989",
+    "answers": [
+      "драконий жемчуг z",
+      "dragon ball z",
+      "гоку",
+      "вегета",
+      "гохан",
+      "dbz",
+      "dragonball z",
+      "דרגון בול זי",
+      "what's my destiny dragon ball",
+      "ดราก้อนบอล z",
+      "bảy viên ngọc rồng z",
+      "драконий жемчуг зет"
+    ]
+  },
+  {
+    "id": "anime_21175",
+    "title": "Драконий жемчуг: Супер",
+    "canonical": "Драконий жемчуг: Супер",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/21175-Qo9gdGPUm4Im.jpg",
+    "genres": "Экшен, Приключения, Комедия, Фэнтези",
+    "year": "2015",
+    "season": "Лето 2015",
+    "answers": [
+      "драконий жемчуг супер",
+      "dragon ball super",
+      "гоку",
+      "dbs",
+      "dragonball super",
+      "דרגון בול סופר",
+      "драконий жемчуг: супер"
+    ]
+  },
+  {
+    "id": "anime_225",
+    "title": "Драконий жемчуг GT",
+    "canonical": "Драконий жемчуг GT",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/225-gMgT7ZPEFvQ7.jpg",
+    "genres": "Экшен, Приключения, Комедия, Фантастика",
+    "year": "1996",
+    "season": "Зима 1996",
+    "answers": [
+      "драконий жемчуг gt",
+      "dragon ball gt",
+      "dbgt",
+      "драконий жемчуг бп"
+    ]
+  },
+  {
+    "id": "anime_2025",
+    "title": "Темнее чёрного: Нарушитель равновесия",
+    "canonical": "Темнее чёрного: Нарушитель равновесия",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/2025-Fx3ALDmrOulv.jpg",
+    "genres": "Экшен, Детектив, Фантастика",
+    "year": "2007",
+    "season": "Весна 2007",
+    "answers": [
+      "темнее черного",
+      "darker than black",
+      "darker than black: kuro no keiyakusha",
+      "darker than black -black contractor-",
+      "bí mật bóng tối",
+      "brama piekieł"
+    ]
+  },
+  {
+    "id": "anime_4898",
+    "title": "Тёмный дворецкий",
+    "canonical": "Тёмный дворецкий",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/4898-qqGPkf0qkMDh.jpg",
+    "genres": "Экшен, Комедия, Фэнтези, Детектив",
+    "year": "2008",
+    "season": "Осень 2008",
+    "answers": [
+      "темный дворецкий",
+      "black butler",
+      "сиэль",
+      "себастьян",
+      "kuroshitsuji",
+      "kuro shitsuji",
+      "kuroshitsuzi",
+      "คนลึกไขปริศนาลับ",
+      "hắc quản gia",
+      "黑执事 第1季",
+      "黑執事 第1季",
+      "흑집사 1기",
+      "diácono negro temporada 1"
+    ]
+  },
+  {
+    "id": "anime_14513",
+    "title": "Маги: Лабиринт магии",
+    "canonical": "Маги: Лабиринт магии",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/14513-DDBxCumOyPIa.jpg",
+    "genres": "Экшен, Приключения, Фэнтези",
+    "year": "2012",
+    "season": "Осень 2012",
+    "answers": [
+      "маги лабиринт магии",
+      "magi the labyrinth of magic",
+      "аладдин",
+      "алибаба",
+      "magi: the labyrinth of magic"
+    ]
+  },
+  {
+    "id": "anime_98707",
+    "title": "Страна самоцветов",
+    "canonical": "Страна самоцветов",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/98707-ZcFGfUAS4YwK.jpg",
+    "genres": "Экшен, Драма, Фэнтези, Детектив",
+    "year": "2017",
+    "season": "Осень 2017",
+    "answers": [
+      "страна самоцветов",
+      "houseki no kuni",
+      "land of the lustrous",
+      "l'ère des cristaux",
+      "das land der juwelen",
+      "vương quốc bảo thạch",
+      "ดินแดนอัญมณี"
+    ]
+  },
+  {
+    "id": "anime_100922",
+    "title": "Необъятный океан",
+    "canonical": "Необъятный океан",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/100922-ef1bBJCUCfxk.jpg",
+    "genres": "Комедия, Повседневность, Спорт",
+    "year": "2018",
+    "season": "Лето 2018",
+    "answers": [
+      "необъятный океан",
+      "grand blue",
+      "иори",
+      "кохей",
+      "grand blue dreaming",
+      "ก๊วนป่วนชวนบุ๋งบุ๋ง"
+    ]
+  },
+  {
+    "id": "anime_153288",
+    "title": "Кайдзю номер восемь",
+    "canonical": "Кайдзю номер восемь",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/153288-JNsWuMPMAuJL.jpg",
+    "genres": "Экшен, Фантастика",
+    "year": "2024",
+    "season": "Весна 2024",
+    "answers": [
+      "кайдзю номер восемь",
+      "kaiju no 8",
+      "кафка хибино",
+      "kaiju no. 8",
+      "kaijuu 8-gou",
+      "monster #8",
+      "8kaijuu",
+      "kaiju no. eight",
+      "kaiju n°8",
+      "괴수 8호"
+    ]
+  },
+  {
+    "id": "anime_5680",
+    "title": "Кэйон!",
+    "canonical": "Кэйон!",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/5680-Mc9n4eFI4i0Y.jpg",
+    "genres": "Комедия, Музыка, Повседневность",
+    "year": "2009",
+    "season": "Весна 2009",
+    "answers": [
+      "кэйон",
+      "кейон",
+      "k on",
+      "юи",
+      "мио",
+      "рицу",
+      "цумуги",
+      "k-on!",
+      "keion",
+      "k-on",
+      "케이온!",
+      "轻音少女"
+    ]
+  },
+  {
+    "id": "anime_10165",
+    "title": "Мелочи жизни",
+    "canonical": "Мелочи жизни",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/10165-1O0xQsic1qpB.jpg",
+    "genres": "Комедия, Повседневность",
+    "year": "2011",
+    "season": "Весна 2011",
+    "answers": [
+      "мелочи жизни",
+      "nichijou",
+      "юко",
+      "мио",
+      "nichijou - my ordinary life",
+      "everyday",
+      "повсякденнощі"
+    ]
+  },
+  {
+    "id": "anime_20729",
+    "title": "Баракамон",
+    "canonical": "Баракамон",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/20729-yIc4suclOeOA.jpg",
+    "genres": "Экшен, Фантастика",
+    "year": "2014",
+    "season": "Осень 2014",
+    "answers": [
+      "баракамон",
+      "barakamon",
+      "сейшу ханда",
+      "нару",
+      "world trigger",
+      "импульс мира"
+    ]
+  },
+  {
+    "id": "anime_20994",
+    "title": "Врата: Там бьются наши воины",
+    "canonical": "Врата: Там бьются наши воины",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/20994-9Vy4mDOFYT7O.jpg",
+    "genres": "Экшен, Приключения, Фэнтези",
+    "year": "2015",
+    "season": "Лето 2015",
+    "answers": [
+      "врата там бьются наши воины",
+      "gate jieitai",
+      "итачи",
+      "gate",
+      "gate: jieitai kanochi nite, kaku tatakaeri"
+    ]
+  },
+  {
+    "id": "anime_21700",
+    "title": "Хроники Акаши",
+    "canonical": "Хроники Акаши",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/21700-3JaMOphL8VGr.jpg",
+    "genres": "Экшен, Комедия, Фэнтези",
+    "year": "2017",
+    "season": "Весна 2017",
+    "answers": [
+      "хроники акаши",
+      "akashic records",
+      "akashic records of bastard magic instructor",
+      "rokudenashi majutsu koushi to akashic records",
+      "rokuaka",
+      "อาจารย์เวทมนตร์ไม่เอาไหนกับตำนานปราสาทลอยฟ้า",
+      "不正經的魔術講師與禁忌教典"
+    ]
+  },
+  {
+    "id": "anime_112301",
+    "title": "Непризнанный школой владыка демонов",
+    "canonical": "Непризнанный школой владыка демонов",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/112301-e50SRjhGDGUu.jpg",
+    "genres": "Экшен, Комедия, Фэнтези",
+    "year": "2020",
+    "season": "Лето 2020",
+    "answers": [
+      "непризнанный школой владыка демонов",
+      "the misfit of demon king academy",
+      "анос волдигод",
+      "the misfit of demon king academy: history’s strongest demon king reincarnates and goes to school with his descendants",
+      "maou gakuin no futekigousha: shijou saikyou no maou no shiso, tensei shite shison-tachi no gakkou e kayou",
+      "maou gakuin no futekigousha",
+      "魔王学院の不適合者",
+      "ใครว่าข้าไม่เหมาะเป็นจอมมาร: ต้นตระกูลจอมมารที่เเกร่งที่สุดในประวัติศาสตร์เกิดใหม่ไปเรียนที่โรงเรียนลูกหลาน",
+      "魔王学院的不适任者～史上最强的魔王始祖，转生就读子孙们的学校～",
+      "непригодный для академии владыки тьмы"
+    ]
+  },
+  {
+    "id": "anime_20457",
+    "title": "Чёрная пуля",
+    "canonical": "Чёрная пуля",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/20457.jpg",
+    "genres": "Экшен, Драма, Детектив, Фантастика",
+    "year": "2014",
+    "season": "Весна 2014",
+    "answers": [
+      "черная пуля",
+      "black bullet",
+      "рэнтаро",
+      "эндзю",
+      "แบล็ค บุลเลท",
+      "黑色子彈"
+    ]
+  },
+  {
+    "id": "anime_205",
+    "title": "Самурай Чамплу",
+    "canonical": "Самурай Чамплу",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/205-L7WpOOWUmVjh.jpg",
+    "genres": "Экшен, Приключения, Комедия",
+    "year": "2004",
+    "season": "Весна 2004",
+    "answers": [
+      "самурай чамплу",
+      "samurai champloo",
+      "муген",
+      "джин",
+      "ساموراي تشامبلو"
+    ]
+  },
+  {
+    "id": "anime_33",
+    "title": "Берсерк",
+    "canonical": "Берсерк",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/33-g7HwYRVm0ZkN.jpg",
+    "genres": "Экшен, Приключения, Драма, Фэнтези",
+    "year": "1997",
+    "season": "Осень 1997",
+    "answers": [
+      "берсерк",
+      "berserk",
+      "гатс",
+      "гриффит",
+      "kenpuu denki berserk",
+      "kenfu denki berserk",
+      "sword-wind chronicle berserk",
+      "berserk (1997)"
+    ]
+  },
+  {
+    "id": "anime_226",
+    "title": "Эльфийская песнь",
+    "canonical": "Эльфийская песнь",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/226.jpg",
+    "genres": "Экшен, Драма, Ecchi, Ужасы",
+    "year": "2004",
+    "season": "Лето 2004",
+    "answers": [
+      "эльфийская песнь",
+      "elfen lied",
+      "люси",
+      "elfen song",
+      "elfic song",
+      "妖精的旋律"
+    ]
+  },
+  {
+    "id": "anime_7724",
+    "title": "Шики (Мертвец)",
+    "canonical": "Шики (Мертвец)",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/7724.jpg",
+    "genres": "Ужасы, Детектив, Сверхъестественное, Триллер",
+    "year": "2010",
+    "season": "Лето 2010",
+    "answers": [
+      "шики",
+      "мертвец",
+      "shiki",
+      "corpse demon"
+    ]
+  },
+  {
+    "id": "anime_934",
+    "title": "Когда плачут цикады",
+    "canonical": "Когда плачут цикады",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/n934-p227WvkFZ7XX.jpg",
+    "genres": "Ужасы, Детектив, Психологическое, Сверхъестественное",
+    "year": "2006",
+    "season": "Весна 2006",
+    "answers": [
+      "когда плачут цикады",
+      "higurashi",
+      "рэна",
+      "when they cry",
+      "higurashi no naku koro ni",
+      "when the cicadas cry",
+      "higurashi: when they cry",
+      "cuando las cigarras lloran",
+      "quando as cigarras choram",
+      "쓰르라미 울 적에",
+      "כשהציקדות בוכות",
+      "hinamizawa, le village maudit",
+      "higurashi when they cry (2006 anime version)",
+      "ยามเมื่อเหล่าจักจั่นกรีดร้อง",
+      "khi ve sầu ngân",
+      "higurashi: όταν κλαίνε τα τζιτζίκια",
+      "gdy zapłaczą cykady"
+    ]
+  },
+  {
+    "id": "anime_20807",
+    "title": "Рыцари Сидонии",
+    "canonical": "Рыцари Сидонии",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/20807-IHYC4Qby3dkT.jpg",
+    "genres": "Комедия, Ecchi",
+    "year": "2015",
+    "season": "Лето 2015",
+    "answers": [
+      "рыцари сидонии",
+      "knights of sidonia",
+      "нагате",
+      "prison school",
+      "โรงเรียนคุกนรก",
+      "kangoku gakuen"
+    ]
+  },
+  {
+    "id": "anime_21613",
+    "title": "Военная хроника маленькой девочки (Таня Дегуршаф)",
+    "canonical": "Военная хроника маленькой девочки (Таня Дегуршаф)",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/21613-FGAqKSTvfxuA.png",
+    "genres": "Экшен, Фэнтези",
+    "year": "2017",
+    "season": "Зима 2017",
+    "answers": [
+      "военная хроника маленькой девочки",
+      "таня дегуршаф",
+      "youjo senki",
+      "таня",
+      "saga of tanya the evil",
+      "幼女战记",
+      "колдунья в погонах"
+    ]
+  },
+  {
+    "id": "anime_178025",
+    "title": "Гачиакута",
+    "canonical": "Гачиакута",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/178025-WvcXi1J2SGRa.jpg",
+    "genres": "Экшен, Драма, Фэнтези",
+    "year": "2025",
+    "season": "Лето 2025",
+    "answers": [
+      "гачиакута",
+      "gachiakuta",
+      "рудо"
+    ]
+  },
+  {
+    "id": "anime_17265",
+    "title": "Покорение горизонта (Лог Горизонт)",
+    "canonical": "Покорение горизонта (Лог Горизонт)",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/17265-53eBCC34SKyM.jpg",
+    "genres": "Экшен, Приключения, Фэнтези",
+    "year": "2013",
+    "season": "Осень 2013",
+    "answers": [
+      "покорение горизонта",
+      "лог горизонт",
+      "log horizon",
+      "сироэ",
+      "รวมพลคนติดอยู่ในเกมส์"
+    ]
+  },
+  {
+    "id": "anime_100668",
+    "title": "Арифурэта: Сильнейший ремесленник в мире",
+    "canonical": "Арифурэта: Сильнейший ремесленник в мире",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/100668-9ZQSB5x5St7c.jpg",
+    "genres": "Экшен, Приключения, Фэнтези, Психологическое",
+    "year": "2019",
+    "season": "Лето 2019",
+    "answers": [
+      "арифурета",
+      "арифурэта",
+      "arifureta",
+      "хадзиме",
+      "arifureta: from commonplace to world's strongest",
+      "arifureta shokugyou de sekai saikyou",
+      "平凡职业造就世界最强",
+      "อาชีพกระจอกแล้วทำไม ยังไงข้าก็เทพ"
+    ]
+  },
+  {
+    "id": "anime_153518",
+    "title": "Подземелье вкусностей",
+    "canonical": "Подземелье вкусностей",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/153518-7uRvV7SLqmHV.jpg",
+    "genres": "Приключения, Комедия, Фэнтези",
+    "year": "2024",
+    "season": "Зима 2024",
+    "answers": [
+      "подземелье вкусностей",
+      "delicious in dungeon",
+      "dungeon meshi",
+      "лайос",
+      "марсиль",
+      "dungeon food",
+      "dungeon meal",
+      "tragones y mazmorras",
+      "gloutons et dragons",
+      "던전밥",
+      "สูตรลับตำรับดันเจียน",
+      "mỹ vị hầm ngục",
+      "підземелля смакоти",
+      "迷宫饭",
+      "מבוכים ומטעמים",
+      "dunmeshi",
+      "labužníci v kobce",
+      "طعام الدهليز اللذيذ"
+    ]
+  },
+  {
+    "id": "anime_97938",
+    "title": "Боруто: Новое поколение Наруто",
+    "canonical": "Боруто: Новое поколение Наруто",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/97938-cT6wkSRifTEC.jpg",
+    "genres": "Экшен, Приключения, Фэнтези",
+    "year": "2017",
+    "season": "Весна 2017",
+    "answers": [
+      "боруто",
+      "boruto",
+      "новое поколение",
+      "boruto: naruto next generations",
+      "博人传 火影忍者新时代",
+      "โบรูโตะ: นารูโตะ เน็กซ์ เจนเนเรชั่น",
+      "بوروتو: الأجيال القادمة من ناروتو"
+    ]
+  },
+  {
+    "id": "anime_113717",
+    "title": "Рейтинг королей",
+    "canonical": "Рейтинг королей",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/113717-XFiGSPtNJQWv.jpg",
+    "genres": "Экшен, Приключения, Драма, Фэнтези",
+    "year": "2021",
+    "season": "Осень 2021",
+    "answers": [
+      "рейтинг королей",
+      "ranking of kings",
+      "ousama ranking",
+      "боджи",
+      "кагэ",
+      "king ranking",
+      "อันดับพระราชา",
+      "تصنيف الملوك",
+      "國王排名"
+    ]
+  },
+  {
+    "id": "anime_131646",
+    "title": "Мемуары Ванитаса",
+    "canonical": "Мемуары Ванитаса",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/131646-ewbYrSfyUyp6.jpg",
+    "genres": "Экшен, Драма, Фэнтези, Детектив",
+    "year": "2021",
+    "season": "Лето 2021",
+    "answers": [
+      "мемуары ванитаса",
+      "the case study of vanitas",
+      "vanitas no carte",
+      "ванитас",
+      "ное",
+      "vanitas no karte",
+      "les mémoires de vanitas",
+      "瓦尼塔斯的手记",
+      "บันทึกแวมไพร์วานิทัส"
+    ]
+  },
+  {
+    "id": "anime_101004",
+    "title": "Повелитель тьмы: Другая история мира",
+    "canonical": "Повелитель тьмы: Другая история мира",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/101004-D0uuwlijGA0y.jpg",
+    "genres": "Комедия, Ecchi, Фэнтези",
+    "year": "2018",
+    "season": "Лето 2018",
+    "answers": [
+      "повелитель тьмы другая история мира",
+      "how not to summon a demon lord",
+      "диабло",
+      "isekai maou to shoukan shoujo no dorei majutsu",
+      "the king of darkness another world story",
+      "异世界魔王与召唤少女的奴隶魔术",
+      "จอมมารต่างโลกกับ บริวารสาวนักอัญเชิญ",
+      "異世界魔王與召喚少女的奴隸魔術"
+    ]
+  },
+  {
+    "id": "anime_105156",
+    "title": "Этот герой неуязвим, но очень осторожен",
+    "canonical": "Этот герой неуязвим, но очень осторожен",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/105156-AER446HoeuJZ.jpg",
+    "genres": "Экшен, Приключения, Комедия, Фэнтези",
+    "year": "2019",
+    "season": "Осень 2019",
+    "answers": [
+      "этот герой неуязвим но очень осторожен",
+      "cautious hero",
+      "сейя",
+      "ристарте",
+      "cautious hero: the hero is overpowered but overly cautious",
+      "shinchou yuusha: kono yuusha ga ore tueee kuse ni shinchou sugiru",
+      "this hero is invincible but \"too cautious\"",
+      "shinchou yuusha",
+      "慎重勇者～这个勇者明明超强却过分慎重～",
+      "ผู้กล้าสุดแกร่ง ขี้ระแวงขั้นวิกฤติ"
+    ]
+  },
+  {
+    "id": "anime_339",
+    "title": "Эксперименты Лэйн",
+    "canonical": "Эксперименты Лэйн",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/339-Lh0tuuwRLRgI.jpg",
+    "genres": "Драма, Детектив, Психологическое, Фантастика",
+    "year": "1998",
+    "season": "Лето 1998",
+    "answers": [
+      "эксперименты лэйн",
+      "serial experiments lain",
+      "лэйн",
+      "シリアルエクスペリメンツレイン",
+      "wirtualna lain"
+    ]
+  },
+  {
+    "id": "anime_6880",
+    "title": "Страна чудес смертников",
+    "canonical": "Страна чудес смертников",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/6880-eq4JajOW0HOd.jpg",
+    "genres": "Экшен, Драма, Фантастика, Сверхъестественное",
+    "year": "2011",
+    "season": "Весна 2011",
+    "answers": [
+      "страна чудес смертников",
+      "deadman wonderland",
+      "ганта",
+      "сиро"
+    ]
+  },
+  {
+    "id": "anime_16592",
+    "title": "Данганронпа: Школа надежды и безнадёжные школьники",
+    "canonical": "Данганронпа: Школа надежды и безнадёжные школьники",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/16592-tcRpZFHvgZjb.jpg",
+    "genres": "Ужасы, Детектив, Психологическое, Фантастика",
+    "year": "2013",
+    "season": "Лето 2013",
+    "answers": [
+      "данганронпа",
+      "danganronpa",
+      "монокума",
+      "макото наэги",
+      "danganronpa: the animation",
+      "danganronpa: kibou no gakuen to zetsubou no koukousei - the animation",
+      "ダンガンロンパ the animation",
+      "danganronpa: academy of hope and high school students of despair the animation",
+      "danganronpa: sekolah harapan dan murid yang putus asa"
+    ]
+  },
+  {
+    "id": "anime_155783",
+    "title": "Иллюзия рая (Великая небесная стена)",
+    "canonical": "Иллюзия рая (Великая небесная стена)",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/155783-MXHfdquIBoHA.jpg",
+    "genres": "Приключения, Детектив, Фантастика, Триллер",
+    "year": "2023",
+    "season": "Весна 2023",
+    "answers": [
+      "иллюзия рая",
+      "великая небесная стена",
+      "tengoku daimakyo",
+      "мару",
+      "кируко",
+      "tengoku daimakyou",
+      "heavenly delusion",
+      "tengoku-daimakyo: ilusão celestial",
+      "ถ้ำปีศาจแดนสวรรค์"
+    ]
+  },
+  {
+    "id": "anime_100977",
+    "title": "Клетки за работой!",
+    "canonical": "Клетки за работой!",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/n100977-IztHpiaTckCh.jpg",
+    "genres": "Экшен, Комедия, Фантастика",
+    "year": "2018",
+    "season": "Лето 2018",
+    "answers": [
+      "клетки за работой",
+      "cells at work",
+      "hataraku saibou",
+      "эритроцит",
+      "лейкоцит",
+      "cells at work!",
+      "les brigades immunitaires",
+      "เซลล์ขยัน พันธุ์เดือด",
+      "lavori in corpo",
+      "клетки за работой!"
+    ]
+  },
+  {
+    "id": "anime_849",
+    "title": "Меланхолия Харухи Судзумии",
+    "canonical": "Меланхолия Харухи Судзумии",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/849-Cey4HHIDoeY2.jpg",
+    "genres": "Комедия, Детектив, Фантастика, Повседневность",
+    "year": "2006",
+    "season": "Весна 2006",
+    "answers": [
+      "меланхолия харухи судзумии",
+      "the melancholy of haruhi suzumiya",
+      "харухи",
+      "кён",
+      "suzumiya haruhi no yuuutsu",
+      "la malinconia di haruhi suzumiya",
+      "凉宫春日的忧郁",
+      "la mélancolie de haruhi suzumiya",
+      "melancholia haruhi suzumiyi"
+    ]
+  },
+  {
+    "id": "anime_4654",
+    "title": "Индекс волшебства",
+    "canonical": "Индекс волшебства",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/4654-YLc90XaeWvPb.jpg",
+    "genres": "Экшен, Фантастика, Сверхъестественное",
+    "year": "2008",
+    "season": "Осень 2008",
+    "answers": [
+      "индекс волшебства",
+      "a certain magical index",
+      "тома камидзё",
+      "индекс",
+      "toaru majutsu no index",
+      "toaru majutsu no kinsho mokuroku",
+      "אינדקס הקסומה",
+      "魔法禁书目录",
+      "فهرس السحر",
+      "อินเดกซ์คัมภีร์คาถาต้องห้าม",
+      "cấm thư ma thuật index",
+      "μία κάποια μαγική καλόγρια"
+    ]
+  },
+  {
+    "id": "anime_151970",
+    "title": "Рубеж Шангри-Ла: Любитель говноигр бросает вызов топ-игре",
+    "canonical": "Рубеж Шангри-Ла: Любитель говноигр бросает вызов топ-игре",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/151970-Tnnfp0f7NOzj.jpg",
+    "genres": "Экшен, Приключения, Комедия, Фэнтези",
+    "year": "2023",
+    "season": "Осень 2023",
+    "answers": [
+      "рубеж шангри ла",
+      "shangri la frontier",
+      "сунраку",
+      "ракуро",
+      "shangri-la frontier",
+      "shanfro",
+      "シャンフロ",
+      "シャングリラ・フロンティア〜クソゲーハンター, 神ゲーに挑まんとす〜",
+      "shangri-la frontier: kusoge hunter, kami ge ni idoman to su",
+      "shangri-la frontier ～เมื่อนักล่าเกมขยะท้าสู้ในเกมเทพ～",
+      "рубеж шангри-ла",
+      "thợ săn game rác thách thức game cấp thánh"
+    ]
+  },
+  {
+    "id": "anime_128546",
+    "title": "Виви: Песнь флюоритового глаза",
+    "canonical": "Виви: Песнь флюоритового глаза",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/128546-V5KVgbzQwFYm.jpg",
+    "genres": "Экшен, Драма, Музыка, Фантастика",
+    "year": "2021",
+    "season": "Весна 2021",
+    "answers": [
+      "виви песнь флюоритового глаза",
+      "vivy fluorite eyes song",
+      "виви",
+      "мацумото",
+      "vivy -fluorite eye's song-",
+      "vivy: fluorite eye’s song",
+      "ヴィヴィ -フローライトアイズソング-",
+      "วีวี่ บทเพลงจักรกลกู้ศตวรรษ"
+    ]
+  },
+  {
+    "id": "anime_13125",
+    "title": "Из нового света",
+    "canonical": "Из нового света",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/13125.jpg",
+    "genres": "Драма, Ужасы, Детектив, Психологическое",
+    "year": "2012",
+    "season": "Осень 2012",
+    "answers": [
+      "из нового света",
+      "from the new world",
+      "shinsekai yori",
+      "саки",
+      "shin sekai yori",
+      "del nuevo mundo"
+    ]
+  },
+  {
+    "id": "anime_97922",
+    "title": "Инуясики",
+    "canonical": "Инуясики",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/97922-j6ba0Zmq8xOa.jpg",
+    "genres": "Экшен, Драма, Психологическое, Фантастика",
+    "year": "2017",
+    "season": "Осень 2017",
+    "answers": [
+      "инуясики",
+      "inuyashiki",
+      "ичиро",
+      "inuyashiki last hero",
+      "اینو یاشیکی",
+      "อินุยาชิกิ",
+      "犬屋敷"
+    ]
+  },
+  {
+    "id": "anime_105190",
+    "title": "Игра Дарвина",
+    "canonical": "Игра Дарвина",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/105190-HhqT6N5MJCpE.jpg",
+    "genres": "Экшен, Детектив, Фантастика, Триллер",
+    "year": "2020",
+    "season": "Зима 2020",
+    "answers": [
+      "игра дарвина",
+      "darwins game",
+      "канамэ",
+      "darwin's game",
+      "达尔文游戏"
+    ]
+  },
+  {
+    "id": "anime_6",
+    "title": "Триган",
+    "canonical": "Триган",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/6-4pIR2RY8AHZ0.jpg",
+    "genres": "Экшен, Приключения, Комедия, Драма",
+    "year": "1998",
+    "season": "Весна 1998",
+    "answers": [
+      "триган",
+      "trigun",
+      "вэш ураган",
+      "вэш",
+      "トライガン",
+      "ไทรกัน"
+    ]
+  },
+  {
+    "id": "anime_14345",
+    "title": "Бтууум!",
+    "canonical": "Бтууум!",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/14345-e2mFB7Z21V8s.jpg",
+    "genres": "Экшен, Психологическое, Фантастика",
+    "year": "2012",
+    "season": "Осень 2012",
+    "answers": [
+      "бтууум",
+      "btooom",
+      "рёта",
+      "btooom!"
+    ]
+  },
+  {
+    "id": "anime_116566",
+    "title": "Акудама Драйв",
+    "canonical": "Акудама Драйв",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/116566-XwsHAwTxbXmC.jpg",
+    "genres": "Экшен, Драма, Фантастика, Триллер",
+    "year": "2020",
+    "season": "Осень 2020",
+    "answers": [
+      "акудама драйв",
+      "akudama drive",
+      "мошенница",
+      "курьер",
+      "아쿠다마 드라이브"
+    ]
+  },
+  {
+    "id": "anime_114888",
+    "title": "Богатый детектив. Баланс: Неограничен",
+    "canonical": "Богатый детектив. Баланс: Неограничен",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/114888-YVXJvMnuWCDb.jpg",
+    "genres": "Экшен, Комедия, Детектив, Фантастика",
+    "year": "2020",
+    "season": "Весна 2020",
+    "answers": [
+      "богатый детектив",
+      "the millionaire detective",
+      "дайске камбе",
+      "the millionaire detective - balance: unlimited",
+      "fugou keiji: balance:unlimited"
+    ]
+  },
+  {
+    "id": "anime_790",
+    "title": "Эрго Прокси",
+    "canonical": "Эрго Прокси",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/790.jpg",
+    "genres": "Приключения, Детектив, Психологическое, Фантастика",
+    "year": "2006",
+    "season": "Зима 2006",
+    "answers": [
+      "эрго прокси",
+      "ergo proxy",
+      "риэл мэйер",
+      "винсент ло",
+      "エルゴプラクシ",
+      "ארגו פרוקסי",
+      "ерго проксі"
+    ]
+  },
+  {
+    "id": "anime_6213",
+    "title": "Некий научный Рейлган",
+    "canonical": "Некий научный Рейлган",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/6213-utGqTxmP6U2F.jpg",
+    "genres": "Экшен, Фэнтези, Фантастика",
+    "year": "2009",
+    "season": "Осень 2009",
+    "answers": [
+      "некий научный рейлган",
+      "a certain scientific railgun",
+      "микото мисака",
+      "рейлган",
+      "toaru kagaku no railgun",
+      "toaru kagaku no choudenjihou",
+      "ריילגאן",
+      "المستوى الخامس",
+      "เรลกัน แฟ้มลับคดีวิทยาศาสตร์",
+      "เรลกัน แฟ้มลับคดีวิทยาศาสตร์ ภาคที่ 1",
+      "cấm thư ma thuật index ngoại truyện: siêu railgun khoa học",
+      "ένα κάποιο επιστημονικό υπερόπλο",
+      "科學超電磁砲",
+      "魔法禁書目錄外傳 科學超電磁砲"
+    ]
+  },
+  {
+    "id": "anime_100077",
+    "title": "Хинамацури",
+    "canonical": "Хинамацури",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/100077-XKMTrxaMGhBj.jpg",
+    "genres": "Комедия, Фантастика, Повседневность, Сверхъестественное",
+    "year": "2018",
+    "season": "Весна 2018",
+    "answers": [
+      "хинамацури",
+      "hinamatsuri",
+      "хина",
+      "нитта"
+    ]
+  },
+  {
+    "id": "anime_100298",
+    "title": "Мегалобокс",
+    "canonical": "Мегалобокс",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/100298-vOjmw7DvMns3.jpg",
+    "genres": "Экшен, Драма, Фантастика, Спорт",
+    "year": "2018",
+    "season": "Весна 2018",
+    "answers": [
+      "мегалобокс",
+      "megalobox",
+      "джанк дог",
+      "джо",
+      "megalo box"
+    ]
+  },
+  {
+    "id": "anime_99420",
+    "title": "Последнее путешествие девочек",
+    "canonical": "Последнее путешествие девочек",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/99420-wwjSxDuLveEu.jpg",
+    "genres": "Приключения, Фантастика, Повседневность",
+    "year": "2017",
+    "season": "Осень 2017",
+    "answers": [
+      "последнее путешествие девочек",
+      "girls last tour",
+      "чито",
+      "юри",
+      "girls' last tour",
+      "shoujo shuumatsu ryokou",
+      "少女终末旅行",
+      "glt",
+      "wisata gadis di akhir hayat"
+    ]
+  },
+  {
+    "id": "anime_132126",
+    "title": "Сонни Бой",
+    "canonical": "Сонни Бой",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/132126-urIgfuSxmxza.jpg",
+    "genres": "Драма, Детектив, Психологическое, Фантастика",
+    "year": "2021",
+    "season": "Лето 2021",
+    "answers": [
+      "сонни бой",
+      "sonny boy",
+      "нагара",
+      "サニーボーイ",
+      "ซันนีบอย"
+    ]
+  },
+  {
+    "id": "anime_154116",
+    "title": "Нежить и неудача",
+    "canonical": "Нежить и неудача",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/154116-dFaciqCd2pZU.jpg",
+    "genres": "Экшен, Комедия, Фантастика, Сверхъестественное",
+    "year": "2023",
+    "season": "Осень 2023",
+    "answers": [
+      "нежить и неудача",
+      "undead unluck",
+      "энди",
+      "фуко",
+      "אל-מת ובלי מזל"
+    ]
+  },
+  {
+    "id": "anime_110350",
+    "title": "ID: Захвачен",
+    "canonical": "ID: Захвачен",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/110350-kJfEuQ4Cx4j1.jpg",
+    "genres": "Драма, Детектив, Психологическое, Фантастика",
+    "year": "2020",
+    "season": "Зима 2020",
+    "answers": [
+      "id захвачен",
+      "id invaded",
+      "сакаидо",
+      "id: invaded",
+      "异度侵入 id:invaded"
+    ]
+  },
+  {
+    "id": "anime_116588",
+    "title": "Комбатанты будут высланы!",
+    "canonical": "Комбатанты будут высланы!",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/116588-IZGB8DLUWPOs.jpg",
+    "genres": "Экшен, Приключения, Комедия, Ecchi",
+    "year": "2021",
+    "season": "Весна 2021",
+    "answers": [
+      "комбатанты будут высланы",
+      "combatants will be dispatched",
+      "номер 6",
+      "combatants will be dispatched!",
+      "sentouin, hakenshimasu!",
+      "kombattanten werden entsandt!",
+      "战斗员派遣中！",
+      "นักรบสายป่วนออกปฏิบัติกวน",
+      "les combattants seront déployés !"
+    ]
+  },
+  {
+    "id": "anime_145665",
+    "title": "Ниер: Автомата — Версия 1.1а",
+    "canonical": "Ниер: Автомата — Версия 1.1а",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/145665-pbXoaav2n51N.jpg",
+    "genres": "Экшен, Драма, Фэнтези, Детектив",
+    "year": "2023",
+    "season": "Зима 2023",
+    "answers": [
+      "ниер автомата",
+      "nier automata",
+      "2b",
+      "9s",
+      "nier:automata ver1.1a",
+      "ニーア オートマタ",
+      "nier automata ver1.1a",
+      "giải cứu địa cầu"
+    ]
+  },
+  {
+    "id": "anime_20849",
+    "title": "Пожиратель богов",
+    "canonical": "Пожиратель богов",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/20849-w4KnIo3OfMx1.jpg",
+    "genres": "Экшен, Фантастика",
+    "year": "2015",
+    "season": "Лето 2015",
+    "answers": [
+      "пожиратель богов",
+      "god eater",
+      "ленка",
+      "ゴッドイーター"
+    ]
+  },
+  {
+    "id": "anime_99424",
+    "title": "Гридмен",
+    "canonical": "Гридмен",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/99424-siL3zkjLWjUc.jpg",
+    "genres": "Экшен, Меха, Фантастика",
+    "year": "2018",
+    "season": "Осень 2018",
+    "answers": [
+      "гридмен",
+      "gridman",
+      "ssss gridman",
+      "юта",
+      "ssss.gridman"
+    ]
+  },
+  {
+    "id": "anime_107663",
+    "title": "Астра, затерянная в космосе",
+    "canonical": "Астра, затерянная в космосе",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/107663-tIwWetvU4k6W.jpg",
+    "genres": "Приключения, Детектив, Фантастика",
+    "year": "2019",
+    "season": "Лето 2019",
+    "answers": [
+      "астра затерянная в космосе",
+      "astra lost in space",
+      "каната",
+      "ариес",
+      "kanata no astra"
+    ]
+  },
+  {
+    "id": "anime_20632",
+    "title": "Альдноа.Зеро",
+    "canonical": "Альдноа.Зеро",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/20632.jpg",
+    "genres": "Экшен, Меха, Фантастика",
+    "year": "2014",
+    "season": "Лето 2014",
+    "answers": [
+      "альдноа зеро",
+      "aldnoah zero",
+      "инахо",
+      "слэйн",
+      "aldnoah.zero",
+      "a/z",
+      "aldnoah.zero: let justice be done, though the heavens fall."
+    ]
+  },
+  {
+    "id": "anime_10161",
+    "title": "Шестая зона",
+    "canonical": "Шестая зона",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/10161-GbnVZzkRxwU2.jpg",
+    "genres": "Экшен, Драма, Психологическое, Фантастика",
+    "year": "2011",
+    "season": "Лето 2011",
+    "answers": [
+      "шестая зона",
+      "no 6",
+      "сион",
+      "нэдзуми",
+      "no.6",
+      "ナンバー・シックス"
+    ]
+  },
+  {
+    "id": "anime_101281",
+    "title": "Кэрол и Тьюсдей",
+    "canonical": "Кэрол и Тьюсдей",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/101281-omdu2Vio02xt.jpg",
+    "genres": "Драма, Музыка, Фантастика",
+    "year": "2019",
+    "season": "Весна 2019",
+    "answers": [
+      "кэрол и тьюсдей",
+      "carole and tuesday",
+      "кэрол",
+      "тьюсдей",
+      "carole & tuesday",
+      "c&t",
+      "carole y tuesday",
+      "عشق الموسيقى",
+      "แครอลกับทูสเดย์"
+    ]
+  },
+  {
+    "id": "anime_110353",
+    "title": "Дека-данс",
+    "canonical": "Дека-данс",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/110353-ZKkmemQSFP7L.jpg",
+    "genres": "Экшен, Приключения, Фантастика",
+    "year": "2020",
+    "season": "Лето 2020",
+    "answers": [
+      "дека данс",
+      "deca dence",
+      "кабураги",
+      "нацумэ",
+      "deca-dence"
+    ]
+  },
+  {
+    "id": "anime_71",
+    "title": "Стальная тревога!",
+    "canonical": "Стальная тревога!",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/71-vSM3St7ZNwju.png",
+    "genres": "Экшен, Комедия, Меха, Фантастика",
+    "year": "2002",
+    "season": "Зима 2002",
+    "answers": [
+      "стальная тревога",
+      "full metal panic",
+      "сосуке сагара",
+      "канаме чидори",
+      "full metal panic!",
+      "fmp",
+      "furumeta"
+    ]
+  },
+  {
+    "id": "anime_108463",
+    "title": "Туалетный мальчик Ханако",
+    "canonical": "Туалетный мальчик Ханако",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/108463-pJ5XS6oJwvKh.jpg",
+    "genres": "Экшен, Комедия, Драма, Детектив",
+    "year": "2020",
+    "season": "Зима 2020",
+    "answers": [
+      "туалетный мальчик ханако",
+      "toilet bound hanako kun",
+      "ханако",
+      "нене ясиро",
+      "toilet-bound hanako-kun",
+      "jibaku shounen hanako-kun",
+      "지박소년 하나코 군",
+      "地缚少年花子君",
+      "hanako-kun e os mistérios do colégio kamone",
+      "ฮานาโกะคุง วิญญาณติดที่"
+    ]
+  },
+  {
+    "id": "anime_129201",
+    "title": "Летнее время",
+    "canonical": "Летнее время",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/129201-eeCsKFrCSQPS.jpg",
+    "genres": "Экшен, Драма, Детектив, Сверхъестественное",
+    "year": "2022",
+    "season": "Весна 2022",
+    "answers": [
+      "летнее время",
+      "summer time rendering",
+      "симпэй",
+      "усио",
+      "summer time render",
+      "summertime render",
+      "ปริศนาบ้านเก่า เงามรณะ",
+      "a ilha das sombras",
+      "夏日重现",
+      "la isla de las sombras",
+      "tajemnica wyspy",
+      "לעבור את הקיץ",
+      "bright sun – dark shadows"
+    ]
+  },
+  {
+    "id": "anime_457",
+    "title": "Мастер Муси",
+    "canonical": "Мастер Муси",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/n457-sWOJfqYC7s2I.jpg",
+    "genres": "Приключения, Фэнтези, Детектив, Психологическое",
+    "year": "2005",
+    "season": "Осень 2005",
+    "answers": [
+      "мастер муси",
+      "mushishi",
+      "гинко",
+      "mushi-shi",
+      "מושישי",
+      "กีฏจารย์กับอาถรรพ์แมลงพิสดาร",
+      "мастер муши"
+    ]
+  },
+  {
+    "id": "anime_105228",
+    "title": "Дорохедоро",
+    "canonical": "Дорохедоро",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/105228-QBAya2q8SP52.jpg",
+    "genres": "Экшен, Приключения, Комедия, Фэнтези",
+    "year": "2020",
+    "season": "Зима 2020",
+    "answers": [
+      "дорохедоро",
+      "dorohedoro",
+      "кайман",
+      "никайдо",
+      "دوروهيدورو",
+      "สาปพันธุ์อสูร"
+    ]
+  },
+  {
+    "id": "anime_2251",
+    "title": "Шумиха! (Баккано!)",
+    "canonical": "Шумиха! (Баккано!)",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/2251-FVSbYyJhQPj2.jpg",
+    "genres": "Экшен, Детектив, Сверхъестественное",
+    "year": "2007",
+    "season": "Лето 2007",
+    "answers": [
+      "шумиха",
+      "баккано",
+      "baccano",
+      "айзек",
+      "мирия",
+      "baccano!"
+    ]
+  },
+  {
+    "id": "anime_114124",
+    "title": "Патриотизм Мориарти",
+    "canonical": "Патриотизм Мориарти",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/114124-44utnIatIX16.jpg",
+    "genres": "Драма, Детектив, Психологическое, Триллер",
+    "year": "2020",
+    "season": "Осень 2020",
+    "answers": [
+      "патриотизм мориарти",
+      "moriarty the patriot",
+      "вильям джеймс мориарти",
+      "шерлок",
+      "yuukoku no moriarty",
+      "มอริอาร์ตี้ผู้รักชาติ"
+    ]
+  },
+  {
+    "id": "anime_103632",
+    "title": "Да, я паук, и что с того?",
+    "canonical": "Да, я паук, и что с того?",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/103632-N4ssExnvLw74.jpg",
+    "genres": "Экшен, Приключения, Комедия, Фэнтези",
+    "year": "2021",
+    "season": "Зима 2021",
+    "answers": [
+      "да я паук и что с того",
+      "so im a spider so what",
+      "кумоко",
+      "so i'm a spider, so what?",
+      "kumo desu ga, nani ka?",
+      "转生成蜘蛛又怎样！",
+      "حسنا أنا عنكبوت، ماذا في ذلك؟",
+      "แมงมุมแล้วไง ข้องใจเหรอคะ",
+      "tôi là nhện đấy, có sao không?"
+    ]
+  },
+  {
+    "id": "anime_108241",
+    "title": "Глейпнир",
+    "canonical": "Глейпнир",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/108241-Cbfv8GHRMFoQ.jpg",
+    "genres": "Экшен, Ecchi, Детектив, Сверхъестественное",
+    "year": "2020",
+    "season": "Весна 2020",
+    "answers": [
+      "глейпнир",
+      "gleipnir",
+      "сюити",
+      "клэр",
+      "格莱普尼尔"
+    ]
+  },
+  {
+    "id": "anime_128547",
+    "title": "Необычное такси",
+    "canonical": "Необычное такси",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/128547-aVWJmZz9dwJJ.jpg",
+    "genres": "Драма, Детектив, Психологическое, Триллер",
+    "year": "2021",
+    "season": "Весна 2021",
+    "answers": [
+      "необычное такси",
+      "odd taxi",
+      "одокава",
+      "oddtaxi"
+    ]
+  },
+  {
+    "id": "anime_20955",
+    "title": "Герои шести лепестков",
+    "canonical": "Герои шести лепестков",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/20955-v7GKIwKsq99g.jpg",
+    "genres": "Экшен, Приключения, Фэнтези, Детектив",
+    "year": "2015",
+    "season": "Лето 2015",
+    "answers": [
+      "герои шести лепестков",
+      "rokka no yuusha",
+      "адлет майер",
+      "rokka -braves of the six flowers-",
+      "ผู้กล้าแห่งบุปผา"
+    ]
+  },
+  {
+    "id": "anime_323",
+    "title": "Агент паранойи",
+    "canonical": "Агент паранойи",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/323-tQCOVrhiRgeU.jpg",
+    "genres": "Драма, Детектив, Психологическое, Сверхъестественное",
+    "year": "2004",
+    "season": "Зима 2004",
+    "answers": [
+      "агент паранойи",
+      "paranoia agent",
+      "сёнэн бат",
+      "mousou dairinin"
+    ]
+  },
+  {
+    "id": "anime_114085",
+    "title": "Инцидент Кэмоно",
+    "canonical": "Инцидент Кэмоно",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/114085-kIiJwfwnY1qL.jpg",
+    "genres": "Экшен, Драма, Детектив, Сверхъестественное",
+    "year": "2021",
+    "season": "Зима 2021",
+    "answers": [
+      "инцидент кэмоно",
+      "kemono jihen",
+      "кабанэ",
+      "けものじへん",
+      "monster incidents",
+      "kemono incidents",
+      "คดีประหลาดคนปีศาจ"
+    ]
+  },
+  {
+    "id": "anime_20754",
+    "title": "Школьная жизнь!",
+    "canonical": "Школьная жизнь!",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/20754-Hwnbsm4uaVFD.jpg",
+    "genres": "Ужасы, Детектив, Психологическое, Повседневность",
+    "year": "2015",
+    "season": "Лето 2015",
+    "answers": [
+      "школьная жизнь",
+      "school live",
+      "юки таякэ",
+      "school-live!",
+      "gakkou gurashi!"
+    ]
+  },
+  {
+    "id": "anime_117343",
+    "title": "Бездарная Нана",
+    "canonical": "Бездарная Нана",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/117343-w0m2gfOlQphZ.jpg",
+    "genres": "Драма, Ужасы, Детектив, Психологическое",
+    "year": "2020",
+    "season": "Осень 2020",
+    "answers": [
+      "бездарная нана",
+      "talentless nana",
+      "нана хиираги",
+      "munou na nana"
+    ]
+  },
+  {
+    "id": "anime_21341",
+    "title": "Получеловек (Аджин)",
+    "canonical": "Получеловек (Аджин)",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/21341-v415m6GrpeZY.jpg",
+    "genres": "Экшен, Ужасы, Детектив, Сверхъестественное",
+    "year": "2016",
+    "season": "Зима 2016",
+    "answers": [
+      "получеловек",
+      "аджин",
+      "ajin",
+      "кей нагаи",
+      "ajin: demi-human",
+      "ajin: semihumano",
+      "อาจิน สายพันธุ์อมนุษย์",
+      "أجين: أنصاف البشر"
+    ]
+  },
+  {
+    "id": "anime_146493",
+    "title": "Рагна Багровый",
+    "canonical": "Рагна Багровый",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/146493-V7hmee4h79hd.jpg",
+    "genres": "Экшен, Приключения, Фэнтези, Детектив",
+    "year": "2023",
+    "season": "Осень 2023",
+    "answers": [
+      "рагна багровый",
+      "ragna crimson",
+      "рагна",
+      "багряный",
+      "ตำนานนักล่ามังกร"
+    ]
+  },
+  {
+    "id": "anime_130003",
+    "title": "Одинокий рокер!",
+    "canonical": "Одинокий рокер!",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/130003-5F90a7BtsPQN.jpg",
+    "genres": "Комедия, Музыка, Повседневность",
+    "year": "2022",
+    "season": "Осень 2022",
+    "answers": [
+      "одинокий рокер",
+      "bocchi the rock",
+      "ботти за рок",
+      "боччи",
+      "хитори гото",
+      "bocchi the rock!",
+      "рок-тихоня!",
+      "บจจิเดอะร็อก!",
+      "孤獨搖滾！",
+      "孤独摇滚！",
+      "외톨이 the rock!",
+      "봇치 더 록!",
+      "btr"
+    ]
+  },
+  {
+    "id": "anime_159831",
+    "title": "Предсмертный список зомби",
+    "canonical": "Предсмертный список зомби",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/159831-FWfdyqpxhLli.jpg",
+    "genres": "Экшен, Приключения, Комедия, Ужасы",
+    "year": "2023",
+    "season": "Лето 2023",
+    "answers": [
+      "предсмертный список зомби",
+      "zom 100",
+      "зом 100",
+      "акира",
+      "zom 100: bucket list of the dead",
+      "zom 100: zombie ni naru made ni shitai 100 no koto",
+      "zombie 100 ~100 things i want to do before i become a zombie~",
+      "zombie 100 ~zombie ni naru made ni shitai 100 no koto~",
+      "100 สิ่งที่อยากทำก่อนจะกลายเป็นซอมบี้",
+      "зомби-апокалипсис и 100 предсмертных дел",
+      "100 coisas para fazer antes de virar zumbi"
+    ]
+  },
+  {
+    "id": "anime_20727",
+    "title": "Фронт кровавой блокады",
+    "canonical": "Фронт кровавой блокады",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/20727-jcGXKLo3lLDP.jpg",
+    "genres": "Экшен, Комедия, Сверхъестественное",
+    "year": "2015",
+    "season": "Весна 2015",
+    "answers": [
+      "фронт кровавой блокады",
+      "kekkai sensen",
+      "blood blockade battlefront",
+      "лео"
+    ]
+  },
+  {
+    "id": "anime_124153",
+    "title": "Скейт: Бесконечность",
+    "canonical": "Скейт: Бесконечность",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/124153-tEEm1Zaoqa58.jpg",
+    "genres": "Экшен, Драма, Спорт",
+    "year": "2021",
+    "season": "Зима 2021",
+    "answers": [
+      "скейт бесконечность",
+      "sk8 the infinity",
+      "sk8",
+      "рэки",
+      "ланга",
+      "sk∞",
+      "sk eight",
+      "เอสเคเอท สเกตบอร์ดล้างเมือง",
+      "hội thanh niên lướt ván sk∞",
+      "ski tak terbatas sk∞"
+    ]
+  },
+  {
+    "id": "anime_18507",
+    "title": "Вольный стиль!",
+    "canonical": "Вольный стиль!",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/18507-2Qs2vdJwjEiP.jpg",
+    "genres": "Комедия, Драма, Повседневность, Спорт",
+    "year": "2013",
+    "season": "Лето 2013",
+    "answers": [
+      "вольный стиль",
+      "free",
+      "фри",
+      "харука",
+      "рин",
+      "free! -iwatobi swim club-",
+      "free!",
+      "フリー！"
+    ]
+  },
+  {
+    "id": "anime_20607",
+    "title": "Пинг-понг",
+    "canonical": "Пинг-понг",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/20607-AYghLMjh7reA.jpg",
+    "genres": "Драма, Психологическое, Спорт",
+    "year": "2014",
+    "season": "Весна 2014",
+    "answers": [
+      "пинг понг",
+      "ping pong the animation",
+      "пэко",
+      "смайл"
+    ]
+  },
+  {
+    "id": "anime_107226",
+    "title": "Насколько тяжёлые гантели ты сможешь поднять?",
+    "canonical": "Насколько тяжёлые гантели ты сможешь поднять?",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/107226-XD45KGeiZmNx.jpg",
+    "genres": "Комедия, Ecchi, Повседневность, Спорт",
+    "year": "2019",
+    "season": "Лето 2019",
+    "answers": [
+      "насколько тяжелые гантели",
+      "dumbbell nan kilo moteru",
+      "гантели",
+      "хибики",
+      "how heavy are the dumbbells you lift?",
+      "dumbbell nan kilo moteru?",
+      "how many kilograms are the dumbbells you lift?",
+      "danberu nan kiro moteru?",
+      "dumbbell : combien tu peux soulever ?",
+      "แก๊งสาวป่วน ก๊วนฟิตเนส"
+    ]
+  },
+  {
+    "id": "anime_185",
+    "title": "Инициал Ди",
+    "canonical": "Инициал Ди",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/185-Z724xydTic8N.jpg",
+    "genres": "Экшен, Драма, Спорт",
+    "year": "1998",
+    "season": "Весна 1998",
+    "answers": [
+      "инициал ди",
+      "initial d",
+      "такуми фудзивара",
+      "такуми",
+      "initial d 1st stage",
+      "inisharu di",
+      "イニシャルd"
+    ]
+  },
+  {
+    "id": "anime_21639",
+    "title": "Кейджо!!!!!!!!",
+    "canonical": "Кейджо!!!!!!!!",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/n21639-4w5iH0RUYIL6.jpg",
+    "genres": "Комедия, Ecchi, Спорт",
+    "year": "2016",
+    "season": "Осень 2016",
+    "answers": [
+      "кейджо",
+      "keijo",
+      "нозоми",
+      "keijo!!!!!!!!",
+      "hip whip girl"
+    ]
+  },
+  {
+    "id": "anime_101903",
+    "title": "Почувствуй ветер",
+    "canonical": "Почувствуй ветер",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/n101903-Jnoc7x0WFusx.jpg",
+    "genres": "Драма, Спорт",
+    "year": "2018",
+    "season": "Осень 2018",
+    "answers": [
+      "почувствуй ветер",
+      "run with the wind",
+      "kaze ga tsuyoku fuiteiru",
+      "какэру",
+      "хайдзи",
+      "kazetsuyo",
+      "в ногу с ветром"
+    ]
+  },
+  {
+    "id": "anime_134732",
+    "title": "Ао Аси",
+    "canonical": "Ао Аси",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/134732-yNshcZ5co1Lp.jpg",
+    "genres": "Драма, Спорт",
+    "year": "2022",
+    "season": "Весна 2022",
+    "answers": [
+      "ао аси",
+      "aoashi",
+      "асито аой",
+      "ао аши",
+      "aoashi แข็งเด็กหัวใจนักสู้",
+      "أواشي",
+      "ao ashi - playmaker"
+    ]
+  },
+  {
+    "id": "anime_98514",
+    "title": "Девушки-пони: Славное дерби",
+    "canonical": "Девушки-пони: Славное дерби",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/98514-0uYzay4a1iiL.jpg",
+    "genres": "Драма, Музыка, Повседневность, Спорт",
+    "year": "2018",
+    "season": "Весна 2018",
+    "answers": [
+      "девушки пони",
+      "umamusume",
+      "умами",
+      "спешл уик",
+      "umamusume: pretty derby",
+      "uma musume: pretty derby",
+      "สาวม้าโมเอะ"
+    ]
+  },
+  {
+    "id": "anime_14131",
+    "title": "Девушки и танки",
+    "canonical": "Девушки и танки",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/14131-hF210i7NqX0k.jpg",
+    "genres": "Экшен, Комедия, Спорт",
+    "year": "2012",
+    "season": "Осень 2012",
+    "answers": [
+      "девушки и танки",
+      "girls und panzer",
+      "панцер",
+      "михо",
+      "garupan",
+      "少女与战车",
+      "gup"
+    ]
+  },
+  {
+    "id": "anime_170",
+    "title": "Слэм-данк",
+    "canonical": "Слэм-данк",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/170-hCgzytQLmZdX.jpg",
+    "genres": "Комедия, Драма, Повседневность, Спорт",
+    "year": "1993",
+    "season": "Осень 1993",
+    "answers": [
+      "слэм данк",
+      "slam dunk",
+      "ханамити сакураги",
+      "сакураги",
+      "スラムダンク",
+      "슬램덩크",
+      "灌篮高手",
+      "灌籃高手",
+      "สแลมดังก์",
+      "سلام دانك"
+    ]
+  },
+  {
+    "id": "anime_18689",
+    "title": "Путь аса",
+    "canonical": "Путь аса",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/n18689-WxipDJ2OR7ph.jpg",
+    "genres": "Спорт",
+    "year": "2013",
+    "season": "Осень 2013",
+    "answers": [
+      "путь аса",
+      "ace of the diamond",
+      "diamond no ace",
+      "савамура",
+      "daiya no ace",
+      "ace of diamond",
+      "daiya no a"
+    ]
+  },
+  {
+    "id": "anime_100402",
+    "title": "Клуб стрельбы из лука (Цурунэ)",
+    "canonical": "Клуб стрельбы из лука (Цурунэ)",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/100402-RaD7hf6vOVVt.jpg",
+    "genres": "Драма, Повседневность, Спорт",
+    "year": "2018",
+    "season": "Осень 2018",
+    "answers": [
+      "клуб стрельбы из лука",
+      "цурунэ",
+      "tsurune",
+      "минато",
+      "tsurune: kazemai koukou kyuudou-bu",
+      "tsurune - il tiro che unisce"
+    ]
+  },
+  {
+    "id": "anime_101239",
+    "title": "Команда мечты (Небо Ахиру)",
+    "canonical": "Команда мечты (Небо Ахиру)",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/101239-3xMk1BuT06HX.jpg",
+    "genres": "Драма, Спорт",
+    "year": "2019",
+    "season": "Осень 2019",
+    "answers": [
+      "команда мечты",
+      "ahiru no sora",
+      "небо ахиру",
+      "со куруматани"
+    ]
+  },
+  {
+    "id": "anime_857",
+    "title": "Эйр Гир",
+    "canonical": "Эйр Гир",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/857-1N95wHWuA5gk.jpg",
+    "genres": "Экшен, Комедия, Ecchi, Спорт",
+    "year": "2006",
+    "season": "Весна 2006",
+    "answers": [
+      "эйр гир",
+      "air gear",
+      "икки"
+    ]
+  },
+  {
+    "id": "anime_5040",
+    "title": "Один на вылет",
+    "canonical": "Один на вылет",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/5040-DGZoPmQP7bV9.jpg",
+    "genres": "Психологическое, Спорт",
+    "year": "2008",
+    "season": "Осень 2008",
+    "answers": [
+      "один на вылет",
+      "one outs",
+      "токучи тоа",
+      "токучи",
+      "one outs - nobody wins, but i!"
+    ]
+  },
+  {
+    "id": "anime_18179",
+    "title": "Трусливый велосипедист",
+    "canonical": "Трусливый велосипедист",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/18179-WCCATFM18Jzo.jpg",
+    "genres": "Комедия, Драма, Спорт",
+    "year": "2013",
+    "season": "Осень 2013",
+    "answers": [
+      "трусливый велосипедист",
+      "yowamushi pedal",
+      "онода сакамичи",
+      "онода",
+      "yowapeda"
+    ]
+  },
+  {
+    "id": "anime_165171",
+    "title": "Медалистка",
+    "canonical": "Медалистка",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/165171-STWwuJVhlDsm.jpg",
+    "genres": "Драма, Психологическое, Спорт",
+    "year": "2025",
+    "season": "Зима 2025",
+    "answers": [
+      "медалистка",
+      "medalist",
+      "инори",
+      "цукаса",
+      "金牌得主"
+    ]
+  },
+  {
+    "id": "anime_287",
+    "title": "Боец Баки",
+    "canonical": "Боец Баки",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/287-iCmAPCmck31R.jpg",
+    "genres": "Экшен, Спорт",
+    "year": "2001",
+    "season": "Зима 2001",
+    "answers": [
+      "боец баки",
+      "baki the grappler",
+      "грапплер баки",
+      "баки",
+      "grappler baki (tv)",
+      "grappler baki tv"
+    ]
+  },
+  {
+    "id": "anime_22",
+    "title": "Принц тенниса",
+    "canonical": "Принц тенниса",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/22-wVJjA9tGMt4k.jpg",
+    "genres": "Экшен, Комедия, Спорт",
+    "year": "2001",
+    "season": "Осень 2001",
+    "answers": [
+      "принц тенниса",
+      "the prince of tennis",
+      "tennis no ouji sama",
+      "рёма этидзэн",
+      "tennis no ouji-sama"
+    ]
+  },
+  {
+    "id": "anime_143327",
+    "title": "МФ Призрак",
+    "canonical": "МФ Призрак",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/143327-9oKdfizmBzC7.jpg",
+    "genres": "Спорт",
+    "year": "2023",
+    "season": "Осень 2023",
+    "answers": [
+      "мф призрак",
+      "mf ghost",
+      "каната ривингтон",
+      "каната",
+      "燃油車鬥魂"
+    ]
+  },
+  {
+    "id": "anime_15",
+    "title": "Айшилд 21",
+    "canonical": "Айшилд 21",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/n15-1eTutXlxYzYl.jpg",
+    "genres": "Экшен, Комедия, Спорт",
+    "year": "2005",
+    "season": "Весна 2005",
+    "answers": [
+      "айшилд 21",
+      "eyeshield 21",
+      "сена кобаякава",
+      "хирума",
+      "eyeshield21"
+    ]
+  },
+  {
+    "id": "anime_14467",
+    "title": "Проект Кей",
+    "canonical": "Проект Кей",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/14467-jG939pd2036a.jpg",
+    "genres": "Экшен, Детектив, Сверхъестественное",
+    "year": "2012",
+    "season": "Осень 2012",
+    "answers": [
+      "проект кей",
+      "k project",
+      "широ",
+      "куро",
+      "k",
+      "k-project (k-プロジェクト)",
+      "k -eine weitere geschichte-"
+    ]
+  },
+  {
+    "id": "anime_177689",
+    "title": "Лето, когда умер Хикару",
+    "canonical": "Лето, когда умер Хикару",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/177689-hbCQDYraujAG.jpg",
+    "genres": "Ужасы, Детектив, Психологическое, Сверхъестественное",
+    "year": "2025",
+    "season": "Лето 2025",
+    "answers": [
+      "лето когда умер хикару",
+      "the summer hikaru died",
+      "hikaru ga shinda natsu",
+      "хикару",
+      "ёсики",
+      "lato, kiedy umarł hikaru",
+      "o verão em que hikaru morreu",
+      "صيف وفاة هيكارو",
+      "光死去的夏天",
+      "光逝去的夏天",
+      "der sommer, in dem hikaru starb",
+      "l'estate in cui hikaru è morto",
+      "히카루가 죽은 여름",
+      "el verano en que hikaru murió",
+      "หน้าร้อนที่ฮิคารุจากไป",
+      "лето, когда погас свет",
+      "léto, kdy umřel hikaru"
+    ]
+  },
+  {
+    "id": "anime_167336",
+    "title": "Лазарь",
+    "canonical": "Лазарь",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/167336-tDasHGggSBcH.jpg",
+    "genres": "Экшен, Фантастика, Триллер",
+    "year": "2025",
+    "season": "Весна 2025",
+    "answers": [
+      "лазарь",
+      "lazarus",
+      "аксель"
+    ]
+  },
+  {
+    "id": "anime_147103",
+    "title": "Мой счастливый брак",
+    "canonical": "Мой счастливый брак",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/147103-MwFq1R7jphZT.jpg",
+    "genres": "Драма, Романтика, Сверхъестественное",
+    "year": "2023",
+    "season": "Лето 2023",
+    "answers": [
+      "мой счастливый брак",
+      "my happy marriage",
+      "watashi no shiawase na kekkon",
+      "миё саймори",
+      "киёка",
+      "watakon",
+      "ขอให้รักเรานี้ได้มีความสุข",
+      "moje szczęśliwe małżeństwo",
+      "hôn nhân hạnh phúc của tôi",
+      "meu casamento feliz",
+      "il mio matrimonio felice",
+      "мій щасливий шлюб",
+      "mi feliz matrimonio",
+      "meine ganz besondere hochzeit",
+      "šťastně vdaná"
+    ]
+  },
+  {
+    "id": "anime_166794",
+    "title": "Любовь с кончиков пальцев",
+    "canonical": "Любовь с кончиков пальцев",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/166794-11TpGckiG12q.jpg",
+    "genres": "Романтика, Повседневность",
+    "year": "2024",
+    "season": "Зима 2024",
+    "answers": [
+      "любовь с кончиков пальцев",
+      "a sign of affection",
+      "yubisaki to renren",
+      "юки",
+      "ицуоми",
+      "ein zeichen der zuneigung",
+      "손끝과 연연",
+      "signos de afecto",
+      "кохання на кінчиках пальців",
+      "znaki naszych uczuć",
+      "cinta dan isyarat",
+      "жест беззаветной любви"
+    ]
+  },
+  {
+    "id": "anime_98202",
+    "title": "Луна прекрасна",
+    "canonical": "Луна прекрасна",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/98202-JlZYSjYB8pux.jpg",
+    "genres": "Драма, Романтика, Повседневность",
+    "year": "2017",
+    "season": "Весна 2017",
+    "answers": [
+      "луна прекрасна",
+      "tsuki ga kirei",
+      "цуки га кирей",
+      "котаро",
+      "акане",
+      "tsukigakirei",
+      "as the moon, so beautiful."
+    ]
+  },
+  {
+    "id": "anime_5231",
+    "title": "Одиннадцать молний (Инадзума 11)",
+    "canonical": "Одиннадцать молний (Инадзума 11)",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/5231-Ts5f27IliDgL.jpg",
+    "genres": "Драма, Спорт, Сверхъестественное",
+    "year": "2008",
+    "season": "Осень 2008",
+    "answers": [
+      "одиннадцать молний",
+      "инадзума 11",
+      "inazuma eleven",
+      "эндо",
+      "super onze",
+      "super once"
+    ]
+  },
+  {
+    "id": "anime_12883",
+    "title": "Рыбалка на озере Цуритама",
+    "canonical": "Рыбалка на озере Цуритама",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/12883-EWrrMyoL9Bju.jpg",
+    "genres": "Комедия, Фантастика, Повседневность, Спорт",
+    "year": "2012",
+    "season": "Весна 2012",
+    "answers": [
+      "цуритама",
+      "tsuritama",
+      "юки",
+      "хару"
+    ]
+  },
+  {
+    "id": "anime_125839",
+    "title": "Сальто назад!!",
+    "canonical": "Сальто назад!!",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/125839-aQwXi9tJ8Q4p.jpg",
+    "genres": "Комедия, Драма, Спорт",
+    "year": "2021",
+    "season": "Весна 2021",
+    "answers": [
+      "сальто назад",
+      "bakuten",
+      "шотаро",
+      "backflip!!",
+      "bakuten!!"
+    ]
+  },
+  {
+    "id": "anime_20475",
+    "title": "Выживание в клубе Сабагебу!",
+    "canonical": "Выживание в клубе Сабагебу!",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/20475-V4tqmd4HV6ki.jpg",
+    "genres": "Экшен, Комедия, Спорт",
+    "year": "2014",
+    "season": "Лето 2014",
+    "answers": [
+      "сабагебу",
+      "sabagebu",
+      "момока",
+      "sabagebu! - survival game club!",
+      "sabagebu!"
+    ]
+  },
+  {
+    "id": "anime_2402",
+    "title": "Завтрашний Джо",
+    "canonical": "Завтрашний Джо",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/2402-Uu2lAPxkPUeg.jpg",
+    "genres": "Экшен, Драма, Повседневность, Спорт",
+    "year": "1970",
+    "season": "Весна 1970",
+    "answers": [
+      "завтрашний джо",
+      "ashita no joe",
+      "джо ябуки",
+      "джо",
+      "tomorrow's joe",
+      "rocky joe",
+      "champion joe"
+    ]
+  },
+  {
+    "id": "anime_21578",
+    "title": "Дни (Дэйс)",
+    "canonical": "Дни (Дэйс)",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/21578-O4IItp3IybTn.jpg",
+    "genres": "Комедия, Драма, Спорт",
+    "year": "2016",
+    "season": "Лето 2016",
+    "answers": [
+      "дни",
+      "days",
+      "цукуси цукамото",
+      "デイズ"
+    ]
+  },
+  {
+    "id": "anime_100990",
+    "title": "Сумо Хиномару",
+    "canonical": "Сумо Хиномару",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/100990-9ccyloqa2AHb.jpg",
+    "genres": "Экшен, Спорт",
+    "year": "2018",
+    "season": "Осень 2018",
+    "answers": [
+      "сумо хиномару",
+      "hinomaru sumo",
+      "хиномару",
+      "hinomaru-zumou",
+      "ฮิโนะมารุ ซูโม่กะเปี๊ยกฟัดโลก"
+    ]
+  },
+  {
+    "id": "anime_120859",
+    "title": "Пылающий каббади",
+    "canonical": "Пылающий каббади",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/120859-xTEIbr5Y7A38.jpg",
+    "genres": "Экшен, Драма, Спорт",
+    "year": "2021",
+    "season": "Весна 2021",
+    "answers": [
+      "пылающий каббади",
+      "burning kabaddi",
+      "ёгоси",
+      "shakunetsu kabaddi",
+      "ดวลเดือด ชมรมกาบัดดี้"
+    ]
+  },
+  {
+    "id": "anime_21330",
+    "title": "Принц страйда: Альтернатива",
+    "canonical": "Принц страйда: Альтернатива",
+    "image_url": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/21330-nTgr7A0Kh2cw.jpg",
+    "genres": "Спорт",
+    "year": "2016",
+    "season": "Зима 2016",
+    "answers": [
+      "принц страйда",
+      "prince of stride",
+      "рику",
+      "такеру",
+      "prince of stride: alternative"
     ]
   }
 ]
