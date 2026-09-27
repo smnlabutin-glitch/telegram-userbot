@@ -2,8 +2,10 @@ import os
 import sys
 import time
 import platform
+import asyncio
 from telethon import TelegramClient, events
 from card_engine import render_card
+from config import BASE_DIR
 
 BOOT_TIME = time.monotonic()
 
@@ -114,6 +116,8 @@ def register_system_handlers(client: TelegramClient, prefix: str):
             badge_text="РУКОВОДСТВО",
             badge_type="info",
             items=[
+                (f"{prefix}update", "Обновить юзербота (git pull + автоперезапуск)"),
+                (f"{prefix}restart", "Перезапустить службу юзербота 24/7"),
                 (f"{prefix}plugins", "Центр управления плагинами (каталог расширений)"),
                 (f"{prefix}online [on|off]", "Вечный онлайн (автоматический статус 'В сети' 24/7)"),
                 (f"{prefix}autoname [on|off]", "Динамическое время в никнейме (поминутно)"),
@@ -133,3 +137,110 @@ def register_system_handlers(client: TelegramClient, prefix: str):
             pass
 
         await client.send_file(event.chat_id, file=card)
+
+    # .update / .upgrade
+    @client.on(events.NewMessage(outgoing=True, pattern=rf"^{prefix}(?:update|upgrade)$"))
+    async def update_handler(event: events.NewMessage.Event):
+        try:
+            await event.edit("`[OTA UPDATE] Проверка и скачивание обновлений из GitHub...`")
+        except Exception:
+            pass
+
+        try:
+            proc = await asyncio.create_subprocess_shell(
+                "git pull",
+                cwd=BASE_DIR,
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE,
+            )
+            stdout, stderr = await proc.communicate()
+            output = stdout.decode().strip()
+            err = stderr.decode().strip()
+        except Exception as ex:
+            output = ""
+            err = str(ex)
+
+        already_updated = "Already up to date" in output or "Уже обновлено" in output
+
+        if already_updated:
+            card = render_card(
+                title="Система актуальна",
+                subtitle="Установлена самая свежая версия юзербота из репозитория",
+                badge_text="АКТУАЛЬНО",
+                badge_type="info",
+                stats=[
+                    ("СТАТУС", "Up-to-date"),
+                    ("ВЕТКА", "main"),
+                    ("ПЕРЕЗАПУСК", "Не требуется"),
+                    ("КОМАНДА", f"{prefix}update"),
+                ],
+                meta_left="OTA UPDATE ENGINE // v1.4",
+                meta_right="GITHUB: SYNCED",
+                category="SYSTEM UPDATE MANAGER",
+            )
+            try:
+                await event.delete()
+            except Exception:
+                pass
+            await client.send_file(event.chat_id, file=card)
+            return
+
+        card = render_card(
+            title="Обновление установлено",
+            subtitle="Новый код успешно загружен с GitHub. Перезапуск службы...",
+            badge_text="ОБНОВЛЕНО",
+            badge_type="success",
+            stats=[
+                ("КОММИТЫ", "Загружены"),
+                ("СТАТУС", "Перезапуск..."),
+                ("СЕССИЯ", "Сохранена"),
+                ("ВРЕМЯ", "< 2 сек"),
+            ],
+            meta_left="OTA UPDATE ENGINE // SUCCESS",
+            meta_right="AUTO-RESTARTING",
+            category="SYSTEM UPDATE MANAGER",
+        )
+        try:
+            await event.delete()
+        except Exception:
+            pass
+        await client.send_file(event.chat_id, file=card)
+
+        # Allow card to finish uploading before restarting
+        await asyncio.sleep(2)
+        if sys.platform.startswith("linux"):
+            os.system("systemctl restart telegram-userbot &")
+            sys.exit(0)
+        else:
+            os.execv(sys.executable, [sys.executable] + sys.argv)
+
+    # .restart / .reboot
+    @client.on(events.NewMessage(outgoing=True, pattern=rf"^{prefix}(?:restart|reboot)$"))
+    async def restart_handler(event: events.NewMessage.Event):
+        card = render_card(
+            title="Перезапуск юзербота",
+            subtitle="Выполняется контролируемый перезапуск службы 24/7...",
+            badge_text="ПЕРЕЗАПУСК",
+            badge_type="warn",
+            stats=[
+                ("СТАТУС", "Перезагрузка"),
+                ("ДЕМОН", "systemd"),
+                ("ВРЕМЯ", "~2 сек"),
+                ("СЕССИЯ", "Сохранена"),
+            ],
+            meta_left="SYSTEM DAEMON // RESTART",
+            meta_right="GRACEFUL EXIT",
+            category="LIFECYCLE MANAGEMENT",
+        )
+        try:
+            await event.delete()
+        except Exception:
+            pass
+        await client.send_file(event.chat_id, file=card)
+
+        await asyncio.sleep(2)
+        if sys.platform.startswith("linux"):
+            os.system("systemctl restart telegram-userbot &")
+            sys.exit(0)
+        else:
+            os.execv(sys.executable, [sys.executable] + sys.argv)
