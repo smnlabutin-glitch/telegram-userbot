@@ -6,6 +6,7 @@ import re
 import asyncio
 import logging
 import urllib.request
+import urllib.error
 from typing import Dict, List, Set, Optional
 
 from telethon import TelegramClient, events
@@ -38,6 +39,7 @@ AUTHORIZED_CHATS: Set[int] = _load_authorized_chats()
 CHAT_CONTEXT: Dict[int, List[dict]] = {}
 LAST_REACTION_TIME: Dict[int, float] = {}
 SILENT_UNTIL: Dict[int, float] = {}
+QUOTA_EXHAUSTED_UNTIL: float = 0
 
 BOT_CLIENT: Optional[TelegramClient] = None
 BOT_USER_ID: Optional[int] = None
@@ -78,10 +80,11 @@ def build_system_instruction(owner_id: int, owner_name: str) -> str:
 - КАТЕГОРИЧЕСКИ ЗАПРЕЩЕНО писать действия в звёздочках или скобках (например: *посмотрела*, *прищурилась*, *вильнула хвостом*, *подозрительно сделала* и т.д.). НИКОГДА так не пиши! Пиши только прямую речь от первого лица.
 - Отвечай строго на русском языке."""
 
-def query_gemini_sync(chat_history: List[dict], system_prompt: str) -> str:
-    """Executes REST request to Gemini API with fallback cascade."""
+def query_gemini_sync(chat_history: List[dict], system_prompt: str) -> Optional[str]:
+    """Executes REST request to Gemini API with fallback cascade. Returns None if quota is exhausted."""
+    global QUOTA_EXHAUSTED_UNTIL
     if not GEMINI_API_KEY:
-        return "Мяу... Ключ Gemini API не настроен, я не могу говорить..."
+        return None
 
     payload = {
         "systemInstruction": {
@@ -96,6 +99,7 @@ def query_gemini_sync(chat_history: List[dict], system_prompt: str) -> str:
     }
     data_bytes = json.dumps(payload).encode("utf-8")
 
+    quota_errors = 0
     last_error = None
     for model_name in MODELS_CASCADE:
         url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={GEMINI_API_KEY}"
@@ -111,17 +115,43 @@ def query_gemini_sync(chat_history: List[dict], system_prompt: str) -> str:
                 if candidates and candidates[0].get("content", {}).get("parts"):
                     raw = candidates[0]["content"]["parts"][0]["text"].strip()
                     return clean_asterisk_actions(raw)
+        except urllib.error.HTTPError as he:
+            last_error = he
+            err_body = ""
+            try:
+                err_body = he.read().decode("utf-8")
+            except Exception:
+                pass
+            if he.code in (429, 403) or "RESOURCE_EXHAUSTED" in err_body or "quota" in err_body.lower():
+                quota_errors += 1
+                logger.warning("Gemini model %s hit quota/rate limit: %s", model_name, he.code)
+            else:
+                logger.warning("Gemini model %s HTTP error: %s", model_name, he)
+            continue
         except Exception as e:
             last_error = e
+            if "429" in str(e) or "RESOURCE_EXHAUSTED" in str(e).upper():
+                quota_errors += 1
             logger.warning("Gemini model %s failed: %s, trying next...", model_name, e)
             continue
 
-    logger.error("All Gemini models failed: %s", last_error)
-    return "Мяу... Голова кружится, не могу думать..."
+    # If all models failed or quota is exhausted (HTTP 429), shut down all reactions
+    if quota_errors > 0 or (last_error and getattr(last_error, "code", None) == 429):
+        QUOTA_EXHAUSTED_UNTIL = time.time() + 600  # Silence for 10 minutes until quota window resets
+        logger.warning(
+            "Gemini API quota/limits exhausted to 0. Keru bot will completely stop reacting to all messages and commands."
+        )
+        return None
 
-async def ask_gemini(chat_id: int, user_text: str, sender_name: str, is_owner: bool, is_owner_passive: bool = False) -> str:
-    """Manages rolling context and queries Gemini asynchronously."""
-    global CHAT_CONTEXT
+    logger.error("All Gemini models failed: %s", last_error)
+    return None
+
+async def ask_gemini(chat_id: int, user_text: str, sender_name: str, is_owner: bool, is_owner_passive: bool = False) -> Optional[str]:
+    """Manages rolling context and queries Gemini asynchronously. Returns None if quota is exhausted."""
+    global CHAT_CONTEXT, QUOTA_EXHAUSTED_UNTIL
+    if time.time() < QUOTA_EXHAUSTED_UNTIL:
+        return None
+
     if chat_id not in CHAT_CONTEXT:
         CHAT_CONTEXT[chat_id] = []
 
@@ -145,6 +175,12 @@ async def ask_gemini(chat_id: int, user_text: str, sender_name: str, is_owner: b
 
     system_prompt = build_system_instruction(OWNER_USER_ID or 0, OWNER_USER_NAME)
     response_text = await asyncio.to_thread(query_gemini_sync, history, system_prompt)
+
+    if not response_text:
+        # Avoid leaving orphaned user turn in history if generation was aborted
+        if history and history[-1]["role"] == "user":
+            history.pop()
+        return None
 
     history.append({
         "role": "model",
@@ -216,6 +252,10 @@ async def start_keru_bot(api_id: int, api_hash: str, owner_id: int, owner_name: 
     # 2. MESSAGE HANDLER (DMs, MENTIONS, OWNER REACTIONS)
     @client.on(events.NewMessage)
     async def message_handler(event: events.NewMessage.Event):
+        # If Gemini API quota/limits are exhausted to 0, stop reacting to any commands or messages
+        if time.time() < QUOTA_EXHAUSTED_UNTIL:
+            return
+
         if not event.text:
             return
 
@@ -311,14 +351,17 @@ async def start_keru_bot(api_id: int, api_hash: str, owner_id: int, owner_name: 
 
         # Generate response via Gemini
         try:
-            async with client.action(chat_id, "typing"):
-                reply_text = await ask_gemini(
-                    chat_id=chat_id,
-                    user_text=text,
-                    sender_name=sender_name,
-                    is_owner=is_owner,
-                    is_owner_passive=is_passive_owner_comment
-                )
+            reply_text = await ask_gemini(
+                chat_id=chat_id,
+                user_text=text,
+                sender_name=sender_name,
+                is_owner=is_owner,
+                is_owner_passive=is_passive_owner_comment
+            )
+
+            # If quota is exhausted or generation returned None, stay completely silent
+            if not reply_text:
+                return
 
             await event.reply(reply_text)
         except Exception as e:
