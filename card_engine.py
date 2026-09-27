@@ -188,26 +188,50 @@ def render_card(
     f_item_val = _load_font(font_reg_path, 14 * scale)
     f_footer = _load_font(font_reg_path, 12 * scale)
 
-    # Base image with Alpha support
-    img = Image.new("RGBA", (w, h), COLOR_BG)
-    draw = ImageDraw.Draw(img)
+    # 0. Base image: Load anime wallpaper or fallback to solid dark obsidian
+    anime_bg_path = os.path.join(ASSETS_FONT_DIR, "..", "anime_bg.jpg")
+    anime_bg_path = os.path.normpath(anime_bg_path)
+
+    if os.path.isfile(anime_bg_path):
+        try:
+            with Image.open(anime_bg_path) as raw_bg:
+                bg_w, bg_h = raw_bg.size
+                ratio = max(w / bg_w, h / bg_h)
+                new_w = int(bg_w * ratio)
+                new_h = int(bg_h * ratio)
+                resized_bg = raw_bg.resize((new_w, new_h), Image.Resampling.LANCZOS)
+                left = (new_w - w) // 2
+                top = (new_h - h) // 2
+                img = resized_bg.crop((left, top, left + w, top + h)).convert("RGBA")
+                resized_bg.close()
+        except Exception:
+            img = Image.new("RGBA", (w, h), COLOR_BG)
+    else:
+        img = Image.new("RGBA", (w, h), COLOR_BG)
 
     # Outer container with rounded corners and subtle border
     card_inset = 20 * scale
     card_rect = [card_inset, card_inset, w - card_inset, h - card_inset]
     card_radius = 18 * scale
 
-    # Card surface background
-    draw.rounded_rectangle(card_rect, radius=card_radius, fill=COLOR_SURFACE, outline=COLOR_BORDER, width=2 * scale)
+    # Dark Frosted Glassmorphism card surface with alpha composite
+    glass_overlay = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+    glass_draw = ImageDraw.Draw(glass_overlay)
+    GLASS_SURFACE = (11, 14, 21, 222)   # Deep obsidian tinted glass (87% opacity)
+    GLASS_BORDER = (75, 92, 125, 185)   # Subtle icy glowing border
+    glass_draw.rounded_rectangle(card_rect, radius=card_radius, fill=GLASS_SURFACE, outline=GLASS_BORDER, width=2 * scale)
 
     # Decorative top accent hairline (subtle tinted segment)
     accent_theme = BADGE_THEMES.get(badge_type.lower(), BADGE_THEMES["info"])
     accent_bar_len = 150 * scale
-    draw.line(
+    glass_draw.line(
         [(card_inset + card_radius, card_inset), (card_inset + card_radius + accent_bar_len, card_inset)],
         fill=accent_theme["dot"],
         width=3 * scale,
     )
+    img = Image.alpha_composite(img, glass_overlay)
+    glass_overlay.close()
+    draw = ImageDraw.Draw(img)
 
     # Content margins
     content_x = card_inset + (34 * scale)
