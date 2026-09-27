@@ -23,6 +23,12 @@ DEFAULT_STATE = {
         "original_first_name": "",
         "original_last_name": "",
         "format": "{name} | {time}",
+    },
+    "anime_quiz": {
+        "enabled": True,
+        "title": "Аниме викторина",
+        "description": "Интерактивная игра 'Угадай аниме по кадру' в реальном времени",
+        "command": ".animequiz [stop]",
     }
 }
 

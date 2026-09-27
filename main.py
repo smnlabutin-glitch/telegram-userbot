@@ -22,6 +22,7 @@ from handlers.system import register_system_handlers
 from handlers.plugins_handler import register_plugins_handlers
 from plugins.always_online import register_always_online, stop_always_online
 from plugins.time_name import register_time_name, stop_autoname
+from plugins.anime_quiz import register_anime_quiz
 
 # Configure logging with RotatingFileHandler for 24/7 operation
 os.makedirs(LOG_DIR, exist_ok=True)
@@ -72,6 +73,7 @@ async def run_userbot(api_id: int, api_hash: str, stop_event: asyncio.Event):
     register_plugins_handlers(client, COMMAND_PREFIX)
     register_always_online(client, COMMAND_PREFIX)
     register_time_name(client, COMMAND_PREFIX)
+    register_anime_quiz(client, COMMAND_PREFIX)
 
     retry_delay = 5
     max_retry_delay = 60

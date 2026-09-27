@@ -67,6 +67,9 @@ def register_plugins_handlers(client: TelegramClient, prefix: str):
             else:
                 await stop_autoname(client)
             p_title = "Время в никнейме"
+        elif p_name in ("quiz", "animequiz", "anime_quiz"):
+            update_plugin_config("anime_quiz", enabled=target_enable)
+            p_title = "Аниме викторина"
         else:
             await event.reply(f"⚠️ Неизвестный плагин: `{p_name}`. Используйте `{prefix}plugins` для просмотра каталога.")
             return
