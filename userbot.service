@@ -1,0 +1,26 @@
+[Unit]
+Description=Telegram Aesthetic Userbot 24/7 Daemon
+After=network.target network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+# Change 'root' to your dedicated user if running as non-root (e.g. User=userbot)
+User=root
+WorkingDirectory=/opt/telegram-userbot
+Environment=PYTHONUNBUFFERED=1
+ExecStart=/opt/telegram-userbot/venv/bin/python main.py
+
+# 24/7 Autorestart policy
+Restart=always
+RestartSec=10s
+KillMode=mixed
+TimeoutStopSec=30s
+
+# Resource limits
+LimitNOFILE=65535
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

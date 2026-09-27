@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  userbot:
+    build: .
+    container_name: telegram_userbot
+    restart: unless-stopped
+    init: true
+    stdin_open: true
+    tty: true
+    environment:
+      - PYTHONUNBUFFERED=1
+    volumes:
+      - ./.env:/app/.env:ro
+      - ./${SESSION_NAME:-userbot_session}.session:/app/${SESSION_NAME:-userbot_session}.session
+      - ./logs:/app/logs
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
