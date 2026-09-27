@@ -208,8 +208,8 @@ def register_anime_quiz(client: TelegramClient, prefix: str):
             except Exception:
                 pass
 
-        # Select anime (excluding previous round to prevent repeats) & download image
-        anime = get_random_anime(exclude_id=LAST_ANIME_ID.get(chat_id))
+        # Select anime with per-chat cycle weighting & download image
+        anime = get_random_anime(exclude_id=LAST_ANIME_ID.get(chat_id), chat_id=chat_id)
         LAST_ANIME_ID[chat_id] = anime["id"]
         img_bytes = await download_cover_bytes(anime["image_url"])
 

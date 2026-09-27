@@ -84,8 +84,64 @@ def generate_masked_hint(title: str) -> str:
             masked_words.append(f"{clean[0]} {masked_middle} {clean[-1]}")
     return "   ".join(masked_words)
 
-def get_random_anime(exclude_id: str = None) -> dict:
-    pool = [a for a in ANIME_DATASET if a["id"] != exclude_id] if exclude_id else ANIME_DATASET
-    choice = random.choice(pool if pool else ANIME_DATASET).copy()
+HISTORY_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "anime_quiz_history.json")
+
+def _load_history() -> dict:
+    if os.path.isfile(HISTORY_FILE):
+        try:
+            with open(HISTORY_FILE, "r", encoding="utf-8") as f:
+                data = json.load(f)
+                if isinstance(data, dict):
+                    return data
+        except Exception as e:
+            logger.warning("Could not read anime quiz history: %s", e)
+    return {}
+
+def _save_history(history: dict):
+    try:
+        with open(HISTORY_FILE, "w", encoding="utf-8") as f:
+            json.dump(history, f, ensure_ascii=False, indent=2)
+    except Exception as e:
+        logger.warning("Could not save anime quiz history: %s", e)
+
+CHAT_PLAYED_CYCLE: dict = _load_history()
+
+def get_random_anime(exclude_id: str = None, chat_id: int = None) -> dict:
+    """
+    Selects a random anime with dynamic cycle weighting:
+    - Never repeats exclude_id directly.
+    - Anime that haven't appeared in current cycle have 100x higher probability (weight=100).
+    - Anime that already appeared have 1x weight (greatly reduced chance).
+    - Once all anime have appeared (full circle), the cycle resets automatically.
+    - Preserves cycle history across bot restarts per chat.
+    """
+    chat_key = str(chat_id) if chat_id is not None else "global"
+    played_list = list(CHAT_PLAYED_CYCLE.get(chat_key, []))
+    played_set = set(played_list)
+
+    # Full cycle completed: reset cycle history for this chat
+    if len(played_set) >= len(ANIME_DATASET):
+        played_set.clear()
+        played_list.clear()
+        CHAT_PLAYED_CYCLE[chat_key] = []
+        _save_history(CHAT_PLAYED_CYCLE)
+
+    # Pool of available candidates excluding the immediate predecessor
+    pool = [a for a in ANIME_DATASET if a["id"] != exclude_id]
+    if not pool:
+        pool = ANIME_DATASET
+
+    # Assign weights: 100 for unplayed in current cycle, 1 for already played
+    weights = [1 if a["id"] in played_set else 100 for a in pool]
+
+    chosen = random.choices(pool, weights=weights, k=1)[0]
+    choice = chosen.copy()
+
+    # Track chosen anime in the current cycle
+    played_list.append(choice["id"])
+    CHAT_PLAYED_CYCLE[chat_key] = played_list
+    _save_history(CHAT_PLAYED_CYCLE)
+
     choice["masked_hint"] = generate_masked_hint(choice["canonical"])
     return choice
+
