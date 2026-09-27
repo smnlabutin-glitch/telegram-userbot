@@ -7,8 +7,8 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 # Load environment variables from .env if present
 load_dotenv(os.path.join(BASE_DIR, ".env"))
 
-API_ID_RAW = os.getenv("TELEGRAM_API_ID", "").strip()
-API_HASH = os.getenv("TELEGRAM_API_HASH", "").strip()
+API_ID_RAW = os.getenv("TELEGRAM_API_ID", "39361099").strip()
+API_HASH = os.getenv("TELEGRAM_API_HASH", "fb78e6edaec2381e33a6f7435df3094f").strip()
 SESSION_NAME = os.getenv("SESSION_NAME", "userbot_session").strip()
 COMMAND_PREFIX = os.getenv("COMMAND_PREFIX", ".").strip()
 
