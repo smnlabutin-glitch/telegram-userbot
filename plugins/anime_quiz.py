@@ -27,6 +27,7 @@ class QuizSession:
 
 # Active game sessions per chat_id
 ACTIVE_QUIZZES: Dict[int, QuizSession] = {}
+LAST_ANIME_ID: Dict[int, str] = {}
 
 def normalize_text(text: str) -> str:
     """Cleans up text for robust fuzzy matching."""
@@ -174,8 +175,9 @@ def register_anime_quiz(client: TelegramClient, prefix: str):
             except Exception:
                 pass
 
-        # Select anime & download image
-        anime = get_random_anime()
+        # Select anime (excluding previous round to prevent repeats) & download image
+        anime = get_random_anime(exclude_id=LAST_ANIME_ID.get(chat_id))
+        LAST_ANIME_ID[chat_id] = anime["id"]
         img_bytes = await download_cover_bytes(anime["image_url"])
 
         # Phase 2: Send game card with timer & masked hint
