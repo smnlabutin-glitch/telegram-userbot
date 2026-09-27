@@ -32,38 +32,71 @@ LAST_ANIME_ID: Dict[int, str] = {}
 def normalize_text(text: str) -> str:
     """Cleans up text for robust fuzzy matching."""
     text = text.lower().replace("ё", "е")
-    # Remove special punctuation and symbols, retain letters, digits and spaces
-    text = re.sub(r"[^\w\s]", "", text)
+    # Replace punctuation with space and normalize whitespace
+    text = re.sub(r"[^\w\s]", " ", text)
     return " ".join(text.split())
 
-def check_answer(user_input: str, anime_data: dict, threshold: float = 0.80) -> bool:
+def check_answer(user_input: str, anime_data: dict, threshold: float = 0.78) -> bool:
     """
-    Evaluates whether user input matches any canonical or alias answers.
-    Supports exact, substring, and Levenshtein/difflib similarity >= 80%.
+    Evaluates whether user input matches the canonical name, title, or any alias.
+    Supports exact, subphrase, token set, and Levenshtein similarity.
     """
     norm_user = normalize_text(user_input)
     if not norm_user:
         return False
 
-    for alias in anime_data.get("answers", []):
-        norm_alias = normalize_text(alias)
-        if not norm_alias:
+    targets = set()
+    for field in ("canonical", "title"):
+        val = anime_data.get(field)
+        if val:
+            targets.add(val)
+            # Without parenthetical notes
+            no_brackets = re.sub(r"\(.*?\)", "", val).strip()
+            if no_brackets:
+                targets.add(no_brackets)
+            for inside in re.findall(r"\((.*?)\)", val):
+                if inside.strip():
+                    targets.add(inside.strip())
+
+    for ans in anime_data.get("answers", []):
+        if ans:
+            targets.add(ans)
+
+    user_words = set(norm_user.split())
+
+    for target in targets:
+        norm_target = normalize_text(target)
+        if not norm_target:
             continue
 
         # Exact match
-        if norm_user == norm_alias:
+        if norm_user == norm_target:
             return True
 
-        # Substring match if input is long enough
-        if len(norm_alias) >= 4 and norm_user in norm_alias and len(norm_user) >= len(norm_alias) * 0.75:
-            return True
-        if len(norm_user) >= 4 and norm_alias in norm_user and len(norm_alias) >= len(norm_user) * 0.75:
-            return True
+        # Target is inside user's input (e.g. user typed extra conversational words)
+        if norm_target in norm_user:
+            if len(norm_target) >= 5 or len(norm_target.split()) >= 2:
+                return True
+            if re.search(rf"(^|\s){re.escape(norm_target)}(\s|$)", norm_user):
+                return True
 
-        # Fuzzy sequence matcher ratio
-        ratio = difflib.SequenceMatcher(None, norm_user, norm_alias).ratio()
+        # User input is inside target title (e.g. user typed main part of a long title)
+        if norm_user in norm_target:
+            # Match if user typed 3+ words or at least 50% length of the title
+            if len(norm_user.split()) >= 3 or (len(norm_user) >= len(norm_target) * 0.5 and len(norm_user.split()) >= 2):
+                return True
+
+        # Fuzzy similarity ratio
+        ratio = difflib.SequenceMatcher(None, norm_user, norm_target).ratio()
         if ratio >= threshold:
             return True
+
+        # Token set match for multi-word titles
+        target_words = set(norm_target.split())
+        if len(target_words) >= 3 and len(user_words) >= 3:
+            overlap = len(user_words & target_words)
+            if overlap >= len(target_words) * 0.75:
+                return True
 
     return False
 
