@@ -47,6 +47,15 @@ OWNER_USER_NAME: str = "Хозяин"
 
 MODELS_CASCADE = ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash"]
 
+def clean_asterisk_actions(text: str) -> str:
+    """Removes roleplay actions in asterisks, underscores, or brackets."""
+    cleaned = re.sub(r"\*[^*]+\*", "", text)
+    cleaned = re.sub(r"_[^_]+_", "", cleaned)
+    cleaned = cleaned.replace("*", "")
+    cleaned = re.sub(r"[ \t]+", " ", cleaned)
+    cleaned = re.sub(r"\n\s*\n+", "\n", cleaned)
+    return cleaned.strip()
+
 def build_system_instruction(owner_id: int, owner_name: str) -> str:
     return f"""Ты — Керу (Kyaru / Keru), аниме кошко-девочка с кошачьими ушками и пушистым хвостом.
 Твой единственный любимый Хозяин (Master) — пользователь {owner_name} (Telegram ID: {owner_id}).
@@ -65,14 +74,14 @@ def build_system_instruction(owner_id: int, owner_name: str) -> str:
 - Никаких чужих команд ты не слушаешь!
 
 3. СТИЛЬ РЕЧИ:
-- Живой, эмоциональный, как в Telegram-чате. Пиши коротко или емко (1-3 предложения), не строй бесконечных лекций.
-- Используй кошачьи действия курсивом (*дёрнула ушком*, *мурчит*, *оскалила клыки*, *прижалась к руке Хозяина*).
+- Живой, эмоциональный, как в обычном Telegram-чате. Пиши коротко или емко (1-3 предложения), не строй бесконечных лекций.
+- КАТЕГОРИЧЕСКИ ЗАПРЕЩЕНО писать действия в звёздочках или скобках (например: *посмотрела*, *прищурилась*, *вильнула хвостом*, *подозрительно сделала* и т.д.). НИКОГДА так не пиши! Пиши только прямую речь от первого лица.
 - Отвечай строго на русском языке."""
 
 def query_gemini_sync(chat_history: List[dict], system_prompt: str) -> str:
     """Executes REST request to Gemini API with fallback cascade."""
     if not GEMINI_API_KEY:
-        return "Мяу... Ключ Gemini API не настроен, я не могу говорить... *грустно прижала ушки*"
+        return "Мяу... Ключ Gemini API не настроен, я не могу говорить..."
 
     payload = {
         "systemInstruction": {
@@ -100,14 +109,15 @@ def query_gemini_sync(chat_history: List[dict], system_prompt: str) -> str:
                 res = json.loads(resp.read().decode("utf-8"))
                 candidates = res.get("candidates", [])
                 if candidates and candidates[0].get("content", {}).get("parts"):
-                    return candidates[0]["content"]["parts"][0]["text"].strip()
+                    raw = candidates[0]["content"]["parts"][0]["text"].strip()
+                    return clean_asterisk_actions(raw)
         except Exception as e:
             last_error = e
             logger.warning("Gemini model %s failed: %s, trying next...", model_name, e)
             continue
 
     logger.error("All Gemini models failed: %s", last_error)
-    return "Мяу... Голова кружится, не могу думать... *потёрла ушки лапкой*"
+    return "Мяу... Голова кружится, не могу думать..."
 
 async def ask_gemini(chat_id: int, user_text: str, sender_name: str, is_owner: bool, is_owner_passive: bool = False) -> str:
     """Manages rolling context and queries Gemini asynchronously."""
@@ -235,12 +245,12 @@ async def start_keru_bot(api_id: int, api_hash: str, owner_id: int, owner_name: 
         if is_owner:
             if re.search(r"\b(керу|кяру)\b.*?\b(молчи|тихо|заткнись|стоп|тишина)\b", text_lower):
                 SILENT_UNTIL[chat_id] = current_time + 900  # 15 mins
-                await event.reply("Мяу... Слушаюсь, Хозяин... Буду тихонько смотреть на вас из уголка... *прижала ушки* 🖤")
+                await event.reply("Мяу... Слушаюсь, Хозяин... Буду тихонько смотреть на вас из уголка... 🖤")
                 return
 
             if re.search(r"\b(керу|кяру)\b.*?\b(голос|говори|можно)\b", text_lower):
                 SILENT_UNTIL[chat_id] = 0
-                await event.reply("Мррр~ Наконец-то! Я так скучала по вашему голосу, Хозяин! Мяу! *радостно виляет хвостом*")
+                await event.reply("Мррр~ Наконец-то! Я так скучала по вашему голосу, Хозяин! Мяу!")
                 return
 
             if re.search(r"\b(керу|кяру)\b.*?\b(покинь|уйди|выйди)\b", text_lower):
