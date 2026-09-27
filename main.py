@@ -16,6 +16,8 @@ from config import (
     LOG_LEVEL,
     LOG_MAX_BYTES,
     LOG_BACKUP_COUNT,
+    KERU_BOT_TOKEN,
+    GEMINI_API_KEY,
 )
 from handlers.purge import register_purge_handlers
 from handlers.system import register_system_handlers
@@ -23,6 +25,8 @@ from handlers.plugins_handler import register_plugins_handlers
 from plugins.always_online import register_always_online, stop_always_online
 from plugins.time_name import register_time_name, stop_autoname
 from plugins.anime_quiz import register_anime_quiz
+from plugins.keru_bot import start_keru_bot, stop_keru_bot
+
 
 # Configure logging with RotatingFileHandler for 24/7 operation
 os.makedirs(LOG_DIR, exist_ok=True)
@@ -100,6 +104,13 @@ async def run_userbot(api_id: int, api_hash: str, stop_event: asyncio.Event):
             # Reset retry backoff on successful connection
             retry_delay = 5
 
+            # Launch Keru Bot background task if configured
+            keru_task = None
+            if KERU_BOT_TOKEN and GEMINI_API_KEY:
+                keru_task = asyncio.create_task(
+                    start_keru_bot(api_id, api_hash, me.id, me.first_name or "Хозяин", stop_event)
+                )
+
             # Run until disconnected or stop signal received
             run_task = asyncio.create_task(client.run_until_disconnected())
             stop_task = asyncio.create_task(stop_event.wait())
@@ -111,6 +122,10 @@ async def run_userbot(api_id: int, api_hash: str, stop_event: asyncio.Event):
 
             for task in pending:
                 task.cancel()
+
+            stop_keru_bot()
+            if keru_task and not keru_task.done():
+                keru_task.cancel()
 
             if stop_event.is_set():
                 logger.info("Stop event received. Disconnecting gracefully...")
@@ -137,6 +152,7 @@ async def run_userbot(api_id: int, api_hash: str, stop_event: asyncio.Event):
             retry_delay = min(retry_delay * 2, max_retry_delay)
 
     stop_always_online()
+    stop_keru_bot()
     if client.is_connected():
         await stop_autoname(client)
         await client.disconnect()
