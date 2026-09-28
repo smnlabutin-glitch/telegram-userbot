@@ -83,7 +83,7 @@ async def perform_graceful_restart(client: TelegramClient):
     await asyncio.sleep(1)
 
     # 1. Try systemd restart first
-    code = os.system("systemctl restart telegram-userbot 2>/dev/null || systemctl restart userbot 2>/dev/null")
+    code = os.system("sudo -n systemctl restart telegram-userbot 2>/dev/null || systemctl restart telegram-userbot 2>/dev/null || sudo -n systemctl restart userbot 2>/dev/null || systemctl restart userbot 2>/dev/null")
     if code == 0:
         sys.exit(0)
 
@@ -92,6 +92,8 @@ async def perform_graceful_restart(client: TelegramClient):
         os.execv(sys.executable, [sys.executable] + sys.argv)
     except Exception:
         sys.exit(0)
+
+_perform_graceful_restart = perform_graceful_restart
 
 def register_system_handlers(client: TelegramClient, prefix: str):
     """Registers system diagnostic and help commands."""
@@ -166,14 +168,12 @@ def register_system_handlers(client: TelegramClient, prefix: str):
     # .keru / .kstatus (Instant Diagnostic Card)
     @client.on(events.NewMessage(outgoing=True, pattern=rf"^{prefix}(?:keru|kstatus)$"))
     async def keru_diagnostic_handler(event: events.NewMessage.Event):
-        from plugins.keru_bot import BOT_CLIENT, BOT_USERNAME, BOT_USER_ID, OWNER_USER_ID, AUTHORIZED_CHATS, KERU_MEMORY, LAST_API_ERROR, DEEPSEEK_MODELS_CASCADE
+        from plugins.keru_bot import BOT_CLIENT, BOT_USERNAME, BOT_USER_ID, OWNER_USER_ID, AUTHORIZED_CHATS, KERU_MEMORY, LAST_API_ERROR, DEEPSEEK_MODELS_CASCADE, KERU_BUILD_VERSION
         from config import KERU_BOT_TOKEN, PROXYAPI_KEY
 
         is_connected = bool(BOT_CLIENT and BOT_CLIENT.is_connected())
         badge_text = "АКТИВЕН (ONLINE)" if is_connected else "НЕ ЗАПУЩЕН (OFFLINE)"
         badge_type = "success" if is_connected else "danger"
-
-        key_masked = f"{PROXYAPI_KEY[:7]}...{PROXYAPI_KEY[-4:]}" if PROXYAPI_KEY and len(PROXYAPI_KEY) > 10 else ("Установлен" if PROXYAPI_KEY else "НЕТ КЛЮЧА")
 
         card = render_card(
             title="Диагностика Керу",
@@ -183,7 +183,7 @@ def register_system_handlers(client: TelegramClient, prefix: str):
             stats=[
                 ("БОТ TELEGRAM", f"@{BOT_USERNAME}" if BOT_USERNAME else ("Токен задан" if KERU_BOT_TOKEN else "Нет токена")),
                 ("ОСНОВНАЯ МОДЕЛЬ", DEEPSEEK_MODELS_CASCADE[0] if PROXYAPI_KEY else "ОТСУТСТВУЕТ"),
-                ("PROXYAPI КЛЮЧ", key_masked),
+                ("ВЕРСИЯ ЯДРА", KERU_BUILD_VERSION),
                 ("СТАТУС СЕТИ", "Подключен" if is_connected else "Отключен"),
             ],
             items=[
@@ -192,7 +192,7 @@ def register_system_handlers(client: TelegramClient, prefix: str):
                 ("Авторизованных чатов", f"{len(AUTHORIZED_CHATS)} чатов"),
                 ("Последняя ошибка ИИ", LAST_API_ERROR[:32] if LAST_API_ERROR else "Ошибок нет (OK)"),
             ],
-            meta_left="KERU BOT DIAGNOSTICS // v2.2",
+            meta_left=f"KERU BOT // {KERU_BUILD_VERSION}",
             meta_right="MTPROTO DAEMON",
             category="AI SERVICE STATUS",
         )

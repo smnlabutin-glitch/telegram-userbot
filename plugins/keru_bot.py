@@ -190,10 +190,12 @@ BOT_USERNAME: Optional[str] = None
 OWNER_USER_ID: Optional[int] = None
 OWNER_USER_NAME: str = "Хозяин"
 
+KERU_BUILD_VERSION = "v3.2-STABLE"
+
 PROXYAPI_URL = "https://api.proxyapi.ru/v1/chat/completions"
 DEEPSEEK_MODELS_CASCADE = [
-    "deepseek/deepseek-v4.1-flash",
-    "deepseek/deepseek-v4-flash",
+    "deepseek/deepseek-v3.2",
+    "deepseek/deepseek-v3.2-20251201",
     "deepseek/deepseek-chat-v3",
 ]
 
@@ -209,7 +211,7 @@ def clean_asterisk_actions(text: str) -> str:
     return cleaned.strip()
 
 def query_deepseek_sync(messages: List[dict]) -> Optional[str]:
-    """Queries DeepSeek via ProxyAPI with 15s timeout and fast fallback."""
+    """Queries DeepSeek via ProxyAPI with 8s timeout and fast fallback."""
     global LAST_API_ERROR
     if not PROXYAPI_KEY:
         LAST_API_ERROR = "PROXYAPI_KEY не установлен в .env или config.py"
@@ -228,7 +230,7 @@ def query_deepseek_sync(messages: List[dict]) -> Optional[str]:
             "model": model_name,
             "messages": messages,
             "temperature": 0.85,
-            "max_tokens": 450
+            "max_tokens": 300
         }
         data_bytes = json.dumps(payload).encode("utf-8")
         req = urllib.request.Request(
@@ -237,16 +239,20 @@ def query_deepseek_sync(messages: List[dict]) -> Optional[str]:
             headers=headers
         )
         try:
-            with urllib.request.urlopen(req, timeout=15) as resp:
+            with urllib.request.urlopen(req, timeout=8) as resp:
                 res = json.loads(resp.read().decode("utf-8"))
                 choices = res.get("choices", [])
                 if choices:
                     msg = choices[0].get("message", {})
-                    raw = (msg.get("content") or msg.get("reasoning_content") or "").strip()
+                    raw = (msg.get("content") or "").strip()
+                    if not raw:
+                        raw = (msg.get("reasoning") or msg.get("reasoning_content") or "").strip()
                     if raw:
-                        LAST_API_ERROR = ""
-                        logger.info("ProxyAPI DeepSeek reply generated successfully using %s", model_name)
-                        return clean_asterisk_actions(raw)
+                        cleaned = clean_asterisk_actions(raw)
+                        if cleaned:
+                            LAST_API_ERROR = ""
+                            logger.info("ProxyAPI DeepSeek reply generated successfully using %s", model_name)
+                            return cleaned
         except urllib.error.HTTPError as he:
             err_body = ""
             try:
@@ -633,7 +639,7 @@ def _register_bot_handlers(client: TelegramClient):
             if not reply_text:
                 logger.warning("Keru generated empty reply for text: %r, last error: %s", text, LAST_API_ERROR)
                 if is_owner or is_private:
-                    err_info = f"\n🔍 Ошибка: `{LAST_API_ERROR}`" if LAST_API_ERROR else ""
+                    err_info = f"\n🔍 Ошибка: `{LAST_API_ERROR}` [{KERU_BUILD_VERSION}]" if LAST_API_ERROR else f" [{KERU_BUILD_VERSION}]"
                     await event.reply(f"Мяу... ИИ временно недоступен!{err_info} 😿\nПопробуйте ещё раз через пару секунд.")
                 return
 
