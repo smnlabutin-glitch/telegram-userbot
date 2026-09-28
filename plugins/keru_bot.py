@@ -190,12 +190,11 @@ OWNER_USER_NAME: str = "Хозяин"
 
 PROXYAPI_URL = "https://api.proxyapi.ru/v1/chat/completions"
 DEEPSEEK_MODELS_CASCADE = [
+    "deepseek/deepseek-v4-flash",
+    "deepseek/deepseek-chat-v3.1",
     "deepseek/deepseek-chat-v3",
-    "gpt-4o-mini",
-]
-GPT_VISION_MODELS_CASCADE = [
-    "gpt-4o-mini",
-    "gpt-4o",
+    "deepseek/deepseek-v3.2",
+    "deepseek/deepseek-chat",
 ]
 
 LAST_API_ERROR: str = ""
@@ -209,27 +208,8 @@ def clean_asterisk_actions(text: str) -> str:
     cleaned = re.sub(r"\n\s*\n+", "\n", cleaned)
     return cleaned.strip()
 
-def prepare_image_for_llm(raw_bytes: bytes) -> tuple[str, str]:
-    """Optimizes image dimensions with PIL if large, returns (base64_str, mime_type)."""
-    try:
-        from PIL import Image
-        img = Image.open(io.BytesIO(raw_bytes))
-        max_dim = 1024
-        if max(img.size) > max_dim:
-            img.thumbnail((max_dim, max_dim), Image.Resampling.LANCZOS)
-        out = io.BytesIO()
-        if img.mode in ("RGBA", "P"):
-            img = img.convert("RGB")
-        img.save(out, format="JPEG", quality=85)
-        b64 = base64.b64encode(out.getvalue()).decode("utf-8")
-        return b64, "image/jpeg"
-    except Exception as e:
-        logger.warning("Error optimizing image with PIL: %s, using raw bytes", e)
-        b64 = base64.b64encode(raw_bytes).decode("utf-8")
-        return b64, "image/jpeg"
-
 def query_deepseek_sync(messages: List[dict]) -> Optional[str]:
-    """Queries DeepSeek-V3 via ProxyAPI with fast 6s timeout and instant gpt-4o-mini fallback."""
+    """Queries DeepSeek via ProxyAPI with 12s timeout and fallback over DeepSeek versions."""
     global LAST_API_ERROR
     if not PROXYAPI_KEY:
         LAST_API_ERROR = "PROXYAPI_KEY не установлен в .env или config.py"
@@ -244,7 +224,6 @@ def query_deepseek_sync(messages: List[dict]) -> Optional[str]:
     }
 
     for model_name in DEEPSEEK_MODELS_CASCADE:
-        timeout_sec = 6 if "deepseek" in model_name else 10
         payload = {
             "model": model_name,
             "messages": messages,
@@ -258,14 +237,14 @@ def query_deepseek_sync(messages: List[dict]) -> Optional[str]:
             headers=headers
         )
         try:
-            with urllib.request.urlopen(req, timeout=timeout_sec) as resp:
+            with urllib.request.urlopen(req, timeout=12) as resp:
                 res = json.loads(resp.read().decode("utf-8"))
                 choices = res.get("choices", [])
                 if choices and choices[0].get("message", {}).get("content"):
                     raw = choices[0]["message"]["content"].strip()
                     if raw:
                         LAST_API_ERROR = ""
-                        logger.info("ProxyAPI text reply generated successfully using %s", model_name)
+                        logger.info("ProxyAPI DeepSeek reply generated successfully using %s", model_name)
                         return clean_asterisk_actions(raw)
         except urllib.error.HTTPError as he:
             err_body = ""
@@ -274,65 +253,11 @@ def query_deepseek_sync(messages: List[dict]) -> Optional[str]:
             except Exception:
                 pass
             LAST_API_ERROR = f"{model_name}: HTTP {he.code} {err_body[:60]}"
-            logger.warning("ProxyAPI model %s HTTP %s: %s, switching to next model...", model_name, he.code, err_body)
+            logger.warning("ProxyAPI model %s HTTP %s: %s, switching to next version...", model_name, he.code, err_body)
             continue
         except Exception as e:
             LAST_API_ERROR = f"{model_name}: {type(e).__name__} ({e})"
-            logger.warning("ProxyAPI model %s failed: %s, switching to next model...", model_name, e)
-            continue
-
-    return None
-
-def query_gpt_mini_sync(messages: List[dict]) -> Optional[str]:
-    """Queries GPT-4o-mini via ProxyAPI for vision tasks when an image is sent."""
-    global LAST_API_ERROR
-    if not PROXYAPI_KEY:
-        LAST_API_ERROR = "PROXYAPI_KEY не установлен в .env или config.py"
-        return None
-
-    headers = {
-        "Content-Type": "application/json",
-        "Authorization": f"Bearer {PROXYAPI_KEY}",
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
-        "Accept": "application/json",
-        "Connection": "close"
-    }
-
-    for model_name in GPT_VISION_MODELS_CASCADE:
-        payload = {
-            "model": model_name,
-            "messages": messages,
-            "temperature": 0.88,
-            "max_tokens": 800
-        }
-        data_bytes = json.dumps(payload).encode("utf-8")
-        req = urllib.request.Request(
-            PROXYAPI_URL,
-            data=data_bytes,
-            headers=headers
-        )
-        try:
-            with urllib.request.urlopen(req, timeout=15) as resp:
-                res = json.loads(resp.read().decode("utf-8"))
-                choices = res.get("choices", [])
-                if choices and choices[0].get("message", {}).get("content"):
-                    raw = choices[0]["message"]["content"].strip()
-                    if raw:
-                        LAST_API_ERROR = ""
-                        logger.info("ProxyAPI vision reply generated successfully using %s", model_name)
-                        return clean_asterisk_actions(raw)
-        except urllib.error.HTTPError as he:
-            err_body = ""
-            try:
-                err_body = he.read().decode("utf-8", "ignore")
-            except Exception:
-                pass
-            LAST_API_ERROR = f"{model_name}: HTTP {he.code} {err_body[:60]}"
-            logger.warning("ProxyAPI vision model %s HTTP %s: %s", model_name, he.code, err_body)
-            continue
-        except Exception as e:
-            LAST_API_ERROR = f"{model_name}: {type(e).__name__} ({e})"
-            logger.warning("ProxyAPI vision model %s error: %s", model_name, e)
+            logger.warning("ProxyAPI model %s failed: %s, switching to next version...", model_name, e)
             continue
 
     return None
@@ -399,10 +324,9 @@ async def ask_llm(
     sender_name: str,
     is_owner: bool,
     is_owner_passive: bool = False,
-    image_bytes: Optional[bytes] = None,
     is_system_event: bool = False
 ) -> Optional[str]:
-    """Manages rolling context and queries DeepSeek (text) or GPT-4o-mini (images) via ProxyAPI."""
+    """Manages rolling context and queries DeepSeek via ProxyAPI."""
     global CHAT_CONTEXT
 
     if chat_id not in CHAT_CONTEXT:
@@ -418,11 +342,10 @@ async def ask_llm(
     else:
         formatted_input = f"[{sender_name}, Статус: {status_str}]: {user_text}"
 
-    # Record in history (compact text summary to save memory and tokens on later turns)
-    history_entry = formatted_input if not image_bytes else f"{formatted_input} [Пользователь прикрепил изображение]"
+    # Record in history
     history.append({
         "role": "user",
-        "content": history_entry
+        "content": formatted_input
     })
 
     # Keep only last 20 messages
@@ -433,32 +356,7 @@ async def ask_llm(
     system_prompt = build_system_instruction(OWNER_USER_ID or 0, OWNER_USER_NAME)
     response_text = None
 
-    # 1. Vision Route: If an image is provided, query GPT-4o-mini via ProxyAPI
-    if image_bytes and PROXYAPI_KEY:
-        try:
-            b64_str, mime_type = prepare_image_for_llm(image_bytes)
-            gpt_messages = [{"role": "system", "content": system_prompt}]
-            # Append prior textual turns from history
-            for m in history[:-1]:
-                gpt_messages.append({"role": m["role"], "content": m["content"]})
-            # Current multimodal message with image and text
-            gpt_messages.append({
-                "role": "user",
-                "content": [
-                    {"type": "text", "text": formatted_input},
-                    {
-                        "type": "image_url",
-                        "image_url": {"url": f"data:{mime_type};base64,{b64_str}"}
-                    }
-                ]
-            })
-            logger.info("Routing user image to GPT-4o-mini via ProxyAPI...")
-            response_text = await asyncio.to_thread(query_gpt_mini_sync, gpt_messages)
-        except Exception as e:
-            logger.warning("Error preparing image or querying GPT-4o-mini: %s", e)
-
-    # 2. Text Route: Query DeepSeek via ProxyAPI
-    if not response_text and PROXYAPI_KEY and not image_bytes:
+    if PROXYAPI_KEY:
         messages = [{"role": "system", "content": system_prompt}] + history
         response_text = await asyncio.to_thread(query_deepseek_sync, messages)
 
@@ -568,7 +466,7 @@ async def start_keru_bot(api_id: int, api_hash: str, owner_id: int, owner_name: 
         logger.info("=" * 54)
         logger.info("Bot Username   : @%s (ID: %s)", BOT_USERNAME, BOT_USER_ID)
         logger.info("Master / Owner : %s (ID: %s)", OWNER_USER_NAME, OWNER_USER_ID)
-        logger.info("AI Models      : %s (Text) + %s (Vision)", DEEPSEEK_MODELS_CASCADE[0], GPT_VISION_MODELS_CASCADE[0])
+        logger.info("AI Model       : %s (DeepSeek via ProxyAPI)", DEEPSEEK_MODELS_CASCADE[0])
         logger.info("-" * 54)
     except Exception as e:
         logger.error("Failed to authenticate Keru bot with token: %s", e)
@@ -587,13 +485,11 @@ async def start_keru_bot(api_id: int, api_hash: str, owner_id: int, owner_name: 
             except Exception as ex:
                 logger.warning("Error greeting chat: %s", ex)
 
-    # 2. MESSAGE HANDLER (DMs, MENTIONS, OWNER REACTIONS, PHOTO REPLIES)
+    # 2. MESSAGE HANDLER (DMs, MENTIONS, OWNER REACTIONS)
     @client.on(events.NewMessage)
     async def message_handler(event: events.NewMessage.Event):
-        has_text = bool(event.raw_text and event.raw_text.strip())
-        is_photo = bool(event.photo or (event.document and getattr(event.document, "mime_type", "").startswith("image/")))
-
-        if not has_text and not is_photo:
+        text = (event.raw_text or "").strip()
+        if not text:
             return
 
         chat_id = event.chat_id
@@ -632,14 +528,10 @@ async def start_keru_bot(api_id: int, api_hash: str, owner_id: int, owner_name: 
         # Check reply info
         is_reply_to_bot = False
         reply_msg = None
-        reply_has_photo = False
         if event.is_reply:
             reply_msg = await event.get_reply_message()
-            if reply_msg:
-                if reply_msg.sender_id == BOT_USER_ID:
-                    is_reply_to_bot = True
-                if reply_msg.photo or (reply_msg.document and getattr(reply_msg.document, "mime_type", "").startswith("image/")):
-                    reply_has_photo = True
+            if reply_msg and reply_msg.sender_id == BOT_USER_ID:
+                is_reply_to_bot = True
 
         # Check silence mode in groups
         current_time = time.time()
@@ -665,7 +557,7 @@ async def start_keru_bot(api_id: int, api_hash: str, owner_id: int, owner_name: 
                 return
 
             if re.search(r"\b(керу|кяру)\b.*?\b(статус|инфо|правила|память)\b", text_lower):
-                active_model = f"`{DEEPSEEK_MODELS_CASCADE[0]}` (текст) + `{GPT_VISION_MODELS_CASCADE[0]}` (картинки)"
+                active_model = f"`{DEEPSEEK_MODELS_CASCADE[0]}` (DeepSeek)"
                 rules_count = len(KERU_MEMORY.get("custom_rules", []))
                 ignored_count = len(KERU_MEMORY.get("ignored_users", []))
                 attitudes_count = len(KERU_MEMORY.get("attitude_overrides", {}))
@@ -713,7 +605,7 @@ async def start_keru_bot(api_id: int, api_hash: str, owner_id: int, owner_name: 
 
         if not should_respond:
             # Save message to rolling chat context so Keru stays context-aware
-            if not is_private and has_text:
+            if not is_private and text:
                 chat_hist = CHAT_CONTEXT.setdefault(chat_id, [])
                 chat_hist.append({
                     "role": "user",
@@ -725,32 +617,14 @@ async def start_keru_bot(api_id: int, api_hash: str, owner_id: int, owner_name: 
 
         logger.info("Keru reacting to message in chat %s from %s (%s): %r", chat_id, sender_name, sender_id, text[:60])
 
-        # Download image if this message has a photo or user replied with/to a photo
-        image_bytes = None
-        if is_photo:
-            try:
-                image_bytes = await event.download_media(file=bytes)
-            except Exception as e:
-                logger.warning("Failed to download image from message: %s", e)
-        elif reply_has_photo and reply_msg and (is_reply_to_bot or bot_mentioned):
-            try:
-                image_bytes = await reply_msg.download_media(file=bytes)
-            except Exception as e:
-                logger.warning("Failed to download image from replied message: %s", e)
-
-        user_text = text if text else ("Посмотри на эту картинку, что скажешь?" if image_bytes else "")
-        if not user_text and not image_bytes:
-            return
-
-        # Generate response via DeepSeek (text) or GPT-4o-mini (image)
+        # Generate response via DeepSeek
         try:
             reply_text = await ask_llm(
                 chat_id=chat_id,
-                user_text=user_text,
+                user_text=text,
                 sender_name=sender_name,
                 is_owner=is_owner,
-                is_owner_passive=is_passive_owner_comment,
-                image_bytes=image_bytes
+                is_owner_passive=is_passive_owner_comment
             )
 
             # If quota is exhausted or generation returned None, notify owner or log
