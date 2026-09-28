@@ -69,6 +69,30 @@ def get_ram_usage() -> str:
 
     return "Active"
 
+async def perform_graceful_restart(client: TelegramClient):
+    """Gracefully closes sessions and restarts service via systemd or in-place execv."""
+    try:
+        from plugins.keru_bot import stop_keru_bot
+        stop_keru_bot()
+    except Exception:
+        pass
+    try:
+        await client.disconnect()
+    except Exception:
+        pass
+    await asyncio.sleep(1)
+
+    # 1. Try systemd restart first
+    code = os.system("systemctl restart telegram-userbot 2>/dev/null || systemctl restart userbot 2>/dev/null")
+    if code == 0:
+        sys.exit(0)
+
+    # 2. Fallback to execv
+    try:
+        os.execv(sys.executable, [sys.executable] + sys.argv)
+    except Exception:
+        sys.exit(0)
+
 def register_system_handlers(client: TelegramClient, prefix: str):
     """Registers system diagnostic and help commands."""
 
@@ -224,11 +248,7 @@ def register_system_handlers(client: TelegramClient, prefix: str):
                 pass
             await client.send_file(event.chat_id, file=card)
             await asyncio.sleep(2)
-            os.system("systemctl restart userbot 2>/dev/null || systemctl restart telegram-userbot 2>/dev/null &")
-            try:
-                os.execv(sys.executable, [sys.executable] + sys.argv)
-            except Exception:
-                sys.exit(0)
+            await perform_graceful_restart(client)
             return
 
         card = render_card(
@@ -251,14 +271,8 @@ def register_system_handlers(client: TelegramClient, prefix: str):
         except Exception:
             pass
         await client.send_file(event.chat_id, file=card)
-
-        # Allow card to finish uploading before restarting
         await asyncio.sleep(2)
-        os.system("systemctl restart userbot 2>/dev/null || systemctl restart telegram-userbot 2>/dev/null &")
-        try:
-            os.execv(sys.executable, [sys.executable] + sys.argv)
-        except Exception:
-            sys.exit(0)
+        await _perform_graceful_restart(client)
 
     # .restart / .reboot
     @client.on(events.NewMessage(outgoing=True, pattern=rf"^{prefix}(?:restart|reboot)$"))
@@ -283,10 +297,5 @@ def register_system_handlers(client: TelegramClient, prefix: str):
         except Exception:
             pass
         await client.send_file(event.chat_id, file=card)
-
         await asyncio.sleep(2)
-        os.system("systemctl restart userbot 2>/dev/null || systemctl restart telegram-userbot 2>/dev/null &")
-        try:
-            os.execv(sys.executable, [sys.executable] + sys.argv)
-        except Exception:
-            sys.exit(0)
+        await _perform_graceful_restart(client)

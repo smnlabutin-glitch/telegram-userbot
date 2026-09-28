@@ -436,227 +436,182 @@ async def keru_spontaneous_talker(stop_event: asyncio.Event):
             except Exception as e:
                 logger.warning("Spontaneous remark error in chat %s: %s", chat_id, e)
 
-async def start_keru_bot(api_id: int, api_hash: str, owner_id: int, owner_name: str, stop_event: asyncio.Event):
-    """Starts the Keru Telegram Bot service using Telethon."""
-    global BOT_CLIENT, BOT_USER_ID, BOT_USERNAME, OWNER_USER_ID, OWNER_USER_NAME
-
-    if not KERU_BOT_TOKEN:
-        logger.info("KERU_BOT_TOKEN is not configured. Keru bot service disabled.")
-        return
-
-    OWNER_USER_ID = owner_id
-    OWNER_USER_NAME = owner_name or "Хозяин"
-
-    logger.info("Initializing Keru Bot (Yandere Catgirl) for Owner ID: %s (%s)...", owner_id, owner_name)
-
-    client = TelegramClient(
-        SESSION_FILE,
-        api_id,
-        api_hash,
-        auto_reconnect=True,
-        connection_retries=-1
-    )
-    BOT_CLIENT = client
-
-    try:
-        await client.start(bot_token=KERU_BOT_TOKEN)
-        me = await client.get_me()
-        BOT_USER_ID = me.id
-        BOT_USERNAME = me.username or ""
-        logger.info("=" * 54)
-        logger.info("   KERU CATGIRL BOT IS ONLINE // YANDERE ENGINE   ")
-        logger.info("=" * 54)
-        logger.info("Bot Username   : @%s (ID: %s)", BOT_USERNAME, BOT_USER_ID)
-        logger.info("Master / Owner : %s (ID: %s)", OWNER_USER_NAME, OWNER_USER_ID)
-        logger.info("AI Model       : %s (DeepSeek via ProxyAPI)", DEEPSEEK_MODELS_CASCADE[0])
-        logger.info("-" * 54)
-    except Exception as e:
-        logger.error("Failed to authenticate Keru bot with token: %s", e)
-        return
-
-    # 1. GROUP MEMBERSHIP & ACCESS CONTROL
+def _register_bot_handlers(client: TelegramClient):
+    """Registers chat and message event handlers on the bot client."""
     @client.on(events.ChatAction)
     async def chat_action_handler(event: events.ChatAction.Event):
-        # Check if this bot was added
-        if event.user_added and BOT_USER_ID in [u.id for u in event.users if hasattr(u, "id")]:
-            AUTHORIZED_CHATS.add(event.chat_id)
-            _save_authorized_chats(AUTHORIZED_CHATS)
-            logger.info("Keru bot added to chat %s", event.chat_id)
-            try:
+        try:
+            if event.user_added and BOT_USER_ID in [u.id for u in event.users if hasattr(u, "id")]:
+                AUTHORIZED_CHATS.add(event.chat_id)
+                _save_authorized_chats(AUTHORIZED_CHATS)
+                logger.info("Keru bot added to chat %s", event.chat_id)
                 await event.respond("Мяу... Керу теперь здесь! 🖤 Буду рядом, мур-р~")
-            except Exception as ex:
-                logger.warning("Error greeting chat: %s", ex)
+        except Exception as ex:
+            logger.warning("Chat action error: %s", ex)
 
-    # 2. MESSAGE HANDLER (DMs, MENTIONS, OWNER REACTIONS)
     @client.on(events.NewMessage)
     async def message_handler(event: events.NewMessage.Event):
-        text = (event.raw_text or "").strip()
-        if not text:
-            return
+        try:
+            text = (event.raw_text or "").strip()
+            if not text:
+                return
 
-        chat_id = event.chat_id
-        is_private = event.is_private
-        sender = await event.get_sender()
-        sender_id = event.sender_id
-        is_owner = (sender_id == OWNER_USER_ID)
-        sender_name = getattr(sender, "first_name", "Участник") or "Участник"
-        text = (event.raw_text or "").strip()
-        text_lower = text.lower()
+            chat_id = event.chat_id
+            is_private = event.is_private
+            sender_id = event.sender_id
+            is_owner = bool(sender_id and OWNER_USER_ID and sender_id == OWNER_USER_ID)
 
-        # 1. STRICT PRIVATE MESSAGES POLICY:
-        # In DMs, Keru ONLY speaks to Owner. Completely ignore everyone else!
-        if is_private and not is_owner:
-            return
+            sender_name = "Участник"
+            try:
+                if event.sender:
+                    sender_name = getattr(event.sender, "first_name", "") or "Участник"
+            except Exception:
+                pass
 
-        # Auto-authorize group chats where bot is present
-        if not is_private and chat_id not in AUTHORIZED_CHATS:
-            AUTHORIZED_CHATS.add(chat_id)
-            _save_authorized_chats(AUTHORIZED_CHATS)
+            text_lower = text.lower()
+            logger.info("Keru incoming: chat=%s, sender=%s, is_owner=%s, text=%r", chat_id, sender_id, is_owner, text[:60])
 
-        # 2. CHECK MASTER'S BEHAVIOR RESTRICTIONS & BLACKLIST
-        sender_username = (getattr(sender, "username", "") or "").lower().lstrip("@")
-        sender_first_name = (getattr(sender, "first_name", "") or "").lower()
-        ignored_users = [str(x).lower().lstrip("@") for x in KERU_MEMORY.get("ignored_users", [])]
-        if not is_owner and (str(sender_id) in ignored_users or sender_username in ignored_users or sender_first_name in ignored_users):
-            logger.info("Keru ignoring message from user %s (%s) by Master's order", sender_id, sender_username)
-            return
+            # Group filtering & access control
+            if not is_private:
+                if chat_id not in AUTHORIZED_CHATS:
+                    AUTHORIZED_CHATS.add(chat_id)
+                    _save_authorized_chats(AUTHORIZED_CHATS)
 
-        if not is_owner and chat_id in KERU_MEMORY.get("chat_only_owner", []):
-            return
-
-        if chat_id in KERU_MEMORY.get("ignored_chats", []):
-            return
-
-        # Check reply info
-        is_reply_to_bot = False
-        reply_msg = None
-        if event.reply_to_msg_id:
-            if event.reply_to_msg_id in RECENT_BOT_MESSAGE_IDS:
-                is_reply_to_bot = True
-            elif event.is_reply:
+                sender_username = ""
                 try:
-                    reply_msg = await event.get_reply_message()
-                    if reply_msg:
-                        rep_id = getattr(reply_msg, "sender_id", None)
-                        if rep_id is None and hasattr(reply_msg, "from_id"):
-                            rep_id = getattr(reply_msg.from_id, "user_id", None)
-                        if rep_id and rep_id == BOT_USER_ID:
-                            is_reply_to_bot = True
-                except Exception as ex:
-                    logger.debug("Error checking reply message: %s", ex)
+                    sender_username = (getattr(event.sender, "username", "") or "").lower().lstrip("@")
+                except Exception:
+                    pass
 
-        # Check silence mode in groups
-        current_time = time.time()
-        is_silent = current_time < SILENT_UNTIL.get(chat_id, 0)
+                ignored_users = [str(x).lower().lstrip("@") for x in KERU_MEMORY.get("ignored_users", [])]
+                if not is_owner and (str(sender_id) in ignored_users or sender_username in ignored_users):
+                    logger.info("Ignoring blacklisted user %s in chat %s", sender_id, chat_id)
+                    return
 
-        # OWNER DIRECT CONTROL COMMANDS
-        if is_owner and text:
-            if re.search(r"\b(кер[а-яё]*|кяр[а-яё]*)\b.*?\b(молчи|тихо|заткнись|стоп|тишина)\b", text_lower):
-                SILENT_UNTIL[chat_id] = current_time + 900  # 15 mins
-                await event.reply("Мяу... Слушаюсь, Хозяин... Буду тихонько смотреть на вас из уголка... 🖤")
+                if not is_owner and chat_id in KERU_MEMORY.get("chat_only_owner", []):
+                    return
+
+                if chat_id in KERU_MEMORY.get("ignored_chats", []):
+                    return
+
+            # Reply detection
+            is_reply_to_bot = False
+            if event.reply_to_msg_id:
+                if event.reply_to_msg_id in RECENT_BOT_MESSAGE_IDS:
+                    is_reply_to_bot = True
+                elif event.is_reply:
+                    try:
+                        reply_msg = await event.get_reply_message()
+                        if reply_msg:
+                            rep_id = getattr(reply_msg, "sender_id", None)
+                            if rep_id is None and hasattr(reply_msg, "from_id"):
+                                rep_id = getattr(reply_msg.from_id, "user_id", None)
+                            if rep_id and rep_id == BOT_USER_ID:
+                                is_reply_to_bot = True
+                    except Exception:
+                        pass
+
+            current_time = time.time()
+            is_silent = current_time < SILENT_UNTIL.get(chat_id, 0)
+
+            # OWNER DIRECT COMMANDS
+            if is_owner and text:
+                if re.search(r"\b(кер[а-яё]*|кяр[а-яё]*)\b.*?\b(молчи|тихо|заткнись|стоп|тишина)\b", text_lower):
+                    SILENT_UNTIL[chat_id] = current_time + 900
+                    await event.reply("Мяу... Слушаюсь, Хозяин... Буду тихонько смотреть на вас из уголка... 🖤")
+                    return
+
+                if re.search(r"\b(кер[а-яё]*|кяр[а-яё]*)\b.*?\b(голос|говори|можно)\b", text_lower):
+                    SILENT_UNTIL[chat_id] = 0
+                    await event.reply("Мррр~ Наконец-то! Я так скучала по вашему голосу, Хозяин! Мяу!")
+                    return
+
+                if re.search(r"\b(кер[а-яё]*|кяр[а-яё]*)\b.*?\b(покинь|уйди|выйди)\b", text_lower):
+                    await event.reply("Мяу... Раз Хозяин велит, я ухожу... Но моё сердечко всегда с вами! 💔")
+                    AUTHORIZED_CHATS.discard(chat_id)
+                    _save_authorized_chats(AUTHORIZED_CHATS)
+                    await client.delete_dialog(chat_id)
+                    return
+
+                if re.search(r"\b(кер[а-яё]*|кяр[а-яё]*)\b.*?\b(статус|инфо|правила|память)\b", text_lower):
+                    active_model = f"`{DEEPSEEK_MODELS_CASCADE[0]}` (DeepSeek)"
+                    status_msg = (
+                        f"🐾 **Керу на связи, любимый Хозяин!**\n\n"
+                        f"🖤 **Хозяин**: {OWNER_USER_NAME} (ID: `{OWNER_USER_ID}`)\n"
+                        f"🧠 **ИИ Модель**: {active_model}\n"
+                        f"📜 **Особых приказов**: {len(KERU_MEMORY.get('custom_rules', []))}\n"
+                        f"🚫 **В чёрном списке**: {len(KERU_MEMORY.get('ignored_users', []))} пользователей\n"
+                        f"🎭 **Специальных отношений**: {len(KERU_MEMORY.get('attitude_overrides', {}))}\n"
+                        f"💬 **Авторизованных чатов**: {len(AUTHORIZED_CHATS)}\n"
+                        f"✨ **Преданность**: 1000% (Я подчиняюсь каждому вашему слову, мяу~)"
+                    )
+                    await event.reply(status_msg)
+                    return
+
+            if is_silent and not is_owner:
                 return
 
-            if re.search(r"\b(кер[а-яё]*|кяр[а-яё]*)\b.*?\b(голос|говори|можно)\b", text_lower):
-                SILENT_UNTIL[chat_id] = 0
-                await event.reply("Мррр~ Наконец-то! Я так скучала по вашему голосу, Хозяин! Мяу!")
-                return
+            # Determine response trigger
+            should_respond = False
+            is_passive_owner_comment = False
 
-            if re.search(r"\b(кер[а-яё]*|кяр[а-яё]*)\b.*?\b(покинь|уйди|выйди)\b", text_lower):
-                await event.reply("Мяу... Раз Хозяин велит, я ухожу... Но моё сердечко всегда с вами! 💔")
-                AUTHORIZED_CHATS.discard(chat_id)
-                _save_authorized_chats(AUTHORIZED_CHATS)
-                await client.delete_dialog(chat_id)
-                return
-
-            if re.search(r"\b(кер[а-яё]*|кяр[а-яё]*)\b.*?\b(статус|инфо|правила|память)\b", text_lower):
-                active_model = f"`{DEEPSEEK_MODELS_CASCADE[0]}` (DeepSeek)"
-                rules_count = len(KERU_MEMORY.get("custom_rules", []))
-                ignored_count = len(KERU_MEMORY.get("ignored_users", []))
-                attitudes_count = len(KERU_MEMORY.get("attitude_overrides", {}))
-                status_msg = (
-                    f"🐾 **Керу на связи, любимый Хозяин!**\n\n"
-                    f"🖤 **Хозяин**: {OWNER_USER_NAME} (ID: `{OWNER_USER_ID}`)\n"
-                    f"🧠 **ИИ Модель**: {active_model}\n"
-                    f"📜 **Особых приказов**: {rules_count}\n"
-                    f"🚫 **В чёрном списке**: {ignored_count} пользователей\n"
-                    f"🎭 **Специальных отношений**: {attitudes_count}\n"
-                    f"💬 **Авторизованных чатов**: {len(AUTHORIZED_CHATS)}\n"
-                    f"✨ **Преданность**: 1000% (Я подчиняюсь каждому вашему слову, мяу~)"
+            if is_private:
+                # IN PRIVATE MESSAGES (DMs) ALWAYS RESPOND
+                should_respond = True
+            else:
+                # 1. Name match (all Russian declensions and nicknames)
+                name_pattern = re.compile(
+                    r"\b(кер[а-яё]*|кяр[а-яё]*|catkeru|кошечк[а-яё]*|котейк[а-яё]*|котя|кошка)\b",
+                    re.IGNORECASE
                 )
-                await event.reply(status_msg)
-                return
+                bot_called_by_name = bool(name_pattern.search(text_lower))
 
-        # If in silence mode and message is not from owner, ignore
-        if is_silent and not is_owner:
-            return
-
-        # Determine if Keru should respond
-        should_respond = False
-        is_passive_owner_comment = False
-
-        if is_private:
-            should_respond = True
-        else:
-            # 1. Broad regex matching for Keru / Kyaru and nicknames in ANY grammatical case
-            # Matches: керу, кера, кере, керой, керы, кер, керуня, керушка, кяру, кяра, кяре, котейка, кошечка, котя, etc.
-            name_pattern = re.compile(
-                r"\b(кер[а-яё]*|кяр[а-яё]*|catkeru|кошечк[а-яё]*|котейк[а-яё]*|котя|кошка)\b",
-                re.IGNORECASE
-            )
-            bot_called_by_name = bool(name_pattern.search(text_lower))
-
-            # 2. Mention by @username or Telegram mention entity
-            bot_tagged = False
-            if BOT_USERNAME and f"@{BOT_USERNAME.lower()}" in text_lower:
-                bot_tagged = True
-            elif event.message and getattr(event.message, "entities", None):
-                for ent in event.message.entities:
-                    if getattr(ent, "user_id", None) == BOT_USER_ID:
-                        bot_tagged = True
-                        break
-                    if hasattr(ent, "offset") and hasattr(ent, "length"):
-                        ent_text = text[ent.offset : ent.offset + ent.length].lower().lstrip("@")
-                        if BOT_USERNAME and ent_text == BOT_USERNAME.lower():
+                # 2. Tag match (username, alias, or mention entity)
+                bot_tagged = False
+                if BOT_USERNAME and f"@{BOT_USERNAME.lower()}" in text_lower:
+                    bot_tagged = True
+                elif "catkeru" in text_lower or "@catkeru_bot" in text_lower:
+                    bot_tagged = True
+                elif event.message and getattr(event.message, "entities", None):
+                    for ent in event.message.entities:
+                        if getattr(ent, "user_id", None) == BOT_USER_ID:
                             bot_tagged = True
                             break
+                        if hasattr(ent, "offset") and hasattr(ent, "length"):
+                            ent_text = text[ent.offset : ent.offset + ent.length].lower().lstrip("@")
+                            if BOT_USERNAME and ent_text == BOT_USERNAME.lower():
+                                bot_tagged = True
+                                break
 
-            # 3. Direct bot commands
-            is_cmd = any(text_lower.startswith(p) for p in ["/start", "/help", "/ping", "/keru", "!keru", "/статус", "/status"])
+                # 3. Direct bot commands
+                is_cmd = any(text_lower.startswith(p) for p in ["/start", "/help", "/ping", "/keru", "!keru", "/статус", "/status"])
 
-            # 4. Active conversation with Owner:
-            # If the Owner is speaking in chat and Keru spoke to Owner recently (< 180 seconds ago),
-            # continue the natural conversation dialogue without requiring repeated mentions!
-            time_since_last_reply = current_time - LAST_BOT_REPLY_TIME.get(chat_id, 0)
-            in_active_owner_dialogue = is_owner and not is_silent and (time_since_last_reply < 180)
+                # 4. Active conversation with Owner (< 180 seconds since last Keru reply)
+                time_since_last_reply = current_time - LAST_BOT_REPLY_TIME.get(chat_id, 0)
+                in_active_owner_dialogue = is_owner and not is_silent and (time_since_last_reply < 180)
 
-            if bot_called_by_name or bot_tagged or is_reply_to_bot or is_cmd:
-                should_respond = True
-            elif in_active_owner_dialogue:
-                should_respond = True
-            elif is_owner and not is_silent and text:
-                # Random spontaneous reaction to Owner when not in active dialogue
-                last_time = LAST_REACTION_TIME.get(chat_id, 0)
-                if current_time - last_time >= 60 and random.random() < 0.25:
+                if bot_called_by_name or bot_tagged or is_reply_to_bot or is_cmd:
                     should_respond = True
-                    is_passive_owner_comment = True
-                    LAST_REACTION_TIME[chat_id] = current_time
+                elif in_active_owner_dialogue:
+                    should_respond = True
+                elif is_owner and not is_silent and text:
+                    # Random spontaneous reaction to Owner
+                    last_time = LAST_REACTION_TIME.get(chat_id, 0)
+                    if current_time - last_time >= 60 and random.random() < 0.25:
+                        should_respond = True
+                        is_passive_owner_comment = True
+                        LAST_REACTION_TIME[chat_id] = current_time
 
-        if not should_respond:
-            # Save message to rolling chat context so Keru stays context-aware
-            if not is_private and text:
-                chat_hist = CHAT_CONTEXT.setdefault(chat_id, [])
-                chat_hist.append({
-                    "role": "user",
-                    "content": f"[{sender_name}]: {text}"
-                })
-                if len(chat_hist) > 20:
-                    CHAT_CONTEXT[chat_id] = chat_hist[-20:]
-            return
+            if not should_respond:
+                if not is_private and text:
+                    chat_hist = CHAT_CONTEXT.setdefault(chat_id, [])
+                    chat_hist.append({"role": "user", "content": f"[{sender_name}]: {text}"})
+                    if len(chat_hist) > 20:
+                        CHAT_CONTEXT[chat_id] = chat_hist[-20:]
+                return
 
-        logger.info("Keru reacting to message in chat %s from %s (%s): %r", chat_id, sender_name, sender_id, text[:60])
+            logger.info("Keru generating response for chat %s from %s (%s)", chat_id, sender_name, sender_id)
 
-        # Generate response via DeepSeek
-        try:
             reply_text = await ask_llm(
                 chat_id=chat_id,
                 user_text=text,
@@ -665,12 +620,11 @@ async def start_keru_bot(api_id: int, api_hash: str, owner_id: int, owner_name: 
                 is_owner_passive=is_passive_owner_comment
             )
 
-            # If quota is exhausted or generation returned None, notify owner or log
             if not reply_text:
-                logger.warning("Keru generated empty reply for text: %r, last error: %s", user_text, LAST_API_ERROR)
-                if is_owner:
+                logger.warning("Keru generated empty reply for text: %r, last error: %s", text, LAST_API_ERROR)
+                if is_owner or is_private:
                     err_info = f"\n🔍 Ошибка: `{LAST_API_ERROR}`" if LAST_API_ERROR else ""
-                    await event.reply(f"Мяу... Хозяин, ИИ API временно недоступен или вернул пустой ответ!{err_info} 😿\nПроверьте баланс ProxyAPI или команду .keru")
+                    await event.reply(f"Мяу... ИИ временно недоступен!{err_info} 😿\nПопробуйте ещё раз через пару секунд.")
                 return
 
             sent_msg = None
@@ -685,20 +639,83 @@ async def start_keru_bot(api_id: int, api_hash: str, owner_id: int, owner_name: 
                 if len(RECENT_BOT_MESSAGE_IDS) > 200:
                     RECENT_BOT_MESSAGE_IDS.pop()
             LAST_BOT_REPLY_TIME[chat_id] = time.time()
+        except Exception as handler_err:
+            logger.error("Unhandled error in Keru message_handler: %s", handler_err, exc_info=True)
+
+async def start_keru_bot(api_id: int, api_hash: str, owner_id: int, owner_name: str, stop_event: asyncio.Event):
+    """Starts and continuously maintains the Keru Telegram Bot service with auto-reconnection."""
+    global BOT_CLIENT, BOT_USER_ID, BOT_USERNAME, OWNER_USER_ID, OWNER_USER_NAME
+
+    if not KERU_BOT_TOKEN:
+        logger.info("KERU_BOT_TOKEN is not configured. Keru bot service disabled.")
+        return
+
+    OWNER_USER_ID = owner_id
+    OWNER_USER_NAME = owner_name or "Хозяин"
+
+    logger.info("Initializing Keru Bot for Owner ID: %s (%s)...", owner_id, owner_name)
+
+    while not stop_event.is_set():
+        client = None
+        try:
+            client = TelegramClient(
+                SESSION_FILE,
+                api_id,
+                api_hash,
+                auto_reconnect=True,
+                connection_retries=-1,
+                retry_delay=3,
+            )
+            BOT_CLIENT = client
+
+            await client.start(bot_token=KERU_BOT_TOKEN)
+            me = await client.get_me()
+            BOT_USER_ID = me.id
+            BOT_USERNAME = me.username or ""
+            logger.info("=" * 54)
+            logger.info("   KERU CATGIRL BOT IS ONLINE // YANDERE ENGINE   ")
+            logger.info("=" * 54)
+            logger.info("Bot Username   : @%s (ID: %s)", BOT_USERNAME, BOT_USER_ID)
+            logger.info("Master / Owner : %s (ID: %s)", OWNER_USER_NAME, OWNER_USER_ID)
+            logger.info("AI Model       : %s (DeepSeek via ProxyAPI)", DEEPSEEK_MODELS_CASCADE[0])
+            logger.info("-" * 54)
+
+            _register_bot_handlers(client)
+
+            # Start spontaneous background chatter task
+            talker_task = asyncio.create_task(keru_spontaneous_talker(stop_event))
+
+            # Actively listen for updates until disconnected or stopped
+            run_task = asyncio.create_task(client.run_until_disconnected())
+            stop_task = asyncio.create_task(stop_event.wait())
+
+            done, pending = await asyncio.wait(
+                [run_task, stop_task],
+                return_when=asyncio.FIRST_COMPLETED
+            )
+            for t in pending:
+                t.cancel()
+            talker_task.cancel()
+
+            if stop_event.is_set():
+                break
+
+            logger.warning("Keru Bot connection dropped. Reconnecting in 5 seconds...")
+            await asyncio.sleep(5)
         except Exception as e:
-            logger.error("Error generating or sending Keru response: %s", e)
+            logger.error("Keru Bot runtime error: %s. Reconnecting in 5s...", e, exc_info=True)
+            if client and client.is_connected():
+                try:
+                    await client.disconnect()
+                except Exception:
+                    pass
+            await asyncio.sleep(5)
 
-    # Start spontaneous talker background task
-    talker_task = asyncio.create_task(keru_spontaneous_talker(stop_event))
-
-    # Keep running until stop_event is set
-    try:
-        await stop_event.wait()
-    finally:
-        logger.info("Disconnecting Keru bot gracefully...")
-        talker_task.cancel()
-        if client.is_connected():
-            await client.disconnect()
+    if BOT_CLIENT and BOT_CLIENT.is_connected():
+        try:
+            await BOT_CLIENT.disconnect()
+        except Exception:
+            pass
 
 def stop_keru_bot():
     """Disconnects the bot client safely."""
