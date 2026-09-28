@@ -192,11 +192,8 @@ OWNER_USER_NAME: str = "Хозяин"
 
 PROXYAPI_URL = "https://api.proxyapi.ru/v1/chat/completions"
 DEEPSEEK_MODELS_CASCADE = [
-    "deepseek/deepseek-v4-flash",
-    "deepseek/deepseek-chat-v3.1",
-    "deepseek/deepseek-chat-v3",
-    "deepseek/deepseek-v3.2",
     "deepseek/deepseek-chat",
+    "deepseek/deepseek-chat-v3.1",
 ]
 
 LAST_API_ERROR: str = ""
@@ -211,7 +208,7 @@ def clean_asterisk_actions(text: str) -> str:
     return cleaned.strip()
 
 def query_deepseek_sync(messages: List[dict]) -> Optional[str]:
-    """Queries DeepSeek via ProxyAPI with 8s timeout and fallback over DeepSeek versions."""
+    """Queries DeepSeek via ProxyAPI with 12s timeout and single fast fallback."""
     global LAST_API_ERROR
     if not PROXYAPI_KEY:
         LAST_API_ERROR = "PROXYAPI_KEY не установлен в .env или config.py"
@@ -230,7 +227,7 @@ def query_deepseek_sync(messages: List[dict]) -> Optional[str]:
             "model": model_name,
             "messages": messages,
             "temperature": 0.85,
-            "max_tokens": 350
+            "max_tokens": 300
         }
         data_bytes = json.dumps(payload).encode("utf-8")
         req = urllib.request.Request(
@@ -239,7 +236,7 @@ def query_deepseek_sync(messages: List[dict]) -> Optional[str]:
             headers=headers
         )
         try:
-            with urllib.request.urlopen(req, timeout=8) as resp:
+            with urllib.request.urlopen(req, timeout=12) as resp:
                 res = json.loads(resp.read().decode("utf-8"))
                 choices = res.get("choices", [])
                 if choices and choices[0].get("message", {}).get("content"):
@@ -255,11 +252,11 @@ def query_deepseek_sync(messages: List[dict]) -> Optional[str]:
             except Exception:
                 pass
             LAST_API_ERROR = f"{model_name}: HTTP {he.code} {err_body[:60]}"
-            logger.warning("ProxyAPI model %s HTTP %s: %s, switching to next version...", model_name, he.code, err_body)
+            logger.warning("ProxyAPI model %s HTTP %s: %s, fallback to next...", model_name, he.code, err_body)
             continue
         except Exception as e:
             LAST_API_ERROR = f"{model_name}: {type(e).__name__} ({e})"
-            logger.warning("ProxyAPI model %s failed: %s, switching to next version...", model_name, e)
+            logger.warning("ProxyAPI model %s failed: %s, fallback to next...", model_name, e)
             continue
 
     return None
@@ -612,13 +609,24 @@ def _register_bot_handlers(client: TelegramClient):
 
             logger.info("Keru generating response for chat %s from %s (%s)", chat_id, sender_name, sender_id)
 
-            reply_text = await ask_llm(
-                chat_id=chat_id,
-                user_text=text,
-                sender_name=sender_name,
-                is_owner=is_owner,
-                is_owner_passive=is_passive_owner_comment
-            )
+            reply_text = None
+            try:
+                async with client.action(chat_id, "typing"):
+                    reply_text = await ask_llm(
+                        chat_id=chat_id,
+                        user_text=text,
+                        sender_name=sender_name,
+                        is_owner=is_owner,
+                        is_owner_passive=is_passive_owner_comment
+                    )
+            except Exception:
+                reply_text = await ask_llm(
+                    chat_id=chat_id,
+                    user_text=text,
+                    sender_name=sender_name,
+                    is_owner=is_owner,
+                    is_owner_passive=is_passive_owner_comment
+                )
 
             if not reply_text:
                 logger.warning("Keru generated empty reply for text: %r, last error: %s", text, LAST_API_ERROR)
