@@ -189,8 +189,16 @@ OWNER_USER_ID: Optional[int] = None
 OWNER_USER_NAME: str = "Хозяин"
 
 PROXYAPI_URL = "https://api.proxyapi.ru/v1/chat/completions"
-DEEPSEEK_MODEL = "deepseek/deepseek-chat"
-GPT_VISION_MODEL = "gpt-4o-mini"
+DEEPSEEK_MODELS_CASCADE = [
+    "deepseek/deepseek-chat-v3",
+    "deepseek/deepseek-chat-v3.1",
+    "deepseek/deepseek-v3.2",
+    "gpt-4o-mini",
+]
+GPT_VISION_MODELS_CASCADE = [
+    "gpt-4o-mini",
+    "gpt-4o",
+]
 
 def clean_asterisk_actions(text: str) -> str:
     """Removes roleplay actions in asterisks or markdown italics."""
@@ -221,97 +229,105 @@ def prepare_image_for_llm(raw_bytes: bytes) -> tuple[str, str]:
         return b64, "image/jpeg"
 
 def query_deepseek_sync(messages: List[dict]) -> Optional[str]:
-    """Queries DeepSeek-V3 via ProxyAPI for intelligent text conversation with auto-retry."""
+    """Queries DeepSeek via ProxyAPI with cascade across active models and gpt-4o-mini fallback."""
     if not PROXYAPI_KEY:
         return None
 
-    for attempt in range(3):
-        payload = {
-            "model": DEEPSEEK_MODEL,
-            "messages": messages,
-            "temperature": 0.88,
-            "max_tokens": 800
-        }
-        data_bytes = json.dumps(payload).encode("utf-8")
-        req = urllib.request.Request(
-            PROXYAPI_URL,
-            data=data_bytes,
-            headers={
-                "Content-Type": "application/json",
-                "Authorization": f"Bearer {PROXYAPI_KEY}"
+    for model_name in DEEPSEEK_MODELS_CASCADE:
+        for attempt in range(2):
+            payload = {
+                "model": model_name,
+                "messages": messages,
+                "temperature": 0.88,
+                "max_tokens": 800
             }
-        )
-        try:
-            with urllib.request.urlopen(req, timeout=20) as resp:
-                res = json.loads(resp.read().decode("utf-8"))
-                choices = res.get("choices", [])
-                if choices and choices[0].get("message", {}).get("content"):
-                    raw = choices[0]["message"]["content"].strip()
-                    return clean_asterisk_actions(raw)
-        except urllib.error.HTTPError as he:
-            err_body = ""
+            data_bytes = json.dumps(payload).encode("utf-8")
+            req = urllib.request.Request(
+                PROXYAPI_URL,
+                data=data_bytes,
+                headers={
+                    "Content-Type": "application/json",
+                    "Authorization": f"Bearer {PROXYAPI_KEY}"
+                }
+            )
             try:
-                err_body = he.read().decode("utf-8", "ignore")
-            except Exception:
-                pass
-            logger.warning("DeepSeek HTTP %s (attempt %d/3): %s", he.code, attempt + 1, err_body)
-            if he.code == 429 and attempt < 2:
-                time.sleep(1.5 * (attempt + 1))
-                continue
-            break
-        except Exception as e:
-            logger.warning("DeepSeek query failed via ProxyAPI (attempt %d/3): %s", attempt + 1, e)
-            if attempt < 2:
-                time.sleep(1.0)
-                continue
-            break
+                with urllib.request.urlopen(req, timeout=18) as resp:
+                    res = json.loads(resp.read().decode("utf-8"))
+                    choices = res.get("choices", [])
+                    if choices and choices[0].get("message", {}).get("content"):
+                        raw = choices[0]["message"]["content"].strip()
+                        if raw:
+                            logger.info("ProxyAPI text reply generated successfully using %s", model_name)
+                            return clean_asterisk_actions(raw)
+            except urllib.error.HTTPError as he:
+                err_body = ""
+                try:
+                    err_body = he.read().decode("utf-8", "ignore")
+                except Exception:
+                    pass
+                logger.warning("ProxyAPI model %s HTTP %s (attempt %d/2): %s", model_name, he.code, attempt + 1, err_body)
+                if he.code == 429 and attempt == 0:
+                    time.sleep(1.2)
+                    continue
+                break
+            except Exception as e:
+                logger.warning("ProxyAPI model %s failed (attempt %d/2): %s", model_name, attempt + 1, e)
+                if attempt == 0:
+                    time.sleep(1.0)
+                    continue
+                break
+
     return None
 
 def query_gpt_mini_sync(messages: List[dict]) -> Optional[str]:
-    """Queries GPT-4o-mini via ProxyAPI for vision tasks when an image is sent with auto-retry."""
+    """Queries GPT-4o-mini via ProxyAPI for vision tasks when an image is sent."""
     if not PROXYAPI_KEY:
         return None
 
-    for attempt in range(3):
-        payload = {
-            "model": GPT_VISION_MODEL,
-            "messages": messages,
-            "temperature": 0.88,
-            "max_tokens": 800
-        }
-        data_bytes = json.dumps(payload).encode("utf-8")
-        req = urllib.request.Request(
-            PROXYAPI_URL,
-            data=data_bytes,
-            headers={
-                "Content-Type": "application/json",
-                "Authorization": f"Bearer {PROXYAPI_KEY}"
+    for model_name in GPT_VISION_MODELS_CASCADE:
+        for attempt in range(2):
+            payload = {
+                "model": model_name,
+                "messages": messages,
+                "temperature": 0.88,
+                "max_tokens": 800
             }
-        )
-        try:
-            with urllib.request.urlopen(req, timeout=25) as resp:
-                res = json.loads(resp.read().decode("utf-8"))
-                choices = res.get("choices", [])
-                if choices and choices[0].get("message", {}).get("content"):
-                    raw = choices[0]["message"]["content"].strip()
-                    return clean_asterisk_actions(raw)
-        except urllib.error.HTTPError as he:
-            err_body = ""
+            data_bytes = json.dumps(payload).encode("utf-8")
+            req = urllib.request.Request(
+                PROXYAPI_URL,
+                data=data_bytes,
+                headers={
+                    "Content-Type": "application/json",
+                    "Authorization": f"Bearer {PROXYAPI_KEY}"
+                }
+            )
             try:
-                err_body = he.read().decode("utf-8", "ignore")
-            except Exception:
-                pass
-            logger.warning("GPT-4o-mini HTTP %s (attempt %d/3): %s", he.code, attempt + 1, err_body)
-            if he.code == 429 and attempt < 2:
-                time.sleep(1.5 * (attempt + 1))
-                continue
-            break
-        except Exception as e:
-            logger.warning("GPT-4o-mini vision query failed via ProxyAPI (attempt %d/3): %s", attempt + 1, e)
-            if attempt < 2:
-                time.sleep(1.0)
-                continue
-            break
+                with urllib.request.urlopen(req, timeout=25) as resp:
+                    res = json.loads(resp.read().decode("utf-8"))
+                    choices = res.get("choices", [])
+                    if choices and choices[0].get("message", {}).get("content"):
+                        raw = choices[0]["message"]["content"].strip()
+                        if raw:
+                            logger.info("ProxyAPI vision reply generated successfully using %s", model_name)
+                            return clean_asterisk_actions(raw)
+            except urllib.error.HTTPError as he:
+                err_body = ""
+                try:
+                    err_body = he.read().decode("utf-8", "ignore")
+                except Exception:
+                    pass
+                logger.warning("ProxyAPI vision model %s HTTP %s (attempt %d/2): %s", model_name, he.code, attempt + 1, err_body)
+                if he.code == 429 and attempt == 0:
+                    time.sleep(1.2)
+                    continue
+                break
+            except Exception as e:
+                logger.warning("ProxyAPI vision model %s error (attempt %d/2): %s", model_name, attempt + 1, e)
+                if attempt == 0:
+                    time.sleep(1.0)
+                    continue
+                break
+
     return None
 
 def build_system_instruction(owner_id: int, owner_name: str) -> str:
@@ -545,7 +561,7 @@ async def start_keru_bot(api_id: int, api_hash: str, owner_id: int, owner_name: 
         logger.info("=" * 54)
         logger.info("Bot Username   : @%s (ID: %s)", BOT_USERNAME, BOT_USER_ID)
         logger.info("Master / Owner : %s (ID: %s)", OWNER_USER_NAME, OWNER_USER_ID)
-        logger.info("AI Models      : %s (Text) + %s (Vision)", DEEPSEEK_MODEL, GPT_VISION_MODEL)
+        logger.info("AI Models      : %s (Text) + %s (Vision)", DEEPSEEK_MODELS_CASCADE[0], GPT_VISION_MODELS_CASCADE[0])
         logger.info("-" * 54)
     except Exception as e:
         logger.error("Failed to authenticate Keru bot with token: %s", e)
@@ -642,7 +658,7 @@ async def start_keru_bot(api_id: int, api_hash: str, owner_id: int, owner_name: 
                 return
 
             if re.search(r"\b(керу|кяру)\b.*?\b(статус|инфо|правила|память)\b", text_lower):
-                active_model = f"`{DEEPSEEK_MODEL}` (текст) + `{GPT_VISION_MODEL}` (картинки)"
+                active_model = f"`{DEEPSEEK_MODELS_CASCADE[0]}` (текст) + `{GPT_VISION_MODELS_CASCADE[0]}` (картинки)"
                 rules_count = len(KERU_MEMORY.get("custom_rules", []))
                 ignored_count = len(KERU_MEMORY.get("ignored_users", []))
                 attitudes_count = len(KERU_MEMORY.get("attitude_overrides", {}))
