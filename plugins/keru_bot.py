@@ -200,6 +200,8 @@ GPT_VISION_MODELS_CASCADE = [
     "gpt-4o",
 ]
 
+LAST_API_ERROR: str = ""
+
 def clean_asterisk_actions(text: str) -> str:
     """Removes roleplay actions in asterisks or markdown italics."""
     cleaned = re.sub(r"\*[^*]+\*", "", text)
@@ -230,7 +232,9 @@ def prepare_image_for_llm(raw_bytes: bytes) -> tuple[str, str]:
 
 def query_deepseek_sync(messages: List[dict]) -> Optional[str]:
     """Queries DeepSeek via ProxyAPI with cascade across active models and gpt-4o-mini fallback."""
+    global LAST_API_ERROR
     if not PROXYAPI_KEY:
+        LAST_API_ERROR = "PROXYAPI_KEY не установлен в .env или config.py"
         return None
 
     for model_name in DEEPSEEK_MODELS_CASCADE:
@@ -251,12 +255,13 @@ def query_deepseek_sync(messages: List[dict]) -> Optional[str]:
                 }
             )
             try:
-                with urllib.request.urlopen(req, timeout=18) as resp:
+                with urllib.request.urlopen(req, timeout=10) as resp:
                     res = json.loads(resp.read().decode("utf-8"))
                     choices = res.get("choices", [])
                     if choices and choices[0].get("message", {}).get("content"):
                         raw = choices[0]["message"]["content"].strip()
                         if raw:
+                            LAST_API_ERROR = ""
                             logger.info("ProxyAPI text reply generated successfully using %s", model_name)
                             return clean_asterisk_actions(raw)
             except urllib.error.HTTPError as he:
@@ -265,15 +270,17 @@ def query_deepseek_sync(messages: List[dict]) -> Optional[str]:
                     err_body = he.read().decode("utf-8", "ignore")
                 except Exception:
                     pass
+                LAST_API_ERROR = f"{model_name}: HTTP {he.code} {err_body[:60]}"
                 logger.warning("ProxyAPI model %s HTTP %s (attempt %d/2): %s", model_name, he.code, attempt + 1, err_body)
                 if he.code == 429 and attempt == 0:
-                    time.sleep(1.2)
+                    time.sleep(1.0)
                     continue
                 break
             except Exception as e:
+                LAST_API_ERROR = f"{model_name}: {type(e).__name__} ({e})"
                 logger.warning("ProxyAPI model %s failed (attempt %d/2): %s", model_name, attempt + 1, e)
                 if attempt == 0:
-                    time.sleep(1.0)
+                    time.sleep(0.8)
                     continue
                 break
 
@@ -281,7 +288,9 @@ def query_deepseek_sync(messages: List[dict]) -> Optional[str]:
 
 def query_gpt_mini_sync(messages: List[dict]) -> Optional[str]:
     """Queries GPT-4o-mini via ProxyAPI for vision tasks when an image is sent."""
+    global LAST_API_ERROR
     if not PROXYAPI_KEY:
+        LAST_API_ERROR = "PROXYAPI_KEY не установлен в .env или config.py"
         return None
 
     for model_name in GPT_VISION_MODELS_CASCADE:
@@ -302,12 +311,13 @@ def query_gpt_mini_sync(messages: List[dict]) -> Optional[str]:
                 }
             )
             try:
-                with urllib.request.urlopen(req, timeout=25) as resp:
+                with urllib.request.urlopen(req, timeout=20) as resp:
                     res = json.loads(resp.read().decode("utf-8"))
                     choices = res.get("choices", [])
                     if choices and choices[0].get("message", {}).get("content"):
                         raw = choices[0]["message"]["content"].strip()
                         if raw:
+                            LAST_API_ERROR = ""
                             logger.info("ProxyAPI vision reply generated successfully using %s", model_name)
                             return clean_asterisk_actions(raw)
             except urllib.error.HTTPError as he:
@@ -316,15 +326,17 @@ def query_gpt_mini_sync(messages: List[dict]) -> Optional[str]:
                     err_body = he.read().decode("utf-8", "ignore")
                 except Exception:
                     pass
+                LAST_API_ERROR = f"{model_name}: HTTP {he.code} {err_body[:60]}"
                 logger.warning("ProxyAPI vision model %s HTTP %s (attempt %d/2): %s", model_name, he.code, attempt + 1, err_body)
                 if he.code == 429 and attempt == 0:
-                    time.sleep(1.2)
+                    time.sleep(1.0)
                     continue
                 break
             except Exception as e:
+                LAST_API_ERROR = f"{model_name}: {type(e).__name__} ({e})"
                 logger.warning("ProxyAPI vision model %s error (attempt %d/2): %s", model_name, attempt + 1, e)
                 if attempt == 0:
-                    time.sleep(1.0)
+                    time.sleep(0.8)
                     continue
                 break
 
@@ -748,9 +760,10 @@ async def start_keru_bot(api_id: int, api_hash: str, owner_id: int, owner_name: 
 
             # If quota is exhausted or generation returned None, notify owner or log
             if not reply_text:
-                logger.warning("Keru generated empty reply for text: %r", user_text)
+                logger.warning("Keru generated empty reply for text: %r, last error: %s", user_text, LAST_API_ERROR)
                 if is_owner:
-                    await event.reply("Мяу... Хозяин, ИИ API временно недоступен или вернул пустой ответ! Проверьте баланс ProxyAPI 😿")
+                    err_info = f"\n🔍 Ошибка: `{LAST_API_ERROR}`" if LAST_API_ERROR else ""
+                    await event.reply(f"Мяу... Хозяин, ИИ API временно недоступен или вернул пустой ответ!{err_info} 😿\nПроверьте баланс ProxyAPI или команду .keru")
                 return
 
             try:
