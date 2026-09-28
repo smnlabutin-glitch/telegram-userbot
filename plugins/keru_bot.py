@@ -191,8 +191,6 @@ OWNER_USER_NAME: str = "Хозяин"
 PROXYAPI_URL = "https://api.proxyapi.ru/v1/chat/completions"
 DEEPSEEK_MODELS_CASCADE = [
     "deepseek/deepseek-chat-v3",
-    "deepseek/deepseek-chat-v3.1",
-    "deepseek/deepseek-v3.2",
     "gpt-4o-mini",
 ]
 GPT_VISION_MODELS_CASCADE = [
@@ -231,58 +229,57 @@ def prepare_image_for_llm(raw_bytes: bytes) -> tuple[str, str]:
         return b64, "image/jpeg"
 
 def query_deepseek_sync(messages: List[dict]) -> Optional[str]:
-    """Queries DeepSeek via ProxyAPI with cascade across active models and gpt-4o-mini fallback."""
+    """Queries DeepSeek-V3 via ProxyAPI with fast 6s timeout and instant gpt-4o-mini fallback."""
     global LAST_API_ERROR
     if not PROXYAPI_KEY:
         LAST_API_ERROR = "PROXYAPI_KEY не установлен в .env или config.py"
         return None
 
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {PROXYAPI_KEY}",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+        "Accept": "application/json",
+        "Connection": "close"
+    }
+
     for model_name in DEEPSEEK_MODELS_CASCADE:
-        for attempt in range(2):
-            payload = {
-                "model": model_name,
-                "messages": messages,
-                "temperature": 0.88,
-                "max_tokens": 800
-            }
-            data_bytes = json.dumps(payload).encode("utf-8")
-            req = urllib.request.Request(
-                PROXYAPI_URL,
-                data=data_bytes,
-                headers={
-                    "Content-Type": "application/json",
-                    "Authorization": f"Bearer {PROXYAPI_KEY}"
-                }
-            )
+        timeout_sec = 6 if "deepseek" in model_name else 10
+        payload = {
+            "model": model_name,
+            "messages": messages,
+            "temperature": 0.88,
+            "max_tokens": 800
+        }
+        data_bytes = json.dumps(payload).encode("utf-8")
+        req = urllib.request.Request(
+            PROXYAPI_URL,
+            data=data_bytes,
+            headers=headers
+        )
+        try:
+            with urllib.request.urlopen(req, timeout=timeout_sec) as resp:
+                res = json.loads(resp.read().decode("utf-8"))
+                choices = res.get("choices", [])
+                if choices and choices[0].get("message", {}).get("content"):
+                    raw = choices[0]["message"]["content"].strip()
+                    if raw:
+                        LAST_API_ERROR = ""
+                        logger.info("ProxyAPI text reply generated successfully using %s", model_name)
+                        return clean_asterisk_actions(raw)
+        except urllib.error.HTTPError as he:
+            err_body = ""
             try:
-                with urllib.request.urlopen(req, timeout=10) as resp:
-                    res = json.loads(resp.read().decode("utf-8"))
-                    choices = res.get("choices", [])
-                    if choices and choices[0].get("message", {}).get("content"):
-                        raw = choices[0]["message"]["content"].strip()
-                        if raw:
-                            LAST_API_ERROR = ""
-                            logger.info("ProxyAPI text reply generated successfully using %s", model_name)
-                            return clean_asterisk_actions(raw)
-            except urllib.error.HTTPError as he:
-                err_body = ""
-                try:
-                    err_body = he.read().decode("utf-8", "ignore")
-                except Exception:
-                    pass
-                LAST_API_ERROR = f"{model_name}: HTTP {he.code} {err_body[:60]}"
-                logger.warning("ProxyAPI model %s HTTP %s (attempt %d/2): %s", model_name, he.code, attempt + 1, err_body)
-                if he.code == 429 and attempt == 0:
-                    time.sleep(1.0)
-                    continue
-                break
-            except Exception as e:
-                LAST_API_ERROR = f"{model_name}: {type(e).__name__} ({e})"
-                logger.warning("ProxyAPI model %s failed (attempt %d/2): %s", model_name, attempt + 1, e)
-                if attempt == 0:
-                    time.sleep(0.8)
-                    continue
-                break
+                err_body = he.read().decode("utf-8", "ignore")
+            except Exception:
+                pass
+            LAST_API_ERROR = f"{model_name}: HTTP {he.code} {err_body[:60]}"
+            logger.warning("ProxyAPI model %s HTTP %s: %s, switching to next model...", model_name, he.code, err_body)
+            continue
+        except Exception as e:
+            LAST_API_ERROR = f"{model_name}: {type(e).__name__} ({e})"
+            logger.warning("ProxyAPI model %s failed: %s, switching to next model...", model_name, e)
+            continue
 
     return None
 
@@ -293,52 +290,50 @@ def query_gpt_mini_sync(messages: List[dict]) -> Optional[str]:
         LAST_API_ERROR = "PROXYAPI_KEY не установлен в .env или config.py"
         return None
 
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {PROXYAPI_KEY}",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+        "Accept": "application/json",
+        "Connection": "close"
+    }
+
     for model_name in GPT_VISION_MODELS_CASCADE:
-        for attempt in range(2):
-            payload = {
-                "model": model_name,
-                "messages": messages,
-                "temperature": 0.88,
-                "max_tokens": 800
-            }
-            data_bytes = json.dumps(payload).encode("utf-8")
-            req = urllib.request.Request(
-                PROXYAPI_URL,
-                data=data_bytes,
-                headers={
-                    "Content-Type": "application/json",
-                    "Authorization": f"Bearer {PROXYAPI_KEY}"
-                }
-            )
+        payload = {
+            "model": model_name,
+            "messages": messages,
+            "temperature": 0.88,
+            "max_tokens": 800
+        }
+        data_bytes = json.dumps(payload).encode("utf-8")
+        req = urllib.request.Request(
+            PROXYAPI_URL,
+            data=data_bytes,
+            headers=headers
+        )
+        try:
+            with urllib.request.urlopen(req, timeout=15) as resp:
+                res = json.loads(resp.read().decode("utf-8"))
+                choices = res.get("choices", [])
+                if choices and choices[0].get("message", {}).get("content"):
+                    raw = choices[0]["message"]["content"].strip()
+                    if raw:
+                        LAST_API_ERROR = ""
+                        logger.info("ProxyAPI vision reply generated successfully using %s", model_name)
+                        return clean_asterisk_actions(raw)
+        except urllib.error.HTTPError as he:
+            err_body = ""
             try:
-                with urllib.request.urlopen(req, timeout=20) as resp:
-                    res = json.loads(resp.read().decode("utf-8"))
-                    choices = res.get("choices", [])
-                    if choices and choices[0].get("message", {}).get("content"):
-                        raw = choices[0]["message"]["content"].strip()
-                        if raw:
-                            LAST_API_ERROR = ""
-                            logger.info("ProxyAPI vision reply generated successfully using %s", model_name)
-                            return clean_asterisk_actions(raw)
-            except urllib.error.HTTPError as he:
-                err_body = ""
-                try:
-                    err_body = he.read().decode("utf-8", "ignore")
-                except Exception:
-                    pass
-                LAST_API_ERROR = f"{model_name}: HTTP {he.code} {err_body[:60]}"
-                logger.warning("ProxyAPI vision model %s HTTP %s (attempt %d/2): %s", model_name, he.code, attempt + 1, err_body)
-                if he.code == 429 and attempt == 0:
-                    time.sleep(1.0)
-                    continue
-                break
-            except Exception as e:
-                LAST_API_ERROR = f"{model_name}: {type(e).__name__} ({e})"
-                logger.warning("ProxyAPI vision model %s error (attempt %d/2): %s", model_name, attempt + 1, e)
-                if attempt == 0:
-                    time.sleep(0.8)
-                    continue
-                break
+                err_body = he.read().decode("utf-8", "ignore")
+            except Exception:
+                pass
+            LAST_API_ERROR = f"{model_name}: HTTP {he.code} {err_body[:60]}"
+            logger.warning("ProxyAPI vision model %s HTTP %s: %s", model_name, he.code, err_body)
+            continue
+        except Exception as e:
+            LAST_API_ERROR = f"{model_name}: {type(e).__name__} ({e})"
+            logger.warning("ProxyAPI vision model %s error: %s", model_name, e)
+            continue
 
     return None
 
