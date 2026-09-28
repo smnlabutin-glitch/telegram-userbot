@@ -192,8 +192,10 @@ OWNER_USER_NAME: str = "Хозяин"
 
 PROXYAPI_URL = "https://api.proxyapi.ru/v1/chat/completions"
 DEEPSEEK_MODELS_CASCADE = [
-    "deepseek/deepseek-chat",
+    "deepseek/deepseek-chat-v3",
     "deepseek/deepseek-chat-v3.1",
+    "deepseek/deepseek-v3.2",
+    "deepseek/deepseek-chat",
 ]
 
 LAST_API_ERROR: str = ""
@@ -347,9 +349,9 @@ async def ask_llm(
         "content": formatted_input
     })
 
-    # Keep only last 20 messages
-    if len(history) > 20:
-        history = history[-20:]
+    # Keep only last 10 messages for ultra-fast generation
+    if len(history) > 10:
+        history = history[-10:]
         CHAT_CONTEXT[chat_id] = history
 
     system_prompt = build_system_instruction(OWNER_USER_ID or 0, OWNER_USER_NAME)
