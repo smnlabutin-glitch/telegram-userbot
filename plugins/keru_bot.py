@@ -180,6 +180,8 @@ def extract_fallback_directives(user_text: str, chat_id: int):
 
 CHAT_CONTEXT: Dict[int, List[dict]] = {}
 LAST_REACTION_TIME: Dict[int, float] = {}
+LAST_BOT_REPLY_TIME: Dict[int, float] = {}
+RECENT_BOT_MESSAGE_IDS: Set[int] = set()
 SILENT_UNTIL: Dict[int, float] = {}
 
 BOT_CLIENT: Optional[TelegramClient] = None
@@ -209,7 +211,7 @@ def clean_asterisk_actions(text: str) -> str:
     return cleaned.strip()
 
 def query_deepseek_sync(messages: List[dict]) -> Optional[str]:
-    """Queries DeepSeek via ProxyAPI with 12s timeout and fallback over DeepSeek versions."""
+    """Queries DeepSeek via ProxyAPI with 8s timeout and fallback over DeepSeek versions."""
     global LAST_API_ERROR
     if not PROXYAPI_KEY:
         LAST_API_ERROR = "PROXYAPI_KEY не установлен в .env или config.py"
@@ -227,8 +229,8 @@ def query_deepseek_sync(messages: List[dict]) -> Optional[str]:
         payload = {
             "model": model_name,
             "messages": messages,
-            "temperature": 0.88,
-            "max_tokens": 800
+            "temperature": 0.85,
+            "max_tokens": 350
         }
         data_bytes = json.dumps(payload).encode("utf-8")
         req = urllib.request.Request(
@@ -237,7 +239,7 @@ def query_deepseek_sync(messages: List[dict]) -> Optional[str]:
             headers=headers
         )
         try:
-            with urllib.request.urlopen(req, timeout=12) as resp:
+            with urllib.request.urlopen(req, timeout=8) as resp:
                 res = json.loads(resp.read().decode("utf-8"))
                 choices = res.get("choices", [])
                 if choices and choices[0].get("message", {}).get("content"):
@@ -528,10 +530,20 @@ async def start_keru_bot(api_id: int, api_hash: str, owner_id: int, owner_name: 
         # Check reply info
         is_reply_to_bot = False
         reply_msg = None
-        if event.is_reply:
-            reply_msg = await event.get_reply_message()
-            if reply_msg and reply_msg.sender_id == BOT_USER_ID:
+        if event.reply_to_msg_id:
+            if event.reply_to_msg_id in RECENT_BOT_MESSAGE_IDS:
                 is_reply_to_bot = True
+            elif event.is_reply:
+                try:
+                    reply_msg = await event.get_reply_message()
+                    if reply_msg:
+                        rep_id = getattr(reply_msg, "sender_id", None)
+                        if rep_id is None and hasattr(reply_msg, "from_id"):
+                            rep_id = getattr(reply_msg.from_id, "user_id", None)
+                        if rep_id and rep_id == BOT_USER_ID:
+                            is_reply_to_bot = True
+                except Exception as ex:
+                    logger.debug("Error checking reply message: %s", ex)
 
         # Check silence mode in groups
         current_time = time.time()
@@ -539,24 +551,24 @@ async def start_keru_bot(api_id: int, api_hash: str, owner_id: int, owner_name: 
 
         # OWNER DIRECT CONTROL COMMANDS
         if is_owner and text:
-            if re.search(r"\b(керу|кяру)\b.*?\b(молчи|тихо|заткнись|стоп|тишина)\b", text_lower):
+            if re.search(r"\b(кер[а-яё]*|кяр[а-яё]*)\b.*?\b(молчи|тихо|заткнись|стоп|тишина)\b", text_lower):
                 SILENT_UNTIL[chat_id] = current_time + 900  # 15 mins
                 await event.reply("Мяу... Слушаюсь, Хозяин... Буду тихонько смотреть на вас из уголка... 🖤")
                 return
 
-            if re.search(r"\b(керу|кяру)\b.*?\b(голос|говори|можно)\b", text_lower):
+            if re.search(r"\b(кер[а-яё]*|кяр[а-яё]*)\b.*?\b(голос|говори|можно)\b", text_lower):
                 SILENT_UNTIL[chat_id] = 0
                 await event.reply("Мррр~ Наконец-то! Я так скучала по вашему голосу, Хозяин! Мяу!")
                 return
 
-            if re.search(r"\b(керу|кяру)\b.*?\b(покинь|уйди|выйди)\b", text_lower):
+            if re.search(r"\b(кер[а-яё]*|кяр[а-яё]*)\b.*?\b(покинь|уйди|выйди)\b", text_lower):
                 await event.reply("Мяу... Раз Хозяин велит, я ухожу... Но моё сердечко всегда с вами! 💔")
                 AUTHORIZED_CHATS.discard(chat_id)
                 _save_authorized_chats(AUTHORIZED_CHATS)
                 await client.delete_dialog(chat_id)
                 return
 
-            if re.search(r"\b(керу|кяру)\b.*?\b(статус|инфо|правила|память)\b", text_lower):
+            if re.search(r"\b(кер[а-яё]*|кяр[а-яё]*)\b.*?\b(статус|инфо|правила|память)\b", text_lower):
                 active_model = f"`{DEEPSEEK_MODELS_CASCADE[0]}` (DeepSeek)"
                 rules_count = len(KERU_MEMORY.get("custom_rules", []))
                 ignored_count = len(KERU_MEMORY.get("ignored_users", []))
@@ -564,7 +576,7 @@ async def start_keru_bot(api_id: int, api_hash: str, owner_id: int, owner_name: 
                 status_msg = (
                     f"🐾 **Керу на связи, любимый Хозяин!**\n\n"
                     f"🖤 **Хозяин**: {OWNER_USER_NAME} (ID: `{OWNER_USER_ID}`)\n"
-                    f"🧠 **ИИ Модели**: {active_model}\n"
+                    f"🧠 **ИИ Модель**: {active_model}\n"
                     f"📜 **Особых приказов**: {rules_count}\n"
                     f"🚫 **В чёрном списке**: {ignored_count} пользователей\n"
                     f"🎭 **Специальных отношений**: {attitudes_count}\n"
@@ -585,20 +597,46 @@ async def start_keru_bot(api_id: int, api_hash: str, owner_id: int, owner_name: 
         if is_private:
             should_respond = True
         else:
-            names = ["керу", "кяру", "кошечка", "кошкодевочка", "котейка", "котя", "catkeru"]
-            bot_mentioned = (
-                (BOT_USERNAME and f"@{BOT_USERNAME.lower()}" in text_lower)
-                or any(name in text_lower for name in names)
+            # 1. Broad regex matching for Keru / Kyaru and nicknames in ANY grammatical case
+            # Matches: керу, кера, кере, керой, керы, кер, керуня, керушка, кяру, кяра, кяре, котейка, кошечка, котя, etc.
+            name_pattern = re.compile(
+                r"\b(кер[а-яё]*|кяр[а-яё]*|catkeru|кошечк[а-яё]*|котейк[а-яё]*|котя|кошка)\b",
+                re.IGNORECASE
             )
+            bot_called_by_name = bool(name_pattern.search(text_lower))
+
+            # 2. Mention by @username or Telegram mention entity
+            bot_tagged = False
+            if BOT_USERNAME and f"@{BOT_USERNAME.lower()}" in text_lower:
+                bot_tagged = True
+            elif event.message and getattr(event.message, "entities", None):
+                for ent in event.message.entities:
+                    if getattr(ent, "user_id", None) == BOT_USER_ID:
+                        bot_tagged = True
+                        break
+                    if hasattr(ent, "offset") and hasattr(ent, "length"):
+                        ent_text = text[ent.offset : ent.offset + ent.length].lower().lstrip("@")
+                        if BOT_USERNAME and ent_text == BOT_USERNAME.lower():
+                            bot_tagged = True
+                            break
+
+            # 3. Direct bot commands
             is_cmd = any(text_lower.startswith(p) for p in ["/start", "/help", "/ping", "/keru", "!keru", "/статус", "/status"])
 
-            if bot_mentioned or is_reply_to_bot or is_cmd:
+            # 4. Active conversation with Owner:
+            # If the Owner is speaking in chat and Keru spoke to Owner recently (< 180 seconds ago),
+            # continue the natural conversation dialogue without requiring repeated mentions!
+            time_since_last_reply = current_time - LAST_BOT_REPLY_TIME.get(chat_id, 0)
+            in_active_owner_dialogue = is_owner and not is_silent and (time_since_last_reply < 180)
+
+            if bot_called_by_name or bot_tagged or is_reply_to_bot or is_cmd:
+                should_respond = True
+            elif in_active_owner_dialogue:
                 should_respond = True
             elif is_owner and not is_silent and text:
-                # Owner spoke in group without mentioning Keru
-                # Subtle reaction probability (20%) with at least 60s cooldown
+                # Random spontaneous reaction to Owner when not in active dialogue
                 last_time = LAST_REACTION_TIME.get(chat_id, 0)
-                if current_time - last_time >= 60 and random.random() < 0.22:
+                if current_time - last_time >= 60 and random.random() < 0.25:
                     should_respond = True
                     is_passive_owner_comment = True
                     LAST_REACTION_TIME[chat_id] = current_time
@@ -635,11 +673,18 @@ async def start_keru_bot(api_id: int, api_hash: str, owner_id: int, owner_name: 
                     await event.reply(f"Мяу... Хозяин, ИИ API временно недоступен или вернул пустой ответ!{err_info} 😿\nПроверьте баланс ProxyAPI или команду .keru")
                 return
 
+            sent_msg = None
             try:
-                await event.reply(reply_text)
+                sent_msg = await event.reply(reply_text)
             except Exception as re_err:
                 logger.warning("event.reply failed (%s), fallback to send_message...", re_err)
-                await client.send_message(chat_id, reply_text)
+                sent_msg = await client.send_message(chat_id, reply_text)
+
+            if sent_msg and hasattr(sent_msg, "id"):
+                RECENT_BOT_MESSAGE_IDS.add(sent_msg.id)
+                if len(RECENT_BOT_MESSAGE_IDS) > 200:
+                    RECENT_BOT_MESSAGE_IDS.pop()
+            LAST_BOT_REPLY_TIME[chat_id] = time.time()
         except Exception as e:
             logger.error("Error generating or sending Keru response: %s", e)
 
