@@ -223,65 +223,97 @@ def prepare_image_for_llm(raw_bytes: bytes) -> tuple[str, str]:
         return b64, "image/jpeg"
 
 def query_deepseek_sync(messages: List[dict]) -> Optional[str]:
-    """Queries DeepSeek-V3 via ProxyAPI for intelligent text conversation."""
+    """Queries DeepSeek-V3 via ProxyAPI for intelligent text conversation with auto-retry."""
     if not PROXYAPI_KEY:
         return None
 
-    payload = {
-        "model": DEEPSEEK_MODEL,
-        "messages": messages,
-        "temperature": 0.88,
-        "max_tokens": 800
-    }
-    data_bytes = json.dumps(payload).encode("utf-8")
-    req = urllib.request.Request(
-        PROXYAPI_URL,
-        data=data_bytes,
-        headers={
-            "Content-Type": "application/json",
-            "Authorization": f"Bearer {PROXYAPI_KEY}"
+    for attempt in range(3):
+        payload = {
+            "model": DEEPSEEK_MODEL,
+            "messages": messages,
+            "temperature": 0.88,
+            "max_tokens": 800
         }
-    )
-    try:
-        with urllib.request.urlopen(req, timeout=18) as resp:
-            res = json.loads(resp.read().decode("utf-8"))
-            choices = res.get("choices", [])
-            if choices and choices[0].get("message", {}).get("content"):
-                raw = choices[0]["message"]["content"].strip()
-                return clean_asterisk_actions(raw)
-    except Exception as e:
-        logger.warning("DeepSeek query failed via ProxyAPI: %s", e)
+        data_bytes = json.dumps(payload).encode("utf-8")
+        req = urllib.request.Request(
+            PROXYAPI_URL,
+            data=data_bytes,
+            headers={
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {PROXYAPI_KEY}"
+            }
+        )
+        try:
+            with urllib.request.urlopen(req, timeout=20) as resp:
+                res = json.loads(resp.read().decode("utf-8"))
+                choices = res.get("choices", [])
+                if choices and choices[0].get("message", {}).get("content"):
+                    raw = choices[0]["message"]["content"].strip()
+                    return clean_asterisk_actions(raw)
+        except urllib.error.HTTPError as he:
+            err_body = ""
+            try:
+                err_body = he.read().decode("utf-8", "ignore")
+            except Exception:
+                pass
+            logger.warning("DeepSeek HTTP %s (attempt %d/3): %s", he.code, attempt + 1, err_body)
+            if he.code == 429 and attempt < 2:
+                time.sleep(1.5 * (attempt + 1))
+                continue
+            break
+        except Exception as e:
+            logger.warning("DeepSeek query failed via ProxyAPI (attempt %d/3): %s", attempt + 1, e)
+            if attempt < 2:
+                time.sleep(1.0)
+                continue
+            break
     return None
 
 def query_gpt_mini_sync(messages: List[dict]) -> Optional[str]:
-    """Queries GPT-4o-mini via ProxyAPI for vision tasks when an image is sent."""
+    """Queries GPT-4o-mini via ProxyAPI for vision tasks when an image is sent with auto-retry."""
     if not PROXYAPI_KEY:
         return None
 
-    payload = {
-        "model": GPT_VISION_MODEL,
-        "messages": messages,
-        "temperature": 0.88,
-        "max_tokens": 800
-    }
-    data_bytes = json.dumps(payload).encode("utf-8")
-    req = urllib.request.Request(
-        PROXYAPI_URL,
-        data=data_bytes,
-        headers={
-            "Content-Type": "application/json",
-            "Authorization": f"Bearer {PROXYAPI_KEY}"
+    for attempt in range(3):
+        payload = {
+            "model": GPT_VISION_MODEL,
+            "messages": messages,
+            "temperature": 0.88,
+            "max_tokens": 800
         }
-    )
-    try:
-        with urllib.request.urlopen(req, timeout=25) as resp:
-            res = json.loads(resp.read().decode("utf-8"))
-            choices = res.get("choices", [])
-            if choices and choices[0].get("message", {}).get("content"):
-                raw = choices[0]["message"]["content"].strip()
-                return clean_asterisk_actions(raw)
-    except Exception as e:
-        logger.warning("GPT-4o-mini vision query failed via ProxyAPI: %s", e)
+        data_bytes = json.dumps(payload).encode("utf-8")
+        req = urllib.request.Request(
+            PROXYAPI_URL,
+            data=data_bytes,
+            headers={
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {PROXYAPI_KEY}"
+            }
+        )
+        try:
+            with urllib.request.urlopen(req, timeout=25) as resp:
+                res = json.loads(resp.read().decode("utf-8"))
+                choices = res.get("choices", [])
+                if choices and choices[0].get("message", {}).get("content"):
+                    raw = choices[0]["message"]["content"].strip()
+                    return clean_asterisk_actions(raw)
+        except urllib.error.HTTPError as he:
+            err_body = ""
+            try:
+                err_body = he.read().decode("utf-8", "ignore")
+            except Exception:
+                pass
+            logger.warning("GPT-4o-mini HTTP %s (attempt %d/3): %s", he.code, attempt + 1, err_body)
+            if he.code == 429 and attempt < 2:
+                time.sleep(1.5 * (attempt + 1))
+                continue
+            break
+        except Exception as e:
+            logger.warning("GPT-4o-mini vision query failed via ProxyAPI (attempt %d/3): %s", attempt + 1, e)
+            if attempt < 2:
+                time.sleep(1.0)
+                continue
+            break
     return None
 
 def build_system_instruction(owner_id: int, owner_name: str) -> str:
@@ -417,8 +449,6 @@ async def ask_gemini(
 ) -> Optional[str]:
     """Manages rolling context and queries DeepSeek (text) or GPT-4o-mini (images) via ProxyAPI (with Gemini fallback)."""
     global CHAT_CONTEXT, QUOTA_EXHAUSTED_UNTIL
-    if time.time() < QUOTA_EXHAUSTED_UNTIL:
-        return None
 
     if chat_id not in CHAT_CONTEXT:
         CHAT_CONTEXT[chat_id] = []
@@ -477,8 +507,8 @@ async def ask_gemini(
         messages = [{"role": "system", "content": system_prompt}] + history
         response_text = await asyncio.to_thread(query_deepseek_sync, messages)
 
-    # 3. Fallback Route: Gemini if ProxyAPI failed or not configured
-    if not response_text and GEMINI_API_KEY:
+    # 3. Fallback Route: Gemini if ProxyAPI failed or not configured (and Gemini quota not exhausted)
+    if not response_text and GEMINI_API_KEY and time.time() >= QUOTA_EXHAUSTED_UNTIL:
         gemini_history = [
             {
                 "role": "user" if m.get("role") == "user" else "model",
@@ -605,30 +635,17 @@ async def start_keru_bot(api_id: int, api_hash: str, owner_id: int, owner_name: 
     async def chat_action_handler(event: events.ChatAction.Event):
         # Check if this bot was added
         if event.user_added and BOT_USER_ID in [u.id for u in event.users if hasattr(u, "id")]:
-            added_by_id = event.action_message.from_id.user_id if hasattr(event.action_message.from_id, "user_id") else event.user_id
-            
-            if added_by_id == OWNER_USER_ID:
-                # Allowed! Added by Master
-                AUTHORIZED_CHATS.add(event.chat_id)
-                _save_authorized_chats(AUTHORIZED_CHATS)
-                logger.info("Keru bot authorized in chat %s by Master %s", event.chat_id, OWNER_USER_ID)
-                await event.respond("Мяу... Хозяин привел меня сюда! 🖤 Я буду рядом, оберегать вас и следить за каждым... мур-р~")
-            else:
-                # Unauthorized! Added by a stranger
-                logger.warning("Keru bot added by unauthorized user %s in chat %s! Leaving...", added_by_id, event.chat_id)
-                try:
-                    await event.respond("Фырк! 😾 Я подчиняюсь только моему любимому Хозяину! Вы не смеете мной командовать! Мяу!")
-                    await client.delete_dialog(event.chat_id)
-                except Exception as ex:
-                    logger.warning("Error leaving unauthorized chat: %s", ex)
+            AUTHORIZED_CHATS.add(event.chat_id)
+            _save_authorized_chats(AUTHORIZED_CHATS)
+            logger.info("Keru bot added to chat %s", event.chat_id)
+            try:
+                await event.respond("Мяу... Керу теперь здесь! 🖤 Буду рядом, мур-р~")
+            except Exception as ex:
+                logger.warning("Error greeting chat: %s", ex)
 
     # 2. MESSAGE HANDLER (DMs, MENTIONS, OWNER REACTIONS, PHOTO REPLIES)
     @client.on(events.NewMessage)
     async def message_handler(event: events.NewMessage.Event):
-        # If Gemini API quota/limits are exhausted to 0, stop reacting to any commands or messages
-        if time.time() < QUOTA_EXHAUSTED_UNTIL:
-            return
-
         has_text = bool(event.raw_text and event.raw_text.strip())
         is_photo = bool(event.photo or (event.document and getattr(event.document, "mime_type", "").startswith("image/")))
 
@@ -732,12 +749,14 @@ async def start_keru_bot(api_id: int, api_hash: str, owner_id: int, owner_name: 
         if is_private:
             should_respond = True
         else:
+            names = ["керу", "кяру", "кошечка", "кошкодевочка", "котейка", "котя", "catkeru"]
             bot_mentioned = (
                 (BOT_USERNAME and f"@{BOT_USERNAME.lower()}" in text_lower)
-                or re.search(r"\b(керу|кяру|кошечка|кошкодевочка)\b", text_lower)
+                or any(name in text_lower for name in names)
             )
+            is_cmd = any(text_lower.startswith(p) for p in ["/start", "/help", "/ping", "/keru", "!keru", "/статус", "/status"])
 
-            if bot_mentioned or is_reply_to_bot:
+            if bot_mentioned or is_reply_to_bot or is_cmd:
                 should_respond = True
             elif is_owner and not is_silent and text:
                 # Owner spoke in group without mentioning Keru
@@ -759,6 +778,8 @@ async def start_keru_bot(api_id: int, api_hash: str, owner_id: int, owner_name: 
                 if len(chat_hist) > 20:
                     CHAT_CONTEXT[chat_id] = chat_hist[-20:]
             return
+
+        logger.info("Keru reacting to message in chat %s from %s (%s): %r", chat_id, sender_name, sender_id, text[:60])
 
         # Download image if this message has a photo or user replied with/to a photo
         image_bytes = None
@@ -788,11 +809,18 @@ async def start_keru_bot(api_id: int, api_hash: str, owner_id: int, owner_name: 
                 image_bytes=image_bytes
             )
 
-            # If quota is exhausted or generation returned None, stay completely silent
+            # If quota is exhausted or generation returned None, notify owner or log
             if not reply_text:
+                logger.warning("Keru generated empty reply for text: %r", user_text)
+                if is_owner:
+                    await event.reply("Мяу... Хозяин, ИИ API временно недоступен или вернул пустой ответ! Проверьте баланс ProxyAPI 😿")
                 return
 
-            await event.reply(reply_text)
+            try:
+                await event.reply(reply_text)
+            except Exception as re_err:
+                logger.warning("event.reply failed (%s), fallback to send_message...", re_err)
+                await client.send_message(chat_id, reply_text)
         except Exception as e:
             logger.error("Error generating or sending Keru response: %s", e)
 

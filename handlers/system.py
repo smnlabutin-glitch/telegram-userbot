@@ -139,6 +139,43 @@ def register_system_handlers(client: TelegramClient, prefix: str):
 
         await client.send_file(event.chat_id, file=card)
 
+    # .keru / .kstatus (Instant Diagnostic Card)
+    @client.on(events.NewMessage(outgoing=True, pattern=rf"^{prefix}(?:keru|kstatus)$"))
+    async def keru_diagnostic_handler(event: events.NewMessage.Event):
+        from plugins.keru_bot import BOT_CLIENT, BOT_USERNAME, BOT_USER_ID, OWNER_USER_ID, AUTHORIZED_CHATS, KERU_MEMORY
+        from config import KERU_BOT_TOKEN, PROXYAPI_KEY, GEMINI_API_KEY
+
+        is_connected = bool(BOT_CLIENT and BOT_CLIENT.is_connected())
+        badge_text = "АКТИВЕН (ONLINE)" if is_connected else "НЕ ЗАПУЩЕН (OFFLINE)"
+        badge_type = "success" if is_connected else "danger"
+
+        card = render_card(
+            title="Диагностика Керу",
+            subtitle="Текущий статус сервиса кошкодевочки Керу",
+            badge_text=badge_text,
+            badge_type=badge_type,
+            stats=[
+                ("БОТ TELEGRAM", f"@{BOT_USERNAME}" if BOT_USERNAME else ("Токен задан" if KERU_BOT_TOKEN else "Нет токена")),
+                ("ИИ ДВИЖОК", "ProxyAPI (DeepSeek)" if PROXYAPI_KEY else ("Gemini" if GEMINI_API_KEY else "ОТСУТСТВУЕТ")),
+                ("PROXYAPI КЛЮЧ", "Установлен" if PROXYAPI_KEY else "НЕТ КЛЮЧА"),
+                ("СТАТУС СЕТИ", "Подключен" if is_connected else "Отключен"),
+            ],
+            items=[
+                ("ID Владельца", str(OWNER_USER_ID or "Не задан")),
+                ("ID Бота Керу", str(BOT_USER_ID or "Не авторизован")),
+                ("Авторизованных чатов", f"{len(AUTHORIZED_CHATS)} чатов"),
+                ("Чёрный список", f"{len(KERU_MEMORY.get('ignored_users', []))} польз."),
+            ],
+            meta_left="KERU BOT DIAGNOSTICS // v2.1",
+            meta_right="MTPROTO DAEMON",
+            category="AI SERVICE STATUS",
+        )
+        try:
+            await event.delete()
+        except Exception:
+            pass
+        await client.send_file(event.chat_id, file=card)
+
     # .update / .upgrade
     @client.on(events.NewMessage(outgoing=True, pattern=rf"^{prefix}(?:update|upgrade)$"))
     async def update_handler(event: events.NewMessage.Event):
@@ -166,13 +203,13 @@ def register_system_handlers(client: TelegramClient, prefix: str):
         if already_updated:
             card = render_card(
                 title="Система актуальна",
-                subtitle="Установлена самая свежая версия юзербота из репозитория",
-                badge_text="АКТУАЛЬНО",
+                subtitle="Код на сервере уже свежий. Перезапускаем для применения изменений...",
+                badge_text="ПЕРЕЗАПУСК",
                 badge_type="info",
                 stats=[
                     ("СТАТУС", "Up-to-date"),
                     ("ВЕТКА", "main"),
-                    ("ПЕРЕЗАПУСК", "Не требуется"),
+                    ("ДЕЙСТВИЕ", "Перезапуск..."),
                     ("КОМАНДА", f"{prefix}update"),
                 ],
                 meta_left="OTA UPDATE ENGINE // v1.4",
@@ -184,6 +221,12 @@ def register_system_handlers(client: TelegramClient, prefix: str):
             except Exception:
                 pass
             await client.send_file(event.chat_id, file=card)
+            await asyncio.sleep(2)
+            os.system("systemctl restart userbot 2>/dev/null || systemctl restart telegram-userbot 2>/dev/null &")
+            try:
+                os.execv(sys.executable, [sys.executable] + sys.argv)
+            except Exception:
+                sys.exit(0)
             return
 
         card = render_card(
@@ -209,11 +252,11 @@ def register_system_handlers(client: TelegramClient, prefix: str):
 
         # Allow card to finish uploading before restarting
         await asyncio.sleep(2)
-        if sys.platform.startswith("linux"):
-            os.system("systemctl restart telegram-userbot &")
-            sys.exit(0)
-        else:
+        os.system("systemctl restart userbot 2>/dev/null || systemctl restart telegram-userbot 2>/dev/null &")
+        try:
             os.execv(sys.executable, [sys.executable] + sys.argv)
+        except Exception:
+            sys.exit(0)
 
     # .restart / .reboot
     @client.on(events.NewMessage(outgoing=True, pattern=rf"^{prefix}(?:restart|reboot)$"))
@@ -225,7 +268,7 @@ def register_system_handlers(client: TelegramClient, prefix: str):
             badge_type="warn",
             stats=[
                 ("СТАТУС", "Перезагрузка"),
-                ("ДЕМОН", "systemd"),
+                ("ДЕМОН", "systemd / in-place"),
                 ("ВРЕМЯ", "~2 сек"),
                 ("СЕССИЯ", "Сохранена"),
             ],
@@ -240,8 +283,8 @@ def register_system_handlers(client: TelegramClient, prefix: str):
         await client.send_file(event.chat_id, file=card)
 
         await asyncio.sleep(2)
-        if sys.platform.startswith("linux"):
-            os.system("systemctl restart telegram-userbot &")
-            sys.exit(0)
-        else:
+        os.system("systemctl restart userbot 2>/dev/null || systemctl restart telegram-userbot 2>/dev/null &")
+        try:
             os.execv(sys.executable, [sys.executable] + sys.argv)
+        except Exception:
+            sys.exit(0)
