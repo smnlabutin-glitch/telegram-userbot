@@ -143,7 +143,7 @@ def register_system_handlers(client: TelegramClient, prefix: str):
     @client.on(events.NewMessage(outgoing=True, pattern=rf"^{prefix}(?:keru|kstatus)$"))
     async def keru_diagnostic_handler(event: events.NewMessage.Event):
         from plugins.keru_bot import BOT_CLIENT, BOT_USERNAME, BOT_USER_ID, OWNER_USER_ID, AUTHORIZED_CHATS, KERU_MEMORY
-        from config import KERU_BOT_TOKEN, PROXYAPI_KEY, GEMINI_API_KEY
+        from config import KERU_BOT_TOKEN, PROXYAPI_KEY
 
         is_connected = bool(BOT_CLIENT and BOT_CLIENT.is_connected())
         badge_text = "АКТИВЕН (ONLINE)" if is_connected else "НЕ ЗАПУЩЕН (OFFLINE)"
@@ -156,7 +156,7 @@ def register_system_handlers(client: TelegramClient, prefix: str):
             badge_type=badge_type,
             stats=[
                 ("БОТ TELEGRAM", f"@{BOT_USERNAME}" if BOT_USERNAME else ("Токен задан" if KERU_BOT_TOKEN else "Нет токена")),
-                ("ИИ ДВИЖОК", "ProxyAPI (DeepSeek)" if PROXYAPI_KEY else ("Gemini" if GEMINI_API_KEY else "ОТСУТСТВУЕТ")),
+                ("ИИ ДВИЖОК", "ProxyAPI (DeepSeek + GPT-4o-mini)" if PROXYAPI_KEY else "ОТСУТСТВУЕТ"),
                 ("PROXYAPI КЛЮЧ", "Установлен" if PROXYAPI_KEY else "НЕТ КЛЮЧА"),
                 ("СТАТУС СЕТИ", "Подключен" if is_connected else "Отключен"),
             ],

@@ -12,7 +12,7 @@ import urllib.error
 from typing import Dict, List, Set, Optional
 
 from telethon import TelegramClient, events
-from config import BASE_DIR, KERU_BOT_TOKEN, GEMINI_API_KEY, PROXYAPI_KEY
+from config import BASE_DIR, KERU_BOT_TOKEN, PROXYAPI_KEY
 
 logger = logging.getLogger("userbot.plugins.keru_bot")
 
@@ -181,7 +181,6 @@ def extract_fallback_directives(user_text: str, chat_id: int):
 CHAT_CONTEXT: Dict[int, List[dict]] = {}
 LAST_REACTION_TIME: Dict[int, float] = {}
 SILENT_UNTIL: Dict[int, float] = {}
-QUOTA_EXHAUSTED_UNTIL: float = 0
 
 BOT_CLIENT: Optional[TelegramClient] = None
 BOT_USER_ID: Optional[int] = None
@@ -189,7 +188,6 @@ BOT_USERNAME: Optional[str] = None
 OWNER_USER_ID: Optional[int] = None
 OWNER_USER_NAME: str = "Хозяин"
 
-MODELS_CASCADE = ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash"]
 PROXYAPI_URL = "https://api.proxyapi.ru/v1/chat/completions"
 DEEPSEEK_MODEL = "deepseek/deepseek-chat"
 GPT_VISION_MODEL = "gpt-4o-mini"
@@ -372,73 +370,7 @@ def build_system_instruction(owner_id: int, owner_name: str) -> str:
 
 Теги [DIRECTIVE:...] скрываются от чата и немедленно применяются ботом!{rules_text}"""
 
-def query_gemini_sync(chat_history: List[dict], system_prompt: str) -> Optional[str]:
-    """Executes REST request to Gemini API with fallback cascade. Returns None if quota is exhausted."""
-    global QUOTA_EXHAUSTED_UNTIL
-    if not GEMINI_API_KEY:
-        return None
-
-    payload = {
-        "systemInstruction": {
-            "parts": [{"text": system_prompt}]
-        },
-        "contents": chat_history,
-        "generationConfig": {
-            "temperature": 0.88,
-            "topP": 0.95,
-            "maxOutputTokens": 800
-        }
-    }
-    data_bytes = json.dumps(payload).encode("utf-8")
-
-    quota_errors = 0
-    last_error = None
-    for model_name in MODELS_CASCADE:
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={GEMINI_API_KEY}"
-        req = urllib.request.Request(
-            url,
-            data=data_bytes,
-            headers={"Content-Type": "application/json"}
-        )
-        try:
-            with urllib.request.urlopen(req, timeout=18) as resp:
-                res = json.loads(resp.read().decode("utf-8"))
-                candidates = res.get("candidates", [])
-                if candidates and candidates[0].get("content", {}).get("parts"):
-                    raw = candidates[0]["content"]["parts"][0]["text"].strip()
-                    return clean_asterisk_actions(raw)
-        except urllib.error.HTTPError as he:
-            last_error = he
-            err_body = ""
-            try:
-                err_body = he.read().decode("utf-8")
-            except Exception:
-                pass
-            if he.code in (429, 403) or "RESOURCE_EXHAUSTED" in err_body or "quota" in err_body.lower():
-                quota_errors += 1
-                logger.warning("Gemini model %s hit quota/rate limit: %s", model_name, he.code)
-            else:
-                logger.warning("Gemini model %s HTTP error: %s", model_name, he)
-            continue
-        except Exception as e:
-            last_error = e
-            if "429" in str(e) or "RESOURCE_EXHAUSTED" in str(e).upper():
-                quota_errors += 1
-            logger.warning("Gemini model %s failed: %s, trying next...", model_name, e)
-            continue
-
-    # If all models failed or quota is exhausted (HTTP 429), shut down all reactions
-    if quota_errors > 0 or (last_error and getattr(last_error, "code", None) == 429):
-        QUOTA_EXHAUSTED_UNTIL = time.time() + 600  # Silence for 10 minutes until quota window resets
-        logger.warning(
-            "Gemini API quota/limits exhausted to 0. Keru bot will completely stop reacting to all messages and commands."
-        )
-        return None
-
-    logger.error("All Gemini models failed: %s", last_error)
-    return None
-
-async def ask_gemini(
+async def ask_llm(
     chat_id: int,
     user_text: str,
     sender_name: str,
@@ -447,8 +379,8 @@ async def ask_gemini(
     image_bytes: Optional[bytes] = None,
     is_system_event: bool = False
 ) -> Optional[str]:
-    """Manages rolling context and queries DeepSeek (text) or GPT-4o-mini (images) via ProxyAPI (with Gemini fallback)."""
-    global CHAT_CONTEXT, QUOTA_EXHAUSTED_UNTIL
+    """Manages rolling context and queries DeepSeek (text) or GPT-4o-mini (images) via ProxyAPI."""
+    global CHAT_CONTEXT
 
     if chat_id not in CHAT_CONTEXT:
         CHAT_CONTEXT[chat_id] = []
@@ -506,17 +438,6 @@ async def ask_gemini(
     if not response_text and PROXYAPI_KEY and not image_bytes:
         messages = [{"role": "system", "content": system_prompt}] + history
         response_text = await asyncio.to_thread(query_deepseek_sync, messages)
-
-    # 3. Fallback Route: Gemini if ProxyAPI failed or not configured (and Gemini quota not exhausted)
-    if not response_text and GEMINI_API_KEY and time.time() >= QUOTA_EXHAUSTED_UNTIL:
-        gemini_history = [
-            {
-                "role": "user" if m.get("role") == "user" else "model",
-                "parts": [{"text": m.get("content", "")}]
-            }
-            for m in history
-        ]
-        response_text = await asyncio.to_thread(query_gemini_sync, gemini_history, system_prompt)
 
     if not response_text:
         # Avoid leaving orphaned user turn in history if generation was aborted
@@ -579,7 +500,7 @@ async def keru_spontaneous_talker(stop_event: asyncio.Event):
                     "по теме недавнего обсуждения участников. Если Хозяин недавно писал в чат, обратись к нему с обожанием и лаской, "
                     "а если общались другие участники — выскажи своё кошачье дерзкое или забавное мнение по теме. Пиши живо, от первого лица, строго без звездочек]"
                 )
-                remark = await ask_gemini(
+                remark = await ask_llm(
                     chat_id=chat_id,
                     user_text=prompt,
                     sender_name="Контекст",
@@ -624,7 +545,7 @@ async def start_keru_bot(api_id: int, api_hash: str, owner_id: int, owner_name: 
         logger.info("=" * 54)
         logger.info("Bot Username   : @%s (ID: %s)", BOT_USERNAME, BOT_USER_ID)
         logger.info("Master / Owner : %s (ID: %s)", OWNER_USER_NAME, OWNER_USER_ID)
-        logger.info("Gemini Model   : %s (Cascade)", MODELS_CASCADE[0])
+        logger.info("AI Models      : %s (Text) + %s (Vision)", DEEPSEEK_MODEL, GPT_VISION_MODEL)
         logger.info("-" * 54)
     except Exception as e:
         logger.error("Failed to authenticate Keru bot with token: %s", e)
@@ -721,7 +642,7 @@ async def start_keru_bot(api_id: int, api_hash: str, owner_id: int, owner_name: 
                 return
 
             if re.search(r"\b(керу|кяру)\b.*?\b(статус|инфо|правила|память)\b", text_lower):
-                active_model = f"`{DEEPSEEK_MODEL}` (текст) + `{GPT_VISION_MODEL}` (картинки)" if PROXYAPI_KEY else f"`{MODELS_CASCADE[0]}` (Google Gemini)"
+                active_model = f"`{DEEPSEEK_MODEL}` (текст) + `{GPT_VISION_MODEL}` (картинки)"
                 rules_count = len(KERU_MEMORY.get("custom_rules", []))
                 ignored_count = len(KERU_MEMORY.get("ignored_users", []))
                 attitudes_count = len(KERU_MEMORY.get("attitude_overrides", {}))
@@ -800,7 +721,7 @@ async def start_keru_bot(api_id: int, api_hash: str, owner_id: int, owner_name: 
 
         # Generate response via DeepSeek (text) or GPT-4o-mini (image)
         try:
-            reply_text = await ask_gemini(
+            reply_text = await ask_llm(
                 chat_id=chat_id,
                 user_text=user_text,
                 sender_name=sender_name,
