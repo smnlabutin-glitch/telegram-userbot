@@ -192,10 +192,9 @@ OWNER_USER_NAME: str = "Хозяин"
 
 PROXYAPI_URL = "https://api.proxyapi.ru/v1/chat/completions"
 DEEPSEEK_MODELS_CASCADE = [
+    "deepseek/deepseek-v4.1-flash",
+    "deepseek/deepseek-v4-flash",
     "deepseek/deepseek-chat-v3",
-    "deepseek/deepseek-chat-v3.1",
-    "deepseek/deepseek-v3.2",
-    "deepseek/deepseek-chat",
 ]
 
 LAST_API_ERROR: str = ""
@@ -210,7 +209,7 @@ def clean_asterisk_actions(text: str) -> str:
     return cleaned.strip()
 
 def query_deepseek_sync(messages: List[dict]) -> Optional[str]:
-    """Queries DeepSeek via ProxyAPI with 12s timeout and single fast fallback."""
+    """Queries DeepSeek via ProxyAPI with 15s timeout and fast fallback."""
     global LAST_API_ERROR
     if not PROXYAPI_KEY:
         LAST_API_ERROR = "PROXYAPI_KEY не установлен в .env или config.py"
@@ -229,7 +228,7 @@ def query_deepseek_sync(messages: List[dict]) -> Optional[str]:
             "model": model_name,
             "messages": messages,
             "temperature": 0.85,
-            "max_tokens": 300
+            "max_tokens": 450
         }
         data_bytes = json.dumps(payload).encode("utf-8")
         req = urllib.request.Request(
@@ -238,11 +237,12 @@ def query_deepseek_sync(messages: List[dict]) -> Optional[str]:
             headers=headers
         )
         try:
-            with urllib.request.urlopen(req, timeout=12) as resp:
+            with urllib.request.urlopen(req, timeout=15) as resp:
                 res = json.loads(resp.read().decode("utf-8"))
                 choices = res.get("choices", [])
-                if choices and choices[0].get("message", {}).get("content"):
-                    raw = choices[0]["message"]["content"].strip()
+                if choices:
+                    msg = choices[0].get("message", {})
+                    raw = (msg.get("content") or msg.get("reasoning_content") or "").strip()
                     if raw:
                         LAST_API_ERROR = ""
                         logger.info("ProxyAPI DeepSeek reply generated successfully using %s", model_name)
