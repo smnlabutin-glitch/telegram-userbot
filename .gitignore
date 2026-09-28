@@ -10,3 +10,4 @@ venv/
 plugins_state.json
 plugins/anime_quiz_history.json
 plugins/keru_authorized_chats.json
+plugins/keru_memory.json

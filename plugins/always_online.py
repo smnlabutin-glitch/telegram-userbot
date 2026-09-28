@@ -1,5 +1,6 @@
 import asyncio
 import logging
+import random
 from telethon import TelegramClient, events, errors
 from telethon.tl.functions.account import UpdateStatusRequest
 from card_engine import render_card
@@ -10,20 +11,38 @@ logger = logging.getLogger("userbot.plugins.online")
 _online_task = None
 
 async def _online_worker(client: TelegramClient):
-    """Background task to continuously keep account status online."""
+    """
+    Background worker that continuously maintains account 'Online' status.
+    Telegram drops online indicator if no packet arrives within ~30-45s.
+    We use an adaptive 16-20s interval with natural jitter (mimicking official clients),
+    and fast recovery on reconnects so status never flickers offline.
+    """
     logger.info("Always-Online background worker started.")
     try:
         while True:
             try:
-                if client.is_connected():
-                    await client(UpdateStatusRequest(offline=False))
-                    logger.debug("Sent UpdateStatusRequest(offline=False)")
+                # If temporarily reconnecting, wait briefly and retry immediately
+                if not client.is_connected():
+                    await asyncio.sleep(2)
+                    continue
+
+                await client(UpdateStatusRequest(offline=False))
+                logger.debug("Sent UpdateStatusRequest(offline=False)")
+
+                # Natural jitter (16-20s) ensures no robotic pattern while staying
+                # well within Telegram's server-side timeout window
+                delay = random.uniform(16.0, 20.0)
+                await asyncio.sleep(delay)
+
             except errors.FloodWaitError as fwe:
                 logger.warning("FloodWait in always_online: sleeping %ss", fwe.seconds)
                 await asyncio.sleep(fwe.seconds + 2)
+            except asyncio.CancelledError:
+                raise
             except Exception as e:
                 logger.error("Exception in always_online ping: %s", e)
-            await asyncio.sleep(25)
+                # On transient glitch, recover in 3s so account doesn't drop offline
+                await asyncio.sleep(3)
     except asyncio.CancelledError:
         logger.info("Always-Online worker cancelled.")
 
@@ -90,12 +109,12 @@ def register_always_online(client: TelegramClient, prefix: str):
             badge_type=badge_type,
             stats=[
                 ("СТАТУС ПЛАГИНА", stat_status),
-                ("ИНТЕРВАЛ ПИНГА", "25 сек"),
+                ("ИНТЕРВАЛ ПИНГА", "16–20 сек (Adaptive)"),
                 ("РЕЖИМ РАБОТЫ", "Daemon 24/7"),
                 ("ПЕРЕКЛЮЧЕНИЕ", f"{prefix}online [on|off]"),
             ],
-            meta_left="PLUGIN // ALWAYS_ONLINE v1.0",
-            meta_right="AUTO-PING: ENABLED",
+            meta_left="PLUGIN // ALWAYS_ONLINE v1.1",
+            meta_right="AUTO-PING: ADAPTIVE",
             category="ONLINE STATUS MANAGER",
         )
 
