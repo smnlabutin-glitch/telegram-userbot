@@ -18,6 +18,7 @@ from config import (
     LOG_BACKUP_COUNT,
     KERU_BOT_TOKEN,
     GEMINI_API_KEY,
+    PROXYAPI_KEY,
 )
 from handlers.purge import register_purge_handlers
 from handlers.system import register_system_handlers
@@ -106,7 +107,7 @@ async def run_userbot(api_id: int, api_hash: str, stop_event: asyncio.Event):
 
             # Launch Keru Bot background task if configured
             keru_task = None
-            if KERU_BOT_TOKEN and GEMINI_API_KEY:
+            if KERU_BOT_TOKEN and (PROXYAPI_KEY or GEMINI_API_KEY):
                 keru_task = asyncio.create_task(
                     start_keru_bot(api_id, api_hash, me.id, me.first_name or "Хозяин", stop_event)
                 )

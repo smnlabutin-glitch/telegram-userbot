@@ -649,14 +649,10 @@ async def start_keru_bot(api_id: int, api_hash: str, owner_id: int, owner_name: 
         if is_private and not is_owner:
             return
 
-        # If owner writes in any group where bot is present, auto-authorize chat
-        if is_owner and not is_private and chat_id not in AUTHORIZED_CHATS:
+        # Auto-authorize group chats where bot is present
+        if not is_private and chat_id not in AUTHORIZED_CHATS:
             AUTHORIZED_CHATS.add(chat_id)
             _save_authorized_chats(AUTHORIZED_CHATS)
-
-        # In groups: check if chat is authorized
-        if not is_private and chat_id not in AUTHORIZED_CHATS:
-            return
 
         # 2. CHECK MASTER'S BEHAVIOR RESTRICTIONS & BLACKLIST
         sender_username = (getattr(sender, "username", "") or "").lower().lstrip("@")

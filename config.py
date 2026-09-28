@@ -11,9 +11,9 @@ API_ID_RAW = os.getenv("TELEGRAM_API_ID", "39361099").strip()
 API_HASH = os.getenv("TELEGRAM_API_HASH", "fb78e6edaec2381e33a6f7435df3094f").strip()
 SESSION_NAME = os.getenv("SESSION_NAME", "userbot_session").strip()
 COMMAND_PREFIX = os.getenv("COMMAND_PREFIX", ".").strip()
-KERU_BOT_TOKEN = os.getenv("KERU_BOT_TOKEN", "").strip()
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "").strip()
-PROXYAPI_KEY = os.getenv("PROXYAPI_KEY", "").strip()
+KERU_BOT_TOKEN = os.getenv("KERU_BOT_TOKEN", "8905001669:AAF7ZpBvNvTsJoXalnXio-TjYJcEjfqfX9A").strip()
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "AIzaSyApl0JZ3L_rBfcVh5sMD7-gLJ5r3oQJ42g").strip()
+PROXYAPI_KEY = os.getenv("PROXYAPI_KEY", "sk-JDq7q3OebJRruvZrV5ho4tCOp1DPHtkS").strip()
 
 # 24/7 Server Tuning Settings
 FLOOD_SLEEP_THRESHOLD = int(os.getenv("FLOOD_SLEEP_THRESHOLD", "120"))
