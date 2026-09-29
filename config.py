@@ -28,7 +28,7 @@ KERU_API_URL = os.getenv("KERU_API_URL", "https://darkapi.shop/v1/chat/completio
 if "zexkora" in KERU_API_URL or "proxyapi.ru" in KERU_API_URL:
     KERU_API_URL = "https://darkapi.shop/v1/chat/completions"
 
-KERU_MODEL = "deepseek-v4-flash"
+KERU_MODEL = "deepseek-v4-pro"
 
 # 24/7 Server Tuning Settings
 FLOOD_SLEEP_THRESHOLD = int(os.getenv("FLOOD_SLEEP_THRESHOLD", "120"))

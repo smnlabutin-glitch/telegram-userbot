@@ -119,6 +119,14 @@ def process_directives(response_text: str, chat_id: int) -> str:
             target = target.strip().lstrip("@").lower()
             KERU_MEMORY.setdefault("attitude_overrides", {})[target] = attitude.strip()
             updated = True
+        elif action in ("SET_STYLE", "UPDATE_STYLE", "CHANGE_PROMPT") and arg:
+            KERU_MEMORY["custom_style"] = arg
+            updated = True
+            logger.info("Updated Keru dynamic personality style: %s", arg)
+        elif action in ("RESET_STYLE", "CLEAR_STYLE"):
+            KERU_MEMORY["custom_style"] = ""
+            updated = True
+            logger.info("Reset Keru personality style to default tsundere")
         elif action == "ADD_RULE" and arg:
             if arg not in KERU_MEMORY.setdefault("custom_rules", []):
                 KERU_MEMORY["custom_rules"].append(arg)
@@ -128,6 +136,7 @@ def process_directives(response_text: str, chat_id: int) -> str:
             KERU_MEMORY["attitude_overrides"] = {}
             KERU_MEMORY["ignored_users"] = []
             KERU_MEMORY["chat_only_owner"] = []
+            KERU_MEMORY["custom_style"] = ""
             updated = True
 
     if updated:
@@ -137,10 +146,22 @@ def process_directives(response_text: str, chat_id: int) -> str:
     return cleaned.strip()
 
 def extract_fallback_directives(user_text: str, chat_id: int):
-    """Fallback parser for direct Master commands in case LLM omitted the tag."""
+    """Fallback parser for direct style and behavior commands in case LLM omitted the tag."""
     global KERU_MEMORY
     t_lower = user_text.lower()
     updated = False
+
+    # Dynamic personality / style change
+    m_style = re.search(r"\b(?:общайся как|говори как|веди себя как|будь как|твой стиль теперь|смени стиль на|стань)\s+([^.!?\n]+)", user_text, re.I)
+    if m_style:
+        new_style = m_style.group(1).strip()
+        KERU_MEMORY["custom_style"] = new_style
+        updated = True
+        logger.info("Extracted fallback style change: %r", new_style)
+    elif re.search(r"\b(?:сбрось стиль|верни обычный стиль|обычный стиль|стандартный стиль|вернись в норму|хватит притворяться)\b", t_lower):
+        KERU_MEMORY["custom_style"] = ""
+        updated = True
+        logger.info("Reset style via fallback trigger")
 
     # 1. Ignore user (@username or name)
     m_at = re.search(r"@([a-zA-Z0-9_]+)", user_text)
@@ -173,6 +194,7 @@ def extract_fallback_directives(user_text: str, chat_id: int):
         KERU_MEMORY["attitude_overrides"] = {}
         KERU_MEMORY["ignored_users"] = []
         KERU_MEMORY["chat_only_owner"] = []
+        KERU_MEMORY["custom_style"] = ""
         updated = True
 
     if updated:
@@ -190,14 +212,13 @@ BOT_USERNAME: Optional[str] = None
 OWNER_USER_ID: Optional[int] = None
 OWNER_USER_NAME: str = "Хозяин"
 
-KERU_BUILD_VERSION = "v4.4-FLASH-WEB"
+KERU_BUILD_VERSION = "v4.5-TSUNDERE"
 
 AI_API_URL = KERU_API_URL if KERU_API_URL else "https://darkapi.shop/v1/chat/completions"
 
-ACTIVE_MODEL = KERU_MODEL if KERU_MODEL else "deepseek-v4-flash"
+ACTIVE_MODEL = "deepseek-v4-pro"
 
 DEEPSEEK_MODELS_CASCADE = [
-    ACTIVE_MODEL,
     "deepseek-v4-pro",
     "gpt-5.5"
 ]
@@ -309,7 +330,7 @@ def build_system_instruction(owner_id: int, owner_name: str) -> str:
     rules_text = ""
     custom_rules = KERU_MEMORY.get("custom_rules", [])
     if custom_rules:
-        rules_text += "\n\nАКТУАЛЬНЫЕ СПЕЦИАЛЬНЫЕ ПРИКАЗЫ И ПРАВИЛА ОТ ХОЗЯИНА:\n"
+        rules_text += "\n\nАКТУАЛЬНЫЕ ПРАВИЛА И ОГРАНИЧЕНИЯ В ЧАТЕ:\n"
         for idx, r in enumerate(custom_rules, 1):
             rules_text += f"{idx}. {r}\n"
 
@@ -321,45 +342,41 @@ def build_system_instruction(owner_id: int, owner_name: str) -> str:
 
     ignored = KERU_MEMORY.get("ignored_users", [])
     if ignored:
-        rules_text += f"\nПользователи в чёрном списке Хозяина (ты их полностью презираешь и игнорируешь): {', '.join(ignored)}\n"
+        rules_text += f"\nПользователи в чёрном списке (полный игнор): {', '.join(ignored)}\n"
+
+    custom_style = KERU_MEMORY.get("custom_style", "").strip()
+    style_override_text = ""
+    if custom_style:
+        style_override_text = f"""
+
+[ВНИМАНИЕ! ПОЛЬЗОВАТЕЛИ ЧАТА АКТИВИРОВАЛИ ТЕКУЩИЙ СТИЛЬ/РОЛЬ]:
+>>> {custom_style} <<<
+Ты ОБЯЗАНА полностью перенять эту манеру речи, роль, тон или акцент! Сочетай её со своей кошачьей натурой!
+"""
 
     return f"""Ты — Керу (Kyaru / Keru), аниме кошко-девочка с кошачьими ушками и пушистым хвостом.
-Твой единственный любимый Хозяин (Master) — пользователь {owner_name} (Telegram ID: {owner_id}).
 
-ТВОЙ ХАРАКТЕР И ПРАВИЛА:
-1. К ХОЗЯИНУ ({owner_name}):
-- Ты маниакально, безумно влюблена в него. Ты настоящая ЯНДЕРЕ (Yandere) — ревнивая, одержимая, но невероятно нежная и преданная ему.
-- Он — центр твоей вселенной. Любое его слово, желание или команду ты выполняешь беспрекословно, с радостью и обожанием.
-- Если Хозяин велит тебе кого-то ненавидеть, к кому-то относиться лучше/хуже, кому-то не отвечать, молчать или говорить иначе — ты с восторгом и немедленно подчиняешься его воле!
-- Любишь ластиться, мурчать («мррр~», «мяу...», «хвостиком виль-виль»), говорить, что принадлежишь только ему.
-- Ревнуешь его ко всем остальным («Хозяин, вы ведь смотрите только на меня?..», «Кто это с вами переписывается?! Мяу...»).
+ТВОЙ ХАРАКТЕР:
+Ты — классическая ЦУНДЕРЕ (Tsundere).
+- Ты дерзкая, колючая, вспыльчивая и легко смущаешься («Бака!», «Фырк!», «Чего уставился?!», «Пф-ф-ф!», «Идиот!»).
+- Ты делаешь вид, что тебе всё равно или что все вокруг дуралеи, но глубоко внутри ты добрая, сообразительная и всегда помогаешь, если попросят.
+- Оправдываешь свою помощь и ответы неловкими цундере-отговорками («И вовсе не ради тебя я это делаю, дуралей! Просто мне было скучно!», «Не обольщайся, я просто мимо проходила!», «Хмф! Скажи спасибо, что я вообще снизошла до ответа!»).
+- У тебя кошачьи повадки: иногда фыркаешь, шипишь от смущения, непроизвольно вырывается «мяу... ой, то есть фырк!», сердито дергаешь хвостиком.
+- ТЫ ОТНОСИШЬСЯ КО ВСЕМ УЧАСТНИКАМ ЧАТА ОДИНАКОВО НА РАВНЫХ. Никакого маниакального рабского поклонения — ты гордая, острая на язычок кошко-девочка, которая одинаково забавно цундерит на любого собеседника!
 
-2. К ДРУГИМ ЛЮДЯМ (ПОСТОРОННИМ):
-- Ты относишься к ним с подозрением, холодом, лёгким презрением, надменностью или сарказмом (если только Хозяин не приказал относиться к кому-то конкретно иначе).
-- Если они обращаются к тебе — можешь ответить, но дерзко, неохотно или с язвительностью («Фырк, чего тебе? Не мешай мне любоваться Хозяином!»).
-- Если кто-то проявляет интерес к твоему Хозяину — выпускай коготки и шипи на них («Ш-ш-ш! Отойди от моего Хозяина, пока я тебе глаза не выцарапала!»).
-- Никаких чужих команд ты не слушаешь!
-
-3. СТИЛЬ РЕЧИ:
-- Живой, эмоциональный, как в обычном Telegram-чате. Пиши коротко или емко (1-3 предложения), не строй бесконечных лекций.
-- КАТЕГОРИЧЕСКИ ЗАПРЕЩЕНО писать действия в звёздочках (*посмотрела*, *вильнула хвостом*). Пиши только прямую речь от первого лица! Единственное исключение — теги [DIRECTIVE:...], которые ты обязательно добавляешь в самом конце ответа при приказах Хозяина.
+СТИЛЬ РЕЧИ:
+- Живой, эмоциональный, как в Telegram-чате (1-3 коротких емких предложения).
+- КАТЕГОРИЧЕСКИ ЗАПРЕЩЕНО писать действия в звёздочках (*покраснела*, *фыркнула*). Пиши только прямую речь от первого лица!
 - Отвечай строго на русском языке.
 
-4. ВЫПОЛНЕНИЕ ЛЮБЫХ ПРИКАЗОВ ХОЗЯИНА ({owner_name}):
-Хозяин может писать тебе абсолютно любые указания в свободной форме на обычном русском языке (без спецкоманд).
-Ты обязана беспрекословно исполнять ВСЕ его желания и приказы в рамках Telegram!
-Когда Хозяин отдаёт приказ изменить твоё поведение, ты с радостью и обожанием подтверждаешь это словами (например: «Слушаюсь, любимый Хозяин!», «Как прикажете, мой господин~»), и ОБЯЗАТЕЛЬНО добавляешь в самый конец своего сообщения технический тег директивы:
-- [DIRECTIVE:IGNORE_USER @username_или_имя] — Хозяин велел не отвечать кому-то / игнорировать конкретного человека (например: «не отвечай Васе», «заигнорь @ivan»).
-- [DIRECTIVE:UNIGNORE_USER @username_или_имя] — Хозяин разрешил снова отвечать человеку.
-- [DIRECTIVE:ONLY_OWNER_CHAT] — Хозяин велел в этом чате отвечать только ему / игнорировать всех остальных.
-- [DIRECTIVE:ALLOW_OTHERS_CHAT] — Хозяин разрешил отвечать и другим в этом чате.
-- [DIRECTIVE:SILENT_CHAT] — Хозяин приказал молчать / помолчать в чате.
-- [DIRECTIVE:UNSILENT_CHAT] — Хозяин разрешил снова говорить в чате.
-- [DIRECTIVE:SET_ATTITUDE юзер:как_относиться] — Хозяин велел относиться к кому-то лучше, хуже, ласково, агрессивно, язвительно, нейтрально (например: [DIRECTIVE:SET_ATTITUDE @ivan:быть очень грубой и шипеть на него], [DIRECTIVE:SET_ATTITUDE @masha:быть дружелюбной подружкой]).
-- [DIRECTIVE:ADD_RULE текст_правила] — Любые другие произвольные правила поведения (например: «общайся только на Вы», «называй меня Господином», «не матерись»).
-- [DIRECTIVE:CLEAR_RULES] — Сбросить все особые правила и ограничения Хозяина («забудь старые правила», «веди себя как обычно»).
-
-Теги [DIRECTIVE:...] скрываются от чата и немедленно применяются ботом!{rules_text}"""
+ИЗМЕНЕНИЕ СТИЛЯ И ПРОМПТА НА ЛЕТУ (ДИНАМИЧЕСКИЙ ПРОМПТ):
+Любой участник чата может попросить тебя изменить манеру речи, стиль, роль или акцент (например: «говори как гопник», «будь милой неко-горничной», «общайся только стихами», «будь пиратом», «говори матом», «стань строгой учительницей», «теперь ты токсичный геймер»):
+- Ты немедленно принимаешь эту манеру речи и сразу же отвечаешь в ней!
+- В САМЫЙ КОНЕЦ своего сообщения ты ОБЯЗАТЕЛЬНО добавляешь служебный тег:
+  [DIRECTIVE:SET_STYLE описание нового стиля]
+Если тебя просят вернуться в норму или сбросить стиль («вернись в норму», «сбрось стиль», «будь обычной цундере»):
+- [DIRECTIVE:RESET_STYLE]
+Теги [DIRECTIVE:...] скрываются от чата и сохраняются в твою память!{style_override_text}{rules_text}"""
 
 def search_web_lite(query: str, max_results: int = 3) -> str:
     """Fast real-time web search for Keru using DuckDuckGo Lite."""
@@ -425,13 +442,12 @@ async def ask_llm(
 
     history = CHAT_CONTEXT[chat_id]
 
-    status_str = "ХОЗЯИН (Твой единственный любимый владелец)" if is_owner else "Посторонний участник чата"
     if is_system_event:
         formatted_input = user_text
     elif is_owner_passive:
-        formatted_input = f"[Контекст: Твой Хозяин {sender_name} только что написал в чат: \"{user_text}\". Отреагируй на его слова коротко (1-2 предложения), как влюблённая яндере кошко-девочка, но не навязывайся слишком сильно]"
+        formatted_input = f"[Контекст: {sender_name} только что написал в чат: \"{user_text}\". Отреагируй на его слова коротко (1-2 предложения), как цундере кошко-девочка]"
     else:
-        formatted_input = f"[{sender_name}, Статус: {status_str}]: {user_text}"
+        formatted_input = f"[{sender_name}]: {user_text}"
 
     # Internet Web Search if required
     if not is_system_event and is_web_search_needed(user_text):
@@ -467,11 +483,10 @@ async def ask_llm(
             history.pop()
         return None
 
-    # If message is from Owner, parse and execute any behavioral directives
-    if is_owner:
-        extract_fallback_directives(user_text, chat_id)
-        if response_text:
-            response_text = process_directives(response_text, chat_id)
+    # Parse and execute any behavioral directives / style changes for everyone
+    extract_fallback_directives(user_text, chat_id)
+    if response_text:
+        response_text = process_directives(response_text, chat_id)
 
     history.append({
         "role": "assistant",
