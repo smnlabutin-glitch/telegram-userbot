@@ -212,6 +212,11 @@ def is_promotional_ad(text: str) -> bool:
         or "to use this bot" in lower
         or "a_toolsx" in lower
         or "подпишитесь на" in lower
+        or "opencode" in lower
+        or "claude code" in lower
+        or "codex" in lower
+        or "[req_" in lower
+        or "these responses are optimized" in lower
     )
 
 def clean_asterisk_actions(text: str) -> str:
