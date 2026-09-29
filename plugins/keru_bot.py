@@ -190,34 +190,40 @@ BOT_USERNAME: Optional[str] = None
 OWNER_USER_ID: Optional[int] = None
 OWNER_USER_NAME: str = "Хозяин"
 
-KERU_BUILD_VERSION = "v4.3-DARKAPI"
+KERU_BUILD_VERSION = "v4.4-FLASH-WEB"
 
 AI_API_URL = KERU_API_URL if KERU_API_URL else "https://darkapi.shop/v1/chat/completions"
 
-ACTIVE_MODEL = KERU_MODEL if KERU_MODEL else "deepseek-v4-pro"
+ACTIVE_MODEL = KERU_MODEL if KERU_MODEL else "deepseek-v4-flash"
 
 DEEPSEEK_MODELS_CASCADE = [
     ACTIVE_MODEL,
+    "deepseek-v4-pro",
     "gpt-5.5"
 ]
 
 LAST_API_ERROR: str = ""
 
 def is_promotional_ad(text: str) -> bool:
-    """Blocks any third-party ads or channel promotions injected by free API gateways."""
-    lower = text.lower()
-    return bool(
-        "join our channel" in lower
-        or "t.me/" in lower
-        or "to use this bot" in lower
-        or "a_toolsx" in lower
-        or "подпишитесь на" in lower
-        or "opencode" in lower
-        or "claude code" in lower
-        or "codex" in lower
-        or "[req_" in lower
-        or "these responses are optimized" in lower
-    )
+    """Blocks third-party ads, provider banners, and fake mock quotes."""
+    lower = text.lower().strip()
+    if any(s in lower for s in [
+        "join our channel", "t.me/", "to use this bot", "a_toolsx",
+        "подпишитесь на", "opencode", "claude code", "codex", "[req_",
+        "these responses are optimized"
+    ]):
+        return True
+
+    # DarkAPI placeholder motivational quotes (English one-liners without Cyrillic)
+    has_cyrillic = bool(re.search(r"[а-яёА-ЯЁ]", text))
+    if not has_cyrillic and len(text.split()) < 15 and any(w in lower for w in [
+        "turn your setbacks", "stay focused", "your vibe", "what you think",
+        "never give up", "comebacks", "attracts your tribe", "you become",
+        "focus on", "dream big", "make it happen", "believe in yourself"
+    ]):
+        return True
+
+    return False
 
 def clean_asterisk_actions(text: str) -> str:
     """Removes roleplay actions in asterisks like *посмотрела*, *мяукнула*."""
@@ -355,6 +361,54 @@ def build_system_instruction(owner_id: int, owner_name: str) -> str:
 
 Теги [DIRECTIVE:...] скрываются от чата и немедленно применяются ботом!{rules_text}"""
 
+def search_web_lite(query: str, max_results: int = 3) -> str:
+    """Fast real-time web search for Keru using DuckDuckGo Lite."""
+    try:
+        clean_q = re.sub(
+            r"\b(кер[а-яё]*|кяр[а-яё]*|catkeru|кошечк[а-яё]*|котейк[а-яё]*|котя|пожалуйста|скажи|найди|погугли|поищи|загугли)\b",
+            "",
+            query,
+            flags=re.I
+        ).strip()
+        if not clean_q:
+            clean_q = query
+        data = urllib.parse.urlencode({"q": clean_q}).encode("utf-8")
+        req = urllib.request.Request(
+            "https://lite.duckduckgo.com/lite/",
+            data=data,
+            headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
+        )
+        with urllib.request.urlopen(req, timeout=4) as resp:
+            html = resp.read().decode("utf-8", "ignore")
+            snippets = re.findall(r'<td class=[\'"]result-snippet[\'"]>(.*?)</td>', html, flags=re.DOTALL)
+            results = []
+            for s in snippets[:max_results]:
+                clean = re.sub(r'<[^>]+>', '', s).strip()
+                if clean:
+                    results.append(clean)
+            return "\n".join(f"- {r}" for r in results)
+    except Exception as e:
+        logger.debug("Web search failed for query %r: %s", query, e)
+        return ""
+
+def is_web_search_needed(text: str) -> bool:
+    """Detects whether a user message requires fresh facts from the internet."""
+    t = text.lower()
+    keywords = [
+        "погугли", "найди", "поищи", "в интернете", "в сети", "пробей", "загугли",
+        "какая погода", "прогноз погоды", "погода в", "градусов",
+        "курс ", "биткоин", "доллар", "евро", "валют", "цена акции",
+        "новости", "что слышно", "что случилось", "что произошло",
+        "кто такой", "кто такая", "что такое", "сколько стоит",
+        "когда выйдет", "дата выхода", "расписание", "счет матча",
+        "найди информацию", "поищи информацию"
+    ]
+    if any(k in t for k in keywords):
+        return True
+    if "?" in t and any(w in t for w in ["сегодня", "сейчас", "вчера", "новости", "курс", "погода", "цена"]):
+        return True
+    return False
+
 async def ask_llm(
     chat_id: int,
     user_text: str,
@@ -363,7 +417,7 @@ async def ask_llm(
     is_owner_passive: bool = False,
     is_system_event: bool = False
 ) -> Optional[str]:
-    """Manages rolling context and queries DeepSeek via ProxyAPI."""
+    """Manages rolling context, web browsing and queries LLM via DarkAPI."""
     global CHAT_CONTEXT
 
     if chat_id not in CHAT_CONTEXT:
@@ -378,6 +432,16 @@ async def ask_llm(
         formatted_input = f"[Контекст: Твой Хозяин {sender_name} только что написал в чат: \"{user_text}\". Отреагируй на его слова коротко (1-2 предложения), как влюблённая яндере кошко-девочка, но не навязывайся слишком сильно]"
     else:
         formatted_input = f"[{sender_name}, Статус: {status_str}]: {user_text}"
+
+    # Internet Web Search if required
+    if not is_system_event and is_web_search_needed(user_text):
+        try:
+            web_facts = await asyncio.to_thread(search_web_lite, user_text)
+            if web_facts:
+                formatted_input += f"\n\n[СВЕЖИЕ ФАКТЫ ИЗ ИНТЕРНЕТА ПО ЗАПРОСУ:\n{web_facts}\nИспользуй эти факты в ответе, отвечай своими словами в роли Керу]"
+                logger.info("Enriched prompt with real-time web search facts (%d chars)", len(web_facts))
+        except Exception as web_ex:
+            logger.debug("Failed web enrichment: %s", web_ex)
 
     # Record in history
     history.append({
