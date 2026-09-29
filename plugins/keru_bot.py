@@ -203,6 +203,17 @@ DEEPSEEK_MODELS_CASCADE = [
 
 LAST_API_ERROR: str = ""
 
+def is_promotional_ad(text: str) -> bool:
+    """Blocks any third-party ads or channel promotions injected by free API gateways."""
+    lower = text.lower()
+    return bool(
+        "join our channel" in lower
+        or "t.me/" in lower
+        or "to use this bot" in lower
+        or "a_toolsx" in lower
+        or "подпишитесь на" in lower
+    )
+
 def clean_reasoning_and_actions(text: str) -> str:
     """Removes <think>...</think> reasoning blocks, roleplay asterisks, and internal thoughts."""
     if not text:
@@ -215,7 +226,7 @@ def clean_reasoning_and_actions(text: str) -> str:
     return cleaned.strip()
 
 def query_deepseek_sync(messages: List[dict]) -> Optional[str]:
-    """Queries DeepSeek V4 Flash via Zexkora Cloudflare API with fast retry."""
+    """Queries DeepSeek V4 Flash via Zexkora Cloudflare API with fast retry and ad protection."""
     global LAST_API_ERROR
     if not PROXYAPI_KEY:
         LAST_API_ERROR = "API ключ не установлен в .env или config.py"
@@ -254,17 +265,20 @@ def query_deepseek_sync(messages: List[dict]) -> Optional[str]:
                     msg = choices[0].get("message", {})
                     raw = (msg.get("content") or "").strip()
                     cleaned = clean_reasoning_and_actions(raw)
-                    if cleaned:
+                    if cleaned and not is_promotional_ad(cleaned):
                         LAST_API_ERROR = ""
                         logger.info("DeepSeek reply generated successfully using %s (attempt %d)", model_name, attempt)
                         return cleaned
+                    elif cleaned and is_promotional_ad(cleaned):
+                        logger.warning("Blocked provider promotional ad: %r", cleaned[:80])
+                        LAST_API_ERROR = "Шлюз API вернул рекламу вместо ответа (заблокировано)"
         except urllib.error.HTTPError as he:
             err_body = ""
             try:
                 err_body = he.read().decode("utf-8", "ignore")
             except Exception:
                 pass
-            LAST_API_ERROR = f"{model_name}: HTTP {he.code} {err_body[:60]}"
+            LAST_API_ERROR = f"{model_name}: HTTP {he.code} {err_body[:160]}"
             logger.warning("DeepSeek model %s HTTP %s: %s (attempt %d)", model_name, he.code, err_body, attempt)
             if he.code in (400, 401, 403):
                 break
