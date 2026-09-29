@@ -70,48 +70,12 @@ def get_ram_usage() -> str:
     return "Active"
 
 async def perform_graceful_restart(client: TelegramClient):
-    """Gracefully closes sessions and restarts service via systemd or in-place execv."""
+    """Instantly kills process at OS level so systemd triggers clean fresh restart."""
     try:
         from plugins.keru_bot import stop_keru_bot
         stop_keru_bot()
     except Exception:
         pass
-    try:
-        await client.disconnect()
-    except Exception:
-        pass
-    await asyncio.sleep(1)
-
-    # 1. Try systemctl restart first
-    try:
-        code = os.system("sudo -n systemctl restart telegram-userbot 2>/dev/null || systemctl restart telegram-userbot 2>/dev/null")
-        if code == 0:
-            os._exit(0)
-    except Exception:
-        pass
-
-    # 2. If running under systemd, systemd has Restart=always configured in deploy.sh.
-    # Exiting the process forces systemd to spawn a clean new process with updated files.
-    is_systemd = bool(os.getenv("INVOCATION_ID") or os.getenv("JOURNAL_STREAM"))
-    if not is_systemd and os.path.exists("/proc/self/cgroup"):
-        try:
-            with open("/proc/self/cgroup", "r") as f:
-                if "systemd" in f.read():
-                    is_systemd = True
-        except Exception:
-            pass
-
-    if is_systemd:
-        os._exit(0)
-
-    # 3. Fallback to in-place execv for interactive or standalone execution
-    try:
-        main_py = os.path.join(BASE_DIR, "main.py")
-        os.execv(sys.executable, [sys.executable, main_py])
-    except Exception:
-        pass
-
-    # 4. Final hard exit to ensure old process never hangs in RAM
     os._exit(0)
 
 _perform_graceful_restart = perform_graceful_restart
