@@ -12,7 +12,7 @@ import urllib.error
 from typing import Dict, List, Set, Optional
 
 from telethon import TelegramClient, events
-from config import BASE_DIR, KERU_BOT_TOKEN, PROXYAPI_KEY
+from config import BASE_DIR, KERU_BOT_TOKEN, PROXYAPI_KEY, KERU_MODEL
 
 logger = logging.getLogger("userbot.plugins.keru_bot")
 
@@ -190,14 +190,16 @@ BOT_USERNAME: Optional[str] = None
 OWNER_USER_ID: Optional[int] = None
 OWNER_USER_NAME: str = "Хозяин"
 
-KERU_BUILD_VERSION = "v3.2-STABLE"
+KERU_BUILD_VERSION = "v4.0-FLASH"
 
 PROXYAPI_URL = "https://api.proxyapi.ru/v1/chat/completions"
-DEEPSEEK_MODELS_CASCADE = [
-    "deepseek/deepseek-v3.2",
-    "deepseek/deepseek-v3.2-20251201",
-    "deepseek/deepseek-chat-v3",
-]
+
+# Primary model from .env (default deepseek/deepseek-v4-flash) with ultra-fast v4 flash fallbacks
+_primary = KERU_MODEL if KERU_MODEL else "deepseek/deepseek-v4-flash"
+DEEPSEEK_MODELS_CASCADE = [_primary]
+for _fallback in ["deepseek/deepseek-v4.1-flash", "deepseek/deepseek-v4-flash-0731"]:
+    if _fallback not in DEEPSEEK_MODELS_CASCADE:
+        DEEPSEEK_MODELS_CASCADE.append(_fallback)
 
 LAST_API_ERROR: str = ""
 
@@ -211,7 +213,7 @@ def clean_asterisk_actions(text: str) -> str:
     return cleaned.strip()
 
 def query_deepseek_sync(messages: List[dict]) -> Optional[str]:
-    """Queries DeepSeek via ProxyAPI with 8s timeout and fast fallback."""
+    """Queries DeepSeek via ProxyAPI with 15s timeout and fast fallback."""
     global LAST_API_ERROR
     if not PROXYAPI_KEY:
         LAST_API_ERROR = "PROXYAPI_KEY не установлен в .env или config.py"
@@ -225,12 +227,13 @@ def query_deepseek_sync(messages: List[dict]) -> Optional[str]:
         "Connection": "close"
     }
 
+    errors = []
     for model_name in DEEPSEEK_MODELS_CASCADE:
         payload = {
             "model": model_name,
             "messages": messages,
             "temperature": 0.85,
-            "max_tokens": 300
+            "max_tokens": 800
         }
         data_bytes = json.dumps(payload).encode("utf-8")
         req = urllib.request.Request(
@@ -239,14 +242,14 @@ def query_deepseek_sync(messages: List[dict]) -> Optional[str]:
             headers=headers
         )
         try:
-            with urllib.request.urlopen(req, timeout=8) as resp:
+            with urllib.request.urlopen(req, timeout=15) as resp:
                 res = json.loads(resp.read().decode("utf-8"))
                 choices = res.get("choices", [])
                 if choices:
                     msg = choices[0].get("message", {})
                     raw = (msg.get("content") or "").strip()
                     if not raw:
-                        raw = (msg.get("reasoning") or msg.get("reasoning_content") or "").strip()
+                        raw = (msg.get("reasoning_content") or msg.get("reasoning") or "").strip()
                     if raw:
                         cleaned = clean_asterisk_actions(raw)
                         if cleaned:
@@ -259,14 +262,18 @@ def query_deepseek_sync(messages: List[dict]) -> Optional[str]:
                 err_body = he.read().decode("utf-8", "ignore")
             except Exception:
                 pass
-            LAST_API_ERROR = f"{model_name}: HTTP {he.code} {err_body[:60]}"
+            err_msg = f"{model_name}: HTTP {he.code} {err_body[:60]}"
+            errors.append(err_msg)
             logger.warning("ProxyAPI model %s HTTP %s: %s, fallback to next...", model_name, he.code, err_body)
             continue
         except Exception as e:
-            LAST_API_ERROR = f"{model_name}: {type(e).__name__} ({e})"
+            err_msg = f"{model_name}: {type(e).__name__} ({e})"
+            errors.append(err_msg)
             logger.warning("ProxyAPI model %s failed: %s, fallback to next...", model_name, e)
             continue
 
+    if errors:
+        LAST_API_ERROR = " | ".join(errors)
     return None
 
 def build_system_instruction(owner_id: int, owner_name: str) -> str:
