@@ -236,7 +236,8 @@ def query_deepseek_sync(messages: List[dict]) -> Optional[str]:
         "model": model_name,
         "messages": messages,
         "temperature": 0.85,
-        "max_tokens": 500
+        "max_tokens": 300,
+        "thinking": {"type": "disabled"}
     }
     data_bytes = json.dumps(payload).encode("utf-8")
 
@@ -366,9 +367,9 @@ async def ask_llm(
         "content": formatted_input
     })
 
-    # Keep only last 10 messages for ultra-fast generation
-    if len(history) > 10:
-        history = history[-10:]
+    # Keep only last 5 messages for ultra-fast generation without context bloating
+    if len(history) > 5:
+        history = history[-5:]
         CHAT_CONTEXT[chat_id] = history
 
     system_prompt = build_system_instruction(OWNER_USER_ID or 0, OWNER_USER_NAME)
