@@ -203,13 +203,15 @@ DEEPSEEK_MODELS_CASCADE = [
 
 LAST_API_ERROR: str = ""
 
-def clean_asterisk_actions(text: str) -> str:
-    """Removes roleplay actions in asterisks or markdown italics."""
-    cleaned = re.sub(r"\*[^*]+\*", "", text)
-    cleaned = re.sub(r"(?<!\w)_[^_]+_(?!\w)", "", cleaned)
-    cleaned = cleaned.replace("*", "")
-    cleaned = re.sub(r"[ \t]+", " ", cleaned)
-    cleaned = re.sub(r"\n\s*\n+", "\n", cleaned)
+def clean_reasoning_and_actions(text: str) -> str:
+    """Removes <think>...</think> reasoning blocks, roleplay asterisks, and internal thoughts."""
+    if not text:
+        return ""
+    # Strip <think>...</think> blocks
+    cleaned = re.sub(r"<think>.*?</think>", "", text, flags=re.DOTALL)
+    cleaned = re.sub(r"^.*?<\/think>", "", cleaned, flags=re.DOTALL)
+    # Strip asterisks / markdown roleplay
+    cleaned = clean_asterisk_actions(cleaned)
     return cleaned.strip()
 
 def query_deepseek_sync(messages: List[dict]) -> Optional[str]:
@@ -232,7 +234,7 @@ def query_deepseek_sync(messages: List[dict]) -> Optional[str]:
         "model": model_name,
         "messages": messages,
         "temperature": 0.85,
-        "max_tokens": 300,
+        "max_tokens": 800,
         "thinking": {"type": "disabled"}
     }
     data_bytes = json.dumps(payload).encode("utf-8")
@@ -251,14 +253,11 @@ def query_deepseek_sync(messages: List[dict]) -> Optional[str]:
                 if choices:
                     msg = choices[0].get("message", {})
                     raw = (msg.get("content") or "").strip()
-                    if not raw:
-                        raw = (msg.get("reasoning_content") or msg.get("reasoning") or "").strip()
-                    if raw:
-                        cleaned = clean_asterisk_actions(raw)
-                        if cleaned:
-                            LAST_API_ERROR = ""
-                            logger.info("DeepSeek reply generated successfully using %s (attempt %d)", model_name, attempt)
-                            return cleaned
+                    cleaned = clean_reasoning_and_actions(raw)
+                    if cleaned:
+                        LAST_API_ERROR = ""
+                        logger.info("DeepSeek reply generated successfully using %s (attempt %d)", model_name, attempt)
+                        return cleaned
         except urllib.error.HTTPError as he:
             err_body = ""
             try:
@@ -573,17 +572,16 @@ def _register_bot_handlers(client: TelegramClient):
                 should_respond = True
             else:
                 # 1. Name match (all Russian declensions and nicknames)
-                name_pattern = re.compile(
-                    r"\b(кер[а-яё]*|кяр[а-яё]*|catkeru|кошечк[а-яё]*|котейк[а-яё]*|котя|кошка)\b",
-                    re.IGNORECASE
-                )
-                bot_called_by_name = bool(name_pattern.search(text_lower))
+                bot_called_by_name = bool(re.search(
+                    r"(кер[а-яё]*|кяр[а-яё]*|catkeru|кошечк[а-яё]*|котейк[а-яё]*|котя|кошка)",
+                    text_lower
+                ))
 
                 # 2. Tag match (username, alias, or mention entity)
                 bot_tagged = False
-                if BOT_USERNAME and f"@{BOT_USERNAME.lower()}" in text_lower:
+                if BOT_USERNAME and BOT_USERNAME.lower() in text_lower:
                     bot_tagged = True
-                elif "catkeru" in text_lower or "@catkeru_bot" in text_lower:
+                elif "catkeru" in text_lower:
                     bot_tagged = True
                 elif event.message and getattr(event.message, "entities", None):
                     for ent in event.message.entities:
