@@ -194,9 +194,15 @@ KERU_BUILD_VERSION = "v4.1-FLASH"
 
 PROXYAPI_URL = "https://api.proxyapi.ru/v1/chat/completions"
 
-# Strictly DeepSeek V4 Flash - no old models or cascades
+# Strictly DeepSeek V4 Flash only - no old models or cascades
+_configured_model = (KERU_MODEL or "").strip()
+if _configured_model and "v4-flash" in _configured_model:
+    ACTIVE_MODEL = _configured_model
+else:
+    ACTIVE_MODEL = "deepseek/deepseek-v4-flash"
+
 DEEPSEEK_MODELS_CASCADE = [
-    KERU_MODEL if KERU_MODEL else "deepseek/deepseek-v4-flash"
+    ACTIVE_MODEL
 ]
 
 LAST_API_ERROR: str = ""

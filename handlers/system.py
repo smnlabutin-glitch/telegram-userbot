@@ -92,14 +92,27 @@ async def perform_graceful_restart(client: TelegramClient):
 
     # 2. If running under systemd, systemd has Restart=always configured in deploy.sh.
     # Exiting the process forces systemd to spawn a clean new process with updated files.
-    if os.getenv("INVOCATION_ID") or os.getenv("JOURNAL_STREAM"):
+    is_systemd = bool(os.getenv("INVOCATION_ID") or os.getenv("JOURNAL_STREAM"))
+    if not is_systemd and os.path.exists("/proc/self/cgroup"):
+        try:
+            with open("/proc/self/cgroup", "r") as f:
+                if "systemd" in f.read():
+                    is_systemd = True
+        except Exception:
+            pass
+
+    if is_systemd:
         os._exit(0)
 
     # 3. Fallback to in-place execv for interactive or standalone execution
     try:
-        os.execv(sys.executable, [sys.executable] + sys.argv)
+        main_py = os.path.join(BASE_DIR, "main.py")
+        os.execv(sys.executable, [sys.executable, main_py])
     except Exception:
-        os._exit(0)
+        pass
+
+    # 4. Final hard exit to ensure old process never hangs in RAM
+    os._exit(0)
 
 _perform_graceful_restart = perform_graceful_restart
 
