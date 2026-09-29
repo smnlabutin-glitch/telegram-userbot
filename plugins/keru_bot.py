@@ -217,7 +217,7 @@ def clean_asterisk_actions(text: str) -> str:
     return cleaned.strip()
 
 def query_deepseek_sync(messages: List[dict]) -> Optional[str]:
-    """Queries DeepSeek V4 Flash via ProxyAPI with 15s timeout."""
+    """Queries DeepSeek V4 Flash via ProxyAPI with 45s timeout and automatic retry."""
     global LAST_API_ERROR
     if not PROXYAPI_KEY:
         LAST_API_ERROR = "PROXYAPI_KEY не установлен в .env или config.py"
@@ -236,40 +236,47 @@ def query_deepseek_sync(messages: List[dict]) -> Optional[str]:
         "model": model_name,
         "messages": messages,
         "temperature": 0.85,
-        "max_tokens": 800
+        "max_tokens": 500
     }
     data_bytes = json.dumps(payload).encode("utf-8")
-    req = urllib.request.Request(
-        PROXYAPI_URL,
-        data=data_bytes,
-        headers=headers
-    )
-    try:
-        with urllib.request.urlopen(req, timeout=15) as resp:
-            res = json.loads(resp.read().decode("utf-8"))
-            choices = res.get("choices", [])
-            if choices:
-                msg = choices[0].get("message", {})
-                raw = (msg.get("content") or "").strip()
-                if not raw:
-                    raw = (msg.get("reasoning_content") or msg.get("reasoning") or "").strip()
-                if raw:
-                    cleaned = clean_asterisk_actions(raw)
-                    if cleaned:
-                        LAST_API_ERROR = ""
-                        logger.info("ProxyAPI DeepSeek reply generated successfully using %s", model_name)
-                        return cleaned
-    except urllib.error.HTTPError as he:
-        err_body = ""
+
+    # Retry up to 2 times with 45s timeout to handle peak-hour latency and reasoning tokens
+    for attempt in range(1, 3):
+        req = urllib.request.Request(
+            PROXYAPI_URL,
+            data=data_bytes,
+            headers=headers
+        )
         try:
-            err_body = he.read().decode("utf-8", "ignore")
-        except Exception:
-            pass
-        LAST_API_ERROR = f"{model_name}: HTTP {he.code} {err_body[:60]}"
-        logger.warning("ProxyAPI model %s HTTP %s: %s", model_name, he.code, err_body)
-    except Exception as e:
-        LAST_API_ERROR = f"{model_name}: {type(e).__name__} ({e})"
-        logger.warning("ProxyAPI model %s failed: %s", model_name, e)
+            with urllib.request.urlopen(req, timeout=45) as resp:
+                res = json.loads(resp.read().decode("utf-8"))
+                choices = res.get("choices", [])
+                if choices:
+                    msg = choices[0].get("message", {})
+                    raw = (msg.get("content") or "").strip()
+                    if not raw:
+                        raw = (msg.get("reasoning_content") or msg.get("reasoning") or "").strip()
+                    if raw:
+                        cleaned = clean_asterisk_actions(raw)
+                        if cleaned:
+                            LAST_API_ERROR = ""
+                            logger.info("ProxyAPI DeepSeek reply generated successfully using %s (attempt %d)", model_name, attempt)
+                            return cleaned
+        except urllib.error.HTTPError as he:
+            err_body = ""
+            try:
+                err_body = he.read().decode("utf-8", "ignore")
+            except Exception:
+                pass
+            LAST_API_ERROR = f"{model_name}: HTTP {he.code} {err_body[:60]}"
+            logger.warning("ProxyAPI model %s HTTP %s: %s (attempt %d)", model_name, he.code, err_body, attempt)
+            if he.code in (400, 401, 403):
+                break
+            time.sleep(1)
+        except Exception as e:
+            LAST_API_ERROR = f"{model_name}: {type(e).__name__} ({e})"
+            logger.warning("ProxyAPI model %s failed: %s (attempt %d)", model_name, e, attempt)
+            time.sleep(1)
 
     return None
 
