@@ -12,8 +12,9 @@ API_HASH = os.getenv("TELEGRAM_API_HASH", "fb78e6edaec2381e33a6f7435df3094f").st
 SESSION_NAME = os.getenv("SESSION_NAME", "userbot_session").strip()
 COMMAND_PREFIX = os.getenv("COMMAND_PREFIX", ".").strip()
 KERU_BOT_TOKEN = os.getenv("KERU_BOT_TOKEN", "8905001669:AAF7ZpBvNvTsJoXalnXio-TjYJcEjfqfX9A").strip()
-PROXYAPI_KEY = os.getenv("PROXYAPI_KEY", "sk-JDq7q3OebJRruvZrV5ho4tCOp1DPHtkS").strip()
-KERU_MODEL = os.getenv("KERU_MODEL", "deepseek/deepseek-v4-flash").strip()
+PROXYAPI_KEY = os.getenv("PROXYAPI_KEY", "sk-YwKlpXZJYYpZzdamjy30Znf3b3wSju09fKQ0YnnW5jh2lX1h").strip()
+KERU_API_URL = os.getenv("KERU_API_URL", "https://api.zexkora.cc/v1/chat/completions").strip()
+KERU_MODEL = os.getenv("KERU_MODEL", "deepseek-v4-flash").strip()
 
 # 24/7 Server Tuning Settings
 FLOOD_SLEEP_THRESHOLD = int(os.getenv("FLOOD_SLEEP_THRESHOLD", "120"))

@@ -12,7 +12,7 @@ import urllib.error
 from typing import Dict, List, Set, Optional
 
 from telethon import TelegramClient, events
-from config import BASE_DIR, KERU_BOT_TOKEN, PROXYAPI_KEY, KERU_MODEL
+from config import BASE_DIR, KERU_BOT_TOKEN, PROXYAPI_KEY, KERU_MODEL, KERU_API_URL
 
 logger = logging.getLogger("userbot.plugins.keru_bot")
 
@@ -190,16 +190,12 @@ BOT_USERNAME: Optional[str] = None
 OWNER_USER_ID: Optional[int] = None
 OWNER_USER_NAME: str = "Хозяин"
 
-KERU_BUILD_VERSION = "v4.1-FLASH"
+KERU_BUILD_VERSION = "v4.2-FLASH"
 
-PROXYAPI_URL = "https://api.proxyapi.ru/v1/chat/completions"
+AI_API_URL = KERU_API_URL if KERU_API_URL else "https://api.zexkora.cc/v1/chat/completions"
 
-# Strictly DeepSeek V4 Flash only - no old models or cascades
-_configured_model = (KERU_MODEL or "").strip()
-if _configured_model and "v4-flash" in _configured_model:
-    ACTIVE_MODEL = _configured_model
-else:
-    ACTIVE_MODEL = "deepseek/deepseek-v4-flash"
+# Strictly DeepSeek V4 Flash only - fast global Cloudflare endpoint
+ACTIVE_MODEL = KERU_MODEL if KERU_MODEL else "deepseek-v4-flash"
 
 DEEPSEEK_MODELS_CASCADE = [
     ACTIVE_MODEL
@@ -217,10 +213,10 @@ def clean_asterisk_actions(text: str) -> str:
     return cleaned.strip()
 
 def query_deepseek_sync(messages: List[dict]) -> Optional[str]:
-    """Queries DeepSeek V4 Flash via ProxyAPI with 45s timeout and automatic retry."""
+    """Queries DeepSeek V4 Flash via Zexkora Cloudflare API with fast retry."""
     global LAST_API_ERROR
     if not PROXYAPI_KEY:
-        LAST_API_ERROR = "PROXYAPI_KEY не установлен в .env или config.py"
+        LAST_API_ERROR = "API ключ не установлен в .env или config.py"
         return None
 
     headers = {
@@ -241,15 +237,15 @@ def query_deepseek_sync(messages: List[dict]) -> Optional[str]:
     }
     data_bytes = json.dumps(payload).encode("utf-8")
 
-    # Retry up to 2 times with 45s timeout to handle peak-hour latency and reasoning tokens
+    # Fast Cloudflare requests with auto-retry
     for attempt in range(1, 3):
         req = urllib.request.Request(
-            PROXYAPI_URL,
+            AI_API_URL,
             data=data_bytes,
             headers=headers
         )
         try:
-            with urllib.request.urlopen(req, timeout=45) as resp:
+            with urllib.request.urlopen(req, timeout=30) as resp:
                 res = json.loads(resp.read().decode("utf-8"))
                 choices = res.get("choices", [])
                 if choices:
@@ -261,7 +257,7 @@ def query_deepseek_sync(messages: List[dict]) -> Optional[str]:
                         cleaned = clean_asterisk_actions(raw)
                         if cleaned:
                             LAST_API_ERROR = ""
-                            logger.info("ProxyAPI DeepSeek reply generated successfully using %s (attempt %d)", model_name, attempt)
+                            logger.info("DeepSeek reply generated successfully using %s (attempt %d)", model_name, attempt)
                             return cleaned
         except urllib.error.HTTPError as he:
             err_body = ""
@@ -270,13 +266,13 @@ def query_deepseek_sync(messages: List[dict]) -> Optional[str]:
             except Exception:
                 pass
             LAST_API_ERROR = f"{model_name}: HTTP {he.code} {err_body[:60]}"
-            logger.warning("ProxyAPI model %s HTTP %s: %s (attempt %d)", model_name, he.code, err_body, attempt)
+            logger.warning("DeepSeek model %s HTTP %s: %s (attempt %d)", model_name, he.code, err_body, attempt)
             if he.code in (400, 401, 403):
                 break
             time.sleep(1)
         except Exception as e:
             LAST_API_ERROR = f"{model_name}: {type(e).__name__} ({e})"
-            logger.warning("ProxyAPI model %s failed: %s (attempt %d)", model_name, e, attempt)
+            logger.warning("DeepSeek model %s failed: %s (attempt %d)", model_name, e, attempt)
             time.sleep(1)
 
     return None
