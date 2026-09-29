@@ -82,16 +82,24 @@ async def perform_graceful_restart(client: TelegramClient):
         pass
     await asyncio.sleep(1)
 
-    # 1. Try systemd restart first
-    code = os.system("sudo -n systemctl restart telegram-userbot 2>/dev/null || systemctl restart telegram-userbot 2>/dev/null || sudo -n systemctl restart userbot 2>/dev/null || systemctl restart userbot 2>/dev/null")
-    if code == 0:
-        sys.exit(0)
+    # 1. Try systemctl restart first
+    try:
+        code = os.system("sudo -n systemctl restart telegram-userbot 2>/dev/null || systemctl restart telegram-userbot 2>/dev/null")
+        if code == 0:
+            os._exit(0)
+    except Exception:
+        pass
 
-    # 2. Fallback to execv
+    # 2. If running under systemd, systemd has Restart=always configured in deploy.sh.
+    # Exiting the process forces systemd to spawn a clean new process with updated files.
+    if os.getenv("INVOCATION_ID") or os.getenv("JOURNAL_STREAM"):
+        os._exit(0)
+
+    # 3. Fallback to in-place execv for interactive or standalone execution
     try:
         os.execv(sys.executable, [sys.executable] + sys.argv)
     except Exception:
-        sys.exit(0)
+        os._exit(0)
 
 _perform_graceful_restart = perform_graceful_restart
 
