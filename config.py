@@ -13,16 +13,16 @@ SESSION_NAME = os.getenv("SESSION_NAME", "userbot_session").strip()
 COMMAND_PREFIX = os.getenv("COMMAND_PREFIX", ".").strip()
 KERU_BOT_TOKEN = os.getenv("KERU_BOT_TOKEN", "8905001669:AAF7ZpBvNvTsJoXalnXio-TjYJcEjfqfX9A").strip()
 _raw_key = os.getenv("PROXYAPI_KEY", "").strip()
-if not _raw_key or _raw_key.startswith("sk-JDq7"):
-    PROXYAPI_KEY = "sk-YwKlpXZJYYpZzdamjy30Znf3b3wSju09fKQ0YnnW5jh2lX1h"
+if not _raw_key or _raw_key.startswith("sk-") or "tc_live" not in _raw_key:
+    PROXYAPI_KEY = "tc_live_f52d8133a24b75e27eb583284dc77355a77d2c672ebcc3b7"
 else:
     PROXYAPI_KEY = _raw_key
 
-KERU_API_URL = os.getenv("KERU_API_URL", "https://api.zexkora.cc/v1/chat/completions").strip()
-if "proxyapi.ru" in KERU_API_URL:
-    KERU_API_URL = "https://api.zexkora.cc/v1/chat/completions"
+KERU_API_URL = os.getenv("KERU_API_URL", "https://darkapi.shop/v1/chat/completions").strip()
+if "zexkora" in KERU_API_URL or "proxyapi.ru" in KERU_API_URL:
+    KERU_API_URL = "https://darkapi.shop/v1/chat/completions"
 
-KERU_MODEL = "deepseek-v4-flash"
+KERU_MODEL = "deepseek-v4-pro"
 
 # 24/7 Server Tuning Settings
 FLOOD_SLEEP_THRESHOLD = int(os.getenv("FLOOD_SLEEP_THRESHOLD", "120"))

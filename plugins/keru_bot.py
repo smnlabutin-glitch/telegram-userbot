@@ -190,15 +190,15 @@ BOT_USERNAME: Optional[str] = None
 OWNER_USER_ID: Optional[int] = None
 OWNER_USER_NAME: str = "Хозяин"
 
-KERU_BUILD_VERSION = "v4.2-FLASH"
+KERU_BUILD_VERSION = "v4.3-DARKAPI"
 
-AI_API_URL = KERU_API_URL if KERU_API_URL else "https://api.zexkora.cc/v1/chat/completions"
+AI_API_URL = KERU_API_URL if KERU_API_URL else "https://darkapi.shop/v1/chat/completions"
 
-# Strictly DeepSeek V4 Flash only - fast global Cloudflare endpoint
-ACTIVE_MODEL = KERU_MODEL if KERU_MODEL else "deepseek-v4-flash"
+ACTIVE_MODEL = KERU_MODEL if KERU_MODEL else "deepseek-v4-pro"
 
 DEEPSEEK_MODELS_CASCADE = [
-    ACTIVE_MODEL
+    ACTIVE_MODEL,
+    "gpt-5.5"
 ]
 
 LAST_API_ERROR: str = ""
@@ -214,6 +214,13 @@ def is_promotional_ad(text: str) -> bool:
         or "подпишитесь на" in lower
     )
 
+def clean_asterisk_actions(text: str) -> str:
+    """Removes roleplay actions in asterisks like *посмотрела*, *мяукнула*."""
+    if not text:
+        return ""
+    cleaned = re.sub(r"\*[^*]+\*", "", text)
+    return cleaned.strip()
+
 def clean_reasoning_and_actions(text: str) -> str:
     """Removes <think>...</think> reasoning blocks, roleplay asterisks, and internal thoughts."""
     if not text:
@@ -226,7 +233,7 @@ def clean_reasoning_and_actions(text: str) -> str:
     return cleaned.strip()
 
 def query_deepseek_sync(messages: List[dict]) -> Optional[str]:
-    """Queries DeepSeek V4 Flash via Zexkora Cloudflare API with fast retry and ad protection."""
+    """Queries DarkAPI with cascade fallback (deepseek-v4-pro -> gpt-5.5) and ad protection."""
     global LAST_API_ERROR
     if not PROXYAPI_KEY:
         LAST_API_ERROR = "API ключ не установлен в .env или config.py"
@@ -240,54 +247,51 @@ def query_deepseek_sync(messages: List[dict]) -> Optional[str]:
         "Connection": "close"
     }
 
-    model_name = DEEPSEEK_MODELS_CASCADE[0]
-    payload = {
-        "model": model_name,
-        "messages": messages,
-        "temperature": 0.85,
-        "max_tokens": 800,
-        "thinking": {"type": "disabled"}
-    }
-    data_bytes = json.dumps(payload).encode("utf-8")
+    for model_name in DEEPSEEK_MODELS_CASCADE:
+        payload = {
+            "model": model_name,
+            "messages": messages,
+            "temperature": 0.85,
+            "max_tokens": 600
+        }
+        data_bytes = json.dumps(payload).encode("utf-8")
 
-    # Fast Cloudflare requests with auto-retry
-    for attempt in range(1, 3):
-        req = urllib.request.Request(
-            AI_API_URL,
-            data=data_bytes,
-            headers=headers
-        )
-        try:
-            with urllib.request.urlopen(req, timeout=30) as resp:
-                res = json.loads(resp.read().decode("utf-8"))
-                choices = res.get("choices", [])
-                if choices:
-                    msg = choices[0].get("message", {})
-                    raw = (msg.get("content") or "").strip()
-                    cleaned = clean_reasoning_and_actions(raw)
-                    if cleaned and not is_promotional_ad(cleaned):
-                        LAST_API_ERROR = ""
-                        logger.info("DeepSeek reply generated successfully using %s (attempt %d)", model_name, attempt)
-                        return cleaned
-                    elif cleaned and is_promotional_ad(cleaned):
-                        logger.warning("Blocked provider promotional ad: %r", cleaned[:80])
-                        LAST_API_ERROR = "Шлюз API вернул рекламу вместо ответа (заблокировано)"
-        except urllib.error.HTTPError as he:
-            err_body = ""
+        for attempt in range(1, 3):
+            req = urllib.request.Request(
+                AI_API_URL,
+                data=data_bytes,
+                headers=headers
+            )
             try:
-                err_body = he.read().decode("utf-8", "ignore")
-            except Exception:
-                pass
-            LAST_API_ERROR = f"{model_name}: HTTP {he.code} {err_body[:160]}"
-            logger.warning("DeepSeek model %s HTTP %s: %s (attempt %d)", model_name, he.code, err_body, attempt)
-            if he.code in (400, 401, 403):
-                break
-            time.sleep(1)
-        except Exception as e:
-            LAST_API_ERROR = f"{model_name}: {type(e).__name__} ({e})"
-            logger.warning("DeepSeek model %s failed: %s (attempt %d)", model_name, e, attempt)
-            time.sleep(1)
-
+                with urllib.request.urlopen(req, timeout=15) as resp:
+                    res = json.loads(resp.read().decode("utf-8"))
+                    choices = res.get("choices", [])
+                    if choices:
+                        msg = choices[0].get("message", {})
+                        raw = (msg.get("content") or "").strip()
+                        cleaned = clean_reasoning_and_actions(raw)
+                        if cleaned and not is_promotional_ad(cleaned):
+                            LAST_API_ERROR = ""
+                            logger.info("DeepSeek reply generated successfully using %s (attempt %d)", model_name, attempt)
+                            return cleaned
+                        elif cleaned and is_promotional_ad(cleaned):
+                            logger.warning("Blocked provider promotional ad: %r", cleaned[:80])
+                            LAST_API_ERROR = "Шлюз API вернул рекламу вместо ответа (заблокировано)"
+            except urllib.error.HTTPError as he:
+                err_body = ""
+                try:
+                    err_body = he.read().decode("utf-8", "ignore")
+                except Exception:
+                    pass
+                LAST_API_ERROR = f"{model_name}: HTTP {he.code} {err_body[:160]}"
+                logger.warning("Model %s HTTP %s: %s (attempt %d)", model_name, he.code, err_body, attempt)
+                if he.code in (401, 403):
+                    break
+                time.sleep(1)
+            except Exception as e:
+                LAST_API_ERROR = f"{model_name}: {type(e).__name__} ({e})"
+                logger.warning("Model %s failed: %s (attempt %d)", model_name, e, attempt)
+                time.sleep(1)
     return None
 
 def build_system_instruction(owner_id: int, owner_name: str) -> str:
