@@ -158,7 +158,31 @@ async def run_userbot(api_id: int, api_hash: str, stop_event: asyncio.Event):
         await client.disconnect()
     logger.info("Userbot session closed safely.")
 
+def cleanup_duplicate_processes():
+    """Kills any duplicate background processes and disables old redundant services on Linux."""
+    if not sys.platform.startswith("linux"):
+        return
+    import subprocess
+    my_pid = os.getpid()
+    try:
+        subprocess.run(["systemctl", "stop", "userbot"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        subprocess.run(["systemctl", "disable", "userbot"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    except Exception:
+        pass
+    try:
+        raw = subprocess.check_output(["pgrep", "-f", "python.*main.py"]).decode().strip()
+        for p in raw.splitlines():
+            pid = int(p.strip())
+            if pid != my_pid:
+                try:
+                    os.kill(pid, signal.SIGKILL)
+                except Exception:
+                    pass
+    except Exception:
+        pass
+
 def main():
+    cleanup_duplicate_processes()
     api_id, api_hash = validate_config()
 
     stop_event = asyncio.Event()

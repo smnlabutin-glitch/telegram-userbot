@@ -299,3 +299,60 @@ def register_system_handlers(client: TelegramClient, prefix: str):
         await client.send_file(event.chat_id, file=card)
         await asyncio.sleep(2)
         await _perform_graceful_restart(client)
+
+    # .clean (kill duplicate processes & disable conflicting services)
+    @client.on(events.NewMessage(outgoing=True, pattern=rf"^{prefix}clean$"))
+    async def clean_handler(event: events.NewMessage.Event):
+        card = render_card(
+            title="Очистка дубликатов",
+            subtitle="Уничтожение висящих фоновых копий бота...",
+            badge_text="ОЧИСТКА",
+            badge_type="info",
+            stats=[
+                ("СЛУЖБА", "userbot -> disabled"),
+                ("ПРОЦЕССЫ", "Уничтожение лишних"),
+                ("РЕЗУЛЬТАТ", "Один процесс 24/7"),
+            ],
+            category="PROCESS MANAGER"
+        )
+        try:
+            await event.delete()
+        except Exception:
+            pass
+        await client.send_file(event.chat_id, file=card)
+
+        import subprocess
+        my_pid = os.getpid()
+        try:
+            subprocess.run(["systemctl", "stop", "userbot"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            subprocess.run(["systemctl", "disable", "userbot"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        except Exception:
+            pass
+        try:
+            raw = subprocess.check_output(["pgrep", "-f", "python.*main.py"]).decode().strip()
+            for p in raw.splitlines():
+                pid = int(p.strip())
+                if pid != my_pid:
+                    try:
+                        os.kill(pid, 9)
+                    except Exception:
+                        pass
+        except Exception:
+            pass
+
+    # .cmd <shell command>
+    @client.on(events.NewMessage(outgoing=True, pattern=rf"^{prefix}cmd\s+(.+)$"))
+    async def cmd_handler(event: events.NewMessage.Event):
+        cmd = event.pattern_match.group(1).strip()
+        msg = await event.reply(f"⏳ **Выполняю:** `{cmd}`...")
+        import subprocess
+        try:
+            proc = subprocess.run(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, timeout=30)
+            res = (proc.stdout or "").strip()
+            if not res:
+                res = "Команда выполнена успешно (вывод пуст)"
+            if len(res) > 3500:
+                res = res[:3500] + "\n... (обрезано)"
+            await msg.edit(f"💻 **Результат (`{cmd}`):**\n```\n{res}\n```")
+        except Exception as e:
+            await msg.edit(f"❌ **Ошибка выполнения:** `{e}`")
