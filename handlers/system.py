@@ -231,9 +231,10 @@ def register_system_handlers(client: TelegramClient, prefix: str):
         except Exception:
             pass
 
+        cmd = "git config --global --add safe.directory '*' 2>/dev/null; git fetch origin main && git reset --hard origin/main"
         try:
             proc = await asyncio.create_subprocess_shell(
-                "git pull",
+                cmd,
                 cwd=BASE_DIR,
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.PIPE,
@@ -241,26 +242,27 @@ def register_system_handlers(client: TelegramClient, prefix: str):
             stdout, stderr = await proc.communicate()
             output = stdout.decode().strip()
             err = stderr.decode().strip()
+            return_code = proc.returncode
         except Exception as ex:
             output = ""
             err = str(ex)
+            return_code = 1
 
-        already_updated = "Already up to date" in output or "Уже обновлено" in output
-
-        if already_updated:
+        if return_code != 0:
+            err_msg = (err or output or "Неизвестная ошибка git")[:120]
             card = render_card(
-                title="Система актуальна",
-                subtitle="Код на сервере уже свежий. Перезапускаем для применения изменений...",
-                badge_text="ПЕРЕЗАПУСК",
-                badge_type="info",
+                title="Ошибка обновления",
+                subtitle=f"Не удалось стянуть код: {err_msg}",
+                badge_text="ОШИБКА",
+                badge_type="danger",
                 stats=[
-                    ("СТАТУС", "Up-to-date"),
+                    ("СТАТУС", "Сбой git"),
+                    ("КОД ВОЗВРАТА", str(return_code)),
                     ("ВЕТКА", "main"),
-                    ("ДЕЙСТВИЕ", "Перезапуск..."),
-                    ("КОМАНДА", f"{prefix}update"),
+                    ("ДЕЙСТВИЕ", "Отменено"),
                 ],
-                meta_left="OTA UPDATE ENGINE // v1.4",
-                meta_right="GITHUB: SYNCED",
+                meta_left="OTA UPDATE ENGINE // ERROR",
+                meta_right="GIT ERROR",
                 category="SYSTEM UPDATE MANAGER",
             )
             try:
@@ -268,17 +270,30 @@ def register_system_handlers(client: TelegramClient, prefix: str):
             except Exception:
                 pass
             await client.send_file(event.chat_id, file=card)
-            await asyncio.sleep(2)
-            await perform_graceful_restart(client)
             return
+
+        # Get latest commit info
+        commit_info = "Обновлено"
+        try:
+            c_proc = await asyncio.create_subprocess_shell(
+                'git log -1 --format="%h: %s"',
+                cwd=BASE_DIR,
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE,
+            )
+            c_out, _ = await c_proc.communicate()
+            if c_out:
+                commit_info = c_out.decode().strip()[:40]
+        except Exception:
+            pass
 
         card = render_card(
             title="Обновление установлено",
-            subtitle="Новый код успешно загружен с GitHub. Перезапуск службы...",
+            subtitle=f"Код синхронизирован: {commit_info}. Перезапуск службы...",
             badge_text="ОБНОВЛЕНО",
             badge_type="success",
             stats=[
-                ("КОММИТЫ", "Загружены"),
+                ("КОММИТ", commit_info[:20]),
                 ("СТАТУС", "Перезапуск..."),
                 ("СЕССИЯ", "Сохранена"),
                 ("ВРЕМЯ", "< 2 сек"),
@@ -293,7 +308,7 @@ def register_system_handlers(client: TelegramClient, prefix: str):
             pass
         await client.send_file(event.chat_id, file=card)
         await asyncio.sleep(2)
-        await _perform_graceful_restart(client)
+        await perform_graceful_restart(client)
 
     # .restart / .reboot
     @client.on(events.NewMessage(outgoing=True, pattern=rf"^{prefix}(?:restart|reboot)$"))
