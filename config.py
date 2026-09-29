@@ -11,6 +11,7 @@ API_ID_RAW = os.getenv("TELEGRAM_API_ID", "39361099").strip()
 API_HASH = os.getenv("TELEGRAM_API_HASH", "fb78e6edaec2381e33a6f7435df3094f").strip()
 SESSION_NAME = os.getenv("SESSION_NAME", "userbot_session").strip()
 COMMAND_PREFIX = os.getenv("COMMAND_PREFIX", ".").strip()
+KERU_BOT_TOKEN = os.getenv("KERU_BOT_TOKEN", "8905001669:AAF7ZpBvNvTsJoXalnXio-TjYJcEjfqfX9A").strip()
 _raw_key = os.getenv("PROXYAPI_KEY", "").strip()
 if not _raw_key or _raw_key.startswith("sk-JDq7"):
     PROXYAPI_KEY = "sk-YwKlpXZJYYpZzdamjy30Znf3b3wSju09fKQ0YnnW5jh2lX1h"
