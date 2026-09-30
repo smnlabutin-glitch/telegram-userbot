@@ -207,6 +207,37 @@ async def fetch_leaderboard() -> Optional[List[dict]]:
     return None
 
 
+async def _animate_loading(event, stop_event: asyncio.Event, role_id: str, zone_id: str):
+    """Dynamic animated telemetry loader displaying real-time fetching progress."""
+    frames = [
+        ("📡 Соединение со шлюзом телеметрии...", "▰▱▱▱▱▱▱▱ 15%"),
+        ("🔍 Запрос досье игрока...", "▰▰▱▱▱▱▱▱ 30%"),
+        ("📊 Выгрузка статистики и ранга...", "▰▰▰▰▱▱▱▱ 55%"),
+        ("🖼 Загрузка HD-аватара...", "▰▰▰▰▰▰▱▱ 75%"),
+        ("🎨 Рендеринг инфографики (Glassmorphism)...", "▰▰▰▰▰▰▰▱ 90%"),
+        ("✨ Финализация карточки...", "▰▰▰▰▰▰▰▰ 100%"),
+    ]
+    idx = 0
+    while not stop_event.is_set():
+        status_text, progress = frames[min(idx, len(frames) - 1)]
+        msg = (
+            f"╭───「 ✦ MLBB TELEMETRY ✦ 」\n"
+            f"│  🎮 **Игрок**: `{role_id}` ({zone_id})\n"
+            f"│  {status_text}\n"
+            f"│  `[{progress}]`\n"
+            f"╰──────────────────────────"
+        )
+        try:
+            await event.edit(msg)
+        except Exception:
+            pass
+        idx += 1
+        try:
+            await asyncio.wait_for(stop_event.wait(), timeout=0.35)
+            break
+        except asyncio.TimeoutError:
+            pass
+
 
 def register_mlbb(client: TelegramClient, prefix: str):
     """Registers Mobile Legends statistics plugin command handlers."""
@@ -414,6 +445,16 @@ def register_mlbb(client: TelegramClient, prefix: str):
 
         # --- SUBCMD: .mlbb top ---
         if subcmd == "top":
+            try:
+                await event.edit(
+                    "╭───「 ✦ MLBB TELEMETRY ✦ 」\n"
+                    "│  🏆 Синхронизация глобального рейтинга...\n"
+                    "│  `[▰▰▰▰▱▱▱▱ 50%]`\n"
+                    "╰──────────────────────────"
+                )
+            except Exception:
+                pass
+
             rankings = await fetch_leaderboard()
             if not rankings:
                 card = render_card(
@@ -490,40 +531,58 @@ def register_mlbb(client: TelegramClient, prefix: str):
                 pass
             return await client.send_file(event.chat_id, file=card)
 
-        # Lookup player profile
-        profile, err = await fetch_player_profile(int(target_role), int(target_zone))
-        if not profile:
-            card = render_card(
-                title="Досье игрока не найдено",
-                subtitle=err or "Игрок отсутствует в базе данных",
-                badge_text="НЕ НАЙДЕН",
-                badge_type="error",
-                items=[
-                    ("Почему не найден?", "Игрок ещё не был проиндексирован через систему авторизации"),
-                    (f"{prefix}mlbb auth {target_role} {target_zone}", "Авторизовать этот аккаунт через код из игры"),
-                    ("Проверьте ID", "Убедитесь, что ID и сервер указаны без ошибок"),
-                ],
-                stats=[
-                    ("ЗАПРОШЕННЫЙ ID", str(target_role)),
-                    ("ЗОНА / СЕРВЕР", str(target_zone)),
-                    ("СТАТУС БАЗЫ", "404 NOT FOUND"),
-                    ("РЕШЕНИЕ", f"{prefix}mlbb auth"),
-                ],
-                category="MLBB // PROFILE SEARCH",
-            )
+        # Start dynamic loading animation in background
+        stop_event = asyncio.Event()
+        anim_task = asyncio.create_task(_animate_loading(event, stop_event, target_role, target_zone))
+
+        try:
+            # Lookup player profile
+            profile, err = await fetch_player_profile(int(target_role), int(target_zone))
+            if not profile:
+                stop_event.set()
+                await anim_task
+                card = render_card(
+                    title="Досье игрока не найдено",
+                    subtitle=err or "Игрок отсутствует в базе данных",
+                    badge_text="НЕ НАЙДЕН",
+                    badge_type="error",
+                    items=[
+                        ("Почему не найден?", "Игрок ещё не был проиндексирован через систему авторизации"),
+                        (f"{prefix}mlbb auth {target_role} {target_zone}", "Авторизовать этот аккаунт через код из игры"),
+                        ("Проверьте ID", "Убедитесь, что ID и сервер указаны без ошибок"),
+                    ],
+                    stats=[
+                        ("ЗАПРОШЕННЫЙ ID", str(target_role)),
+                        ("ЗОНА / СЕРВЕР", str(target_zone)),
+                        ("СТАТУС БАЗЫ", "404 NOT FOUND"),
+                        ("РЕШЕНИЕ", f"{prefix}mlbb auth"),
+                    ],
+                    category="MLBB // PROFILE SEARCH",
+                )
+                try:
+                    await event.delete()
+                except Exception:
+                    pass
+                return await client.send_file(event.chat_id, file=card)
+
+            # Player found - fetch avatar and render card asynchronously
+            avatar_bytes = await fetch_player_avatar(int(target_role), int(target_zone), profile.get("avatar") if profile else None)
+            card_image = await asyncio.to_thread(render_mlbb_card, profile, avatar_bytes)
+
+            stop_event.set()
+            await anim_task
+
             try:
                 await event.delete()
             except Exception:
                 pass
-            return await client.send_file(event.chat_id, file=card)
 
-        # Player found - fetch avatar and render card
-        avatar_bytes = await fetch_player_avatar(int(target_role), int(target_zone), profile.get("avatar") if profile else None)
-        card_image = render_mlbb_card(profile, avatar_bytes)
-
-        try:
-            await event.delete()
-        except Exception:
-            pass
-
-        await client.send_file(event.chat_id, file=card_image)
+            await client.send_file(event.chat_id, file=card_image)
+        finally:
+            if not stop_event.is_set():
+                stop_event.set()
+            if not anim_task.done():
+                try:
+                    await anim_task
+                except Exception:
+                    pass
