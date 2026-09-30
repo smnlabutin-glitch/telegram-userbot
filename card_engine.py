@@ -1,6 +1,7 @@
 import io
 import os
 import sys
+import math
 from functools import lru_cache
 from typing import List, Tuple, Optional, Dict
 from PIL import Image, ImageDraw, ImageFont
@@ -655,6 +656,38 @@ RANK_BADGE_THEMES = {
 }
 
 
+RANK_ICONS_CONFIG = [
+    {"key": "immortal", "file": "mythicalimmortal.png"},
+    {"key": "glory", "file": "mythicalglory.png"},
+    {"key": "honor", "file": "mythical_honor.png"},
+    {"key": "mythic", "file": "mythic.png"},
+    {"key": "legend", "file": "legend.png"},
+    {"key": "epic", "file": "epic.png"},
+    {"key": "grandmaster", "file": "grandmaster.png"},
+    {"key": "master", "file": "master.png"},
+    {"key": "elite", "file": "elite.png"},
+    {"key": "warrior", "file": "warrior.png"},
+]
+
+def _get_rank_icon_path(rank_name: str, tier: str = "") -> Optional[str]:
+    combined = f"{rank_name} {tier}".lower()
+    for item in RANK_ICONS_CONFIG:
+        if item["key"] in combined:
+            p = os.path.join(ASSETS_FONT_DIR, "..", "ranks", item["file"])
+            p = os.path.normpath(p)
+            if os.path.isfile(p):
+                return p
+    return None
+
+def _draw_star(draw: ImageDraw.ImageDraw, cx: float, cy: float, r_out: float, fill: tuple, outline: tuple = None) -> None:
+    points = []
+    r_in = r_out * 0.42
+    for i in range(10):
+        angle = i * (math.pi / 5.0) - (math.pi / 2.0)
+        r = r_out if i % 2 == 0 else r_in
+        points.append((cx + r * math.cos(angle), cy + r * math.sin(angle)))
+    draw.polygon(points, fill=fill, outline=outline)
+
 def _plural_ru(n: int, one: str, two: str, five: str) -> str:
     n_abs = abs(n) % 100
     if 11 <= n_abs <= 19:
@@ -903,42 +936,137 @@ def render_mlbb_card(
     # 1. Top row: Category tag + Status Pill
     draw.text((content_x, content_y + 4 * scale), "MOBILE LEGENDS // PLAYER DOSSIER", font=f_category, fill=COLOR_TEXT_DIM)
 
-    # Badge pill on right
-    bbox = f_badge.getbbox(rank_badge_text)
-    text_w = bbox[2] - bbox[0]
-    pill_padding_x = 16 * scale
-    pill_padding_y = 6 * scale
-    dot_radius = 4 * scale
-    dot_gap = 8 * scale
-    pill_w = text_w + (dot_radius * 2) + dot_gap + (pill_padding_x * 2)
-    pill_h = (bbox[3] - bbox[1]) + (pill_padding_y * 2)
+    # 1. Top Right: Rank Crest Icon + Stars Pill Below Icon
+    rank_icon_path = _get_rank_icon_path(rank_name, tier)
+    drawn_rank_icon = False
 
-    pill_x2 = content_right
-    pill_x1 = pill_x2 - pill_w
-    pill_y1 = content_y
-    pill_y2 = pill_y1 + pill_h
+    if rank_icon_path and os.path.isfile(rank_icon_path):
+        try:
+            with Image.open(rank_icon_path) as raw_rank_icon:
+                orig_w, orig_h = raw_rank_icon.size
+                aspect = orig_w / orig_h
+                icon_h = int(68 * scale)
+                icon_w = int(icon_h * aspect)
+                badge_center_x = content_right - (56 * scale)
+                icon_x = badge_center_x - (icon_w // 2)
+                icon_y = content_y + (2 * scale)
 
-    pill_overlay = Image.new("RGBA", (w, h), (0, 0, 0, 0))
-    pill_draw = ImageDraw.Draw(pill_overlay)
-    pill_draw.rounded_rectangle(
-        [pill_x1, pill_y1, pill_x2, pill_y2],
-        radius=pill_h // 2,
-        fill=accent_theme["bg"],
-        outline=accent_theme["border"],
-        width=1 * scale,
-    )
-    dot_center_x = pill_x1 + pill_padding_x + dot_radius
-    dot_center_y = pill_y1 + (pill_h // 2)
-    pill_draw.ellipse(
-        [dot_center_x - dot_radius, dot_center_y - dot_radius, dot_center_x + dot_radius, dot_center_y + dot_radius],
-        fill=accent_theme["dot"],
-    )
-    img = Image.alpha_composite(img, pill_overlay)
-    draw = ImageDraw.Draw(img)
+                resized_rank = raw_rank_icon.convert("RGBA").resize((icon_w, icon_h), Image.Resampling.LANCZOS)
+                img.paste(resized_rank, (icon_x, icon_y), resized_rank)
+                resized_rank.close()
+                drawn_rank_icon = True
 
-    text_pos_x = dot_center_x + dot_radius + dot_gap
-    text_pos_y = pill_y1 + pill_padding_y - bbox[1]
-    draw.text((text_pos_x, text_pos_y), rank_badge_text, font=f_badge, fill=accent_theme["text"])
+                # Stars or rank pill below the rank icon
+                below_y = icon_y + icon_h + (3 * scale)
+                p_pad_x = 9 * scale
+                p_pad_y = 3 * scale
+
+                if rank_stars is not None and rank_stars > 0:
+                    num_str = str(rank_stars)
+                    s_box = f_badge_sm.getbbox(num_str)
+                    s_w = s_box[2] - s_box[0]
+                    s_h = s_box[3] - s_box[1]
+                    star_r = 5 * scale
+                    star_gap = 5 * scale
+                    inner_w = (star_r * 2) + star_gap + s_w
+                    p_w = inner_w + (p_pad_x * 2)
+                    p_h = max(s_h, int(star_r * 2)) + (p_pad_y * 2)
+                    p_x1 = badge_center_x - (p_w // 2)
+                    p_x2 = p_x1 + p_w
+                    p_y1 = below_y
+                    p_y2 = p_y1 + p_h
+
+                    p_overlay = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+                    p_draw = ImageDraw.Draw(p_overlay)
+                    p_draw.rounded_rectangle(
+                        [p_x1, p_y1, p_x2, p_y2],
+                        radius=p_h // 2,
+                        fill=accent_theme["bg"],
+                        outline=accent_theme["border"],
+                        width=1 * scale,
+                    )
+                    # Vector crisp 5-pointed star
+                    star_cx = p_x1 + p_pad_x + star_r
+                    star_cy = p_y1 + (p_h // 2)
+                    _draw_star(p_draw, star_cx, star_cy, star_r, fill=accent_theme["text"])
+                    img = Image.alpha_composite(img, p_overlay)
+                    p_overlay.close()
+                    draw = ImageDraw.Draw(img)
+
+                    # Star number
+                    text_x = star_cx + star_r + star_gap - s_box[0]
+                    text_y = p_y1 + p_pad_y - s_box[1]
+                    draw.text((text_x, text_y), num_str, font=f_badge_sm, fill=accent_theme["text"])
+                else:
+                    star_label = rank_name.upper()
+                    s_box = f_badge_sm.getbbox(star_label)
+                    s_w = s_box[2] - s_box[0]
+                    s_h = s_box[3] - s_box[1]
+                    p_w = s_w + (p_pad_x * 2)
+                    p_h = s_h + (p_pad_y * 2)
+                    p_x1 = badge_center_x - (p_w // 2)
+                    p_x2 = p_x1 + p_w
+                    p_y1 = below_y
+                    p_y2 = p_y1 + p_h
+
+                    p_overlay = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+                    p_draw = ImageDraw.Draw(p_overlay)
+                    p_draw.rounded_rectangle(
+                        [p_x1, p_y1, p_x2, p_y2],
+                        radius=p_h // 2,
+                        fill=accent_theme["bg"],
+                        outline=accent_theme["border"],
+                        width=1 * scale,
+                    )
+                    img = Image.alpha_composite(img, p_overlay)
+                    p_overlay.close()
+                    draw = ImageDraw.Draw(img)
+
+                    draw.text(
+                        (p_x1 + p_pad_x - s_box[0], p_y1 + p_pad_y - s_box[1]),
+                        star_label,
+                        font=f_badge_sm,
+                        fill=accent_theme["text"],
+                    )
+        except Exception:
+            drawn_rank_icon = False
+
+    if not drawn_rank_icon:
+        bbox = f_badge.getbbox(rank_badge_text)
+        text_w = bbox[2] - bbox[0]
+        pill_padding_x = 16 * scale
+        pill_padding_y = 6 * scale
+        dot_radius = 4 * scale
+        dot_gap = 8 * scale
+        pill_w = text_w + (dot_radius * 2) + dot_gap + (pill_padding_x * 2)
+        pill_h = (bbox[3] - bbox[1]) + (pill_padding_y * 2)
+
+        pill_x2 = content_right
+        pill_x1 = pill_x2 - pill_w
+        pill_y1 = content_y
+        pill_y2 = pill_y1 + pill_h
+
+        pill_overlay = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+        pill_draw = ImageDraw.Draw(pill_overlay)
+        pill_draw.rounded_rectangle(
+            [pill_x1, pill_y1, pill_x2, pill_y2],
+            radius=pill_h // 2,
+            fill=accent_theme["bg"],
+            outline=accent_theme["border"],
+            width=1 * scale,
+        )
+        dot_center_x = pill_x1 + pill_padding_x + dot_radius
+        dot_center_y = pill_y1 + (pill_h // 2)
+        pill_draw.ellipse(
+            [dot_center_x - dot_radius, dot_center_y - dot_radius, dot_center_x + dot_radius, dot_center_y + dot_radius],
+            fill=accent_theme["dot"],
+        )
+        img = Image.alpha_composite(img, pill_overlay)
+        draw = ImageDraw.Draw(img)
+
+        text_pos_x = dot_center_x + dot_radius + dot_gap
+        text_pos_y = pill_y1 + pill_padding_y - bbox[1]
+        draw.text((text_pos_x, text_pos_y), rank_badge_text, font=f_badge, fill=accent_theme["text"])
 
     # 2. Header Area: Avatar + Name + Meta
     header_y = content_y + (36 * scale)
