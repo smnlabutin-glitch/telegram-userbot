@@ -29,8 +29,17 @@ DEFAULT_STATE = {
         "title": "Аниме викторина",
         "description": "Интерактивная игра 'Угадай аниме по кадру' в реальном времени",
         "command": ".animequiz [stop]",
+    },
+    "mlbb": {
+        "enabled": True,
+        "title": "Mobile Legends Статистика",
+        "description": "Карточки профиля, винрейт и сезоны игроков MLBB через открытый API",
+        "command": ".mlbb [id zone | auth | verify | top]",
+        "default_role_id": "",
+        "default_zone_id": "",
     }
 }
+
 
 def load_state() -> dict:
     if os.path.isfile(STATE_FILE):

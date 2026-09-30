@@ -86,7 +86,7 @@ def generate_samples():
     print("Generated previews/sample_ping.png")
 
     # 5. Anime Quiz Question Card
-    from card_engine import render_quiz_card
+    from card_engine import render_quiz_card, render_mlbb_card
     card_quiz = render_quiz_card(
         frame_bytes=None,
         masked_hint="А _ _ _ а   т _ _ _ _ в",
@@ -97,5 +97,32 @@ def generate_samples():
         f.write(card_quiz.getvalue())
     print("Generated previews/sample_animequiz.png")
 
+    # 6. Mobile Legends Player Dossier Card
+    sample_player = {
+        "roleId": 314626595,
+        "zoneId": 6242,
+        "name": "RRebySSSA",
+        "level": 111,
+        "currentRank": {
+            "name": "Mythical Immortal",
+            "stars": 124,
+            "tier": "mythic",
+        },
+        "historyRank": {
+            "name": "Mythical Immortal",
+        },
+        "stats": [
+            {"season": 37, "mode": 2, "games": 42, "winRate": 64.3, "kda": 4.12, "mvp": 14},
+            {"season": 36, "mode": 2, "games": 185, "winRate": 61.8, "kda": 3.75, "mvp": 38},
+            {"season": 35, "mode": 2, "games": 310, "winRate": 59.4, "kda": 3.28, "mvp": 52},
+            {"season": 34, "mode": 2, "games": 161, "winRate": 60.2, "kda": 3.33, "mvp": 22},
+        ],
+    }
+    card_mlbb = render_mlbb_card(sample_player)
+    with open("previews/sample_mlbb.png", "wb") as f:
+        f.write(card_mlbb.getvalue())
+    print("Generated previews/sample_mlbb.png")
+
 if __name__ == "__main__":
     generate_samples()
+

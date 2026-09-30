@@ -626,3 +626,381 @@ def render_quiz_card(
     output.name = "anime_quiz_card.png"
     return output
 
+
+def render_mlbb_card(
+    player_data: dict,
+    avatar_bytes: Optional[bytes] = None,
+) -> io.BytesIO:
+    """
+    Renders an ultra-premium Mobile Legends: Bang Bang player dossier card.
+    Uses Frosted Glassmorphism, 2x supersampling and Lanczos downsampling.
+    Matches the exact architectural dark theme of the Telegram userbot.
+    """
+    scale = 2
+    target_width = 1040
+    target_height = 680
+    w = target_width * scale
+    h = target_height * scale
+
+    # Load typography
+    font_bold_path = _find_font(bold=True)
+    font_reg_path = _find_font(bold=False)
+    font_mono_path = _find_font(mono=True)
+
+    f_category = _load_font(font_bold_path, 12 * scale)
+    f_badge = _load_font(font_bold_path, 12 * scale)
+    f_name = _load_font(font_bold_path, 30 * scale)
+    f_meta = _load_font(font_reg_path, 14 * scale)
+    f_meta_mono = _load_font(font_mono_path or font_bold_path, 14 * scale)
+    f_stat_label = _load_font(font_bold_path, 11 * scale)
+    f_stat_val = _load_font(font_bold_path, 21 * scale)
+    f_stat_val_mono = _load_font(font_mono_path or font_bold_path, 20 * scale)
+    f_row_label = _load_font(font_bold_path, 13 * scale)
+    f_row_val = _load_font(font_mono_path or font_bold_path, 13 * scale)
+    f_footer = _load_font(font_reg_path, 12 * scale)
+
+    # Extract player properties
+    name = str(player_data.get("name") or "Player").strip()
+    role_id = str(player_data.get("roleId") or "")
+    zone_id = str(player_data.get("zoneId") or "")
+    level = str(player_data.get("level") or "—")
+
+    # Current Rank
+    rank_info = player_data.get("currentRank") or {}
+    rank_name = rank_info.get("name") or "Unranked"
+    rank_stars = rank_info.get("stars")
+    tier = str(rank_info.get("tier") or "").lower()
+
+    if rank_stars is not None and rank_stars > 0:
+        rank_badge_text = f"{rank_name.upper()} • {rank_stars} STARS"
+    else:
+        rank_badge_text = rank_name.upper()
+
+
+    # Determine badge theme based on rank tier
+    if "immortal" in rank_name.lower() or "glory" in rank_name.lower():
+        badge_type = "warn"  # Gold / Amber for top Mythic
+    elif "mythic" in rank_name.lower() or "myth" in tier:
+        badge_type = "running"  # Violet for Mythic
+    elif "legend" in rank_name.lower():
+        badge_type = "info"  # Blue for Legend
+    else:
+        badge_type = "success"  # Emerald
+
+    # Peak / Highest Rank
+    hist_rank = player_data.get("historyRank")
+    if isinstance(hist_rank, dict):
+        peak_rank_name = hist_rank.get("name") or rank_name
+    elif isinstance(hist_rank, str) and hist_rank:
+        peak_rank_name = hist_rank
+    else:
+        peak_rank_name = rank_name
+
+    # Compute overall statistics from all seasons
+    raw_stats = player_data.get("stats")
+    total_games = 0
+    total_wins = 0
+    total_mvps = 0
+    ranked_seasons = []
+
+    if isinstance(raw_stats, dict):
+        total_games = raw_stats.get("totalGames") or 0
+        total_wins = raw_stats.get("totalWins") or 0
+        total_mvps = raw_stats.get("mvpCount") or 0
+        direct_wr = raw_stats.get("winRate")
+        if direct_wr is not None:
+            overall_wr_str = f"{float(direct_wr):.1f}%"
+        elif total_games > 0:
+            overall_wr_str = f"{(total_wins / total_games) * 100:.1f}%"
+        else:
+            overall_wr_str = "—"
+
+        seasons_pool = raw_stats.get("seasonSummaries") or []
+        for entry in seasons_pool:
+            if isinstance(entry, dict) and entry.get("mode") == 2 and entry.get("games", 0) > 0:
+                ranked_seasons.append(entry)
+    elif isinstance(raw_stats, list):
+        for entry in raw_stats:
+            if isinstance(entry, dict):
+                games = entry.get("games", 0)
+                wr = entry.get("winRate", 0.0)
+                mvp = entry.get("mvp", 0)
+                mode = entry.get("mode")
+
+                total_games += games
+                total_wins += round(games * (wr / 100.0))
+                total_mvps += mvp
+
+                if mode == 2 and games > 0:
+                    ranked_seasons.append(entry)
+
+        if total_games > 0:
+            overall_wr = (total_wins / total_games) * 100.0
+            overall_wr_str = f"{overall_wr:.1f}%"
+        else:
+            overall_wr_str = "—"
+    else:
+        overall_wr_str = "—"
+
+    # Sort ranked seasons descending by season number
+    ranked_seasons.sort(key=lambda x: x.get("season", 0), reverse=True)
+
+    # Current / latest season info
+    if ranked_seasons:
+        latest = ranked_seasons[0]
+        cur_season_num = latest.get("season", "")
+        cur_season_games = latest.get("games", 0)
+        cur_season_wr = latest.get("winRate", 0.0)
+        cur_season_kda = latest.get("kda", 0.0)
+        cur_season_mvp = latest.get("mvp", 0)
+        cur_season_text = f"{cur_season_games} игр ({cur_season_wr:.1f}%)"
+        cur_kda_text = f"{cur_season_kda:.2f} KDA • {cur_season_mvp} MVP"
+    else:
+        cur_season_num = ""
+        cur_season_text = "Нет матчей"
+        cur_kda_text = "—"
+
+
+    # 0. Base wallpaper / dark obsidian background
+    anime_bg_path = os.path.join(ASSETS_FONT_DIR, "..", "anime_bg.jpg")
+    anime_bg_path = os.path.normpath(anime_bg_path)
+    if os.path.isfile(anime_bg_path):
+        try:
+            with Image.open(anime_bg_path) as raw_bg:
+                bg_w, bg_h = raw_bg.size
+                ratio = max(w / bg_w, h / bg_h)
+                new_w = int(bg_w * ratio)
+                new_h = int(bg_h * ratio)
+                resized_bg = raw_bg.resize((new_w, new_h), Image.Resampling.LANCZOS)
+                left = (new_w - w) // 2
+                top = (new_h - h) // 2
+                img = resized_bg.crop((left, top, left + w, top + h)).convert("RGBA")
+                resized_bg.close()
+        except Exception:
+            img = Image.new("RGBA", (w, h), COLOR_BG)
+    else:
+        img = Image.new("RGBA", (w, h), COLOR_BG)
+
+    # Outer container with rounded corners and subtle border
+    card_inset = 20 * scale
+    card_rect = [card_inset, card_inset, w - card_inset, h - card_inset]
+    card_radius = 18 * scale
+
+    # Dark Frosted Glassmorphism card surface
+    glass_overlay = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+    glass_draw = ImageDraw.Draw(glass_overlay)
+    GLASS_SURFACE = (11, 14, 21, 230)
+    GLASS_BORDER = (75, 92, 125, 185)
+    glass_draw.rounded_rectangle(card_rect, radius=card_radius, fill=GLASS_SURFACE, outline=GLASS_BORDER, width=2 * scale)
+
+    # Decorative top accent hairline
+    accent_theme = BADGE_THEMES.get(badge_type, BADGE_THEMES["warn"])
+    accent_bar_len = 160 * scale
+    glass_draw.line(
+        [(card_inset + card_radius, card_inset), (card_inset + card_radius + accent_bar_len, card_inset)],
+        fill=accent_theme["dot"],
+        width=3 * scale,
+    )
+    img = Image.alpha_composite(img, glass_overlay)
+    glass_overlay.close()
+    draw = ImageDraw.Draw(img)
+
+    content_x = card_inset + (34 * scale)
+    content_y = card_inset + (30 * scale)
+    content_right = w - card_inset - (34 * scale)
+
+    # 1. Top row: Category tag + Status Pill
+    draw.text((content_x, content_y + 4 * scale), "MOBILE LEGENDS // PLAYER DOSSIER", font=f_category, fill=COLOR_TEXT_DIM)
+
+    # Badge pill on right
+    bbox = f_badge.getbbox(rank_badge_text)
+    text_w = bbox[2] - bbox[0]
+    pill_padding_x = 16 * scale
+    pill_padding_y = 6 * scale
+    dot_radius = 4 * scale
+    dot_gap = 8 * scale
+    pill_w = text_w + (dot_radius * 2) + dot_gap + (pill_padding_x * 2)
+    pill_h = (bbox[3] - bbox[1]) + (pill_padding_y * 2)
+
+    pill_x2 = content_right
+    pill_x1 = pill_x2 - pill_w
+    pill_y1 = content_y
+    pill_y2 = pill_y1 + pill_h
+
+    pill_overlay = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+    pill_draw = ImageDraw.Draw(pill_overlay)
+    pill_draw.rounded_rectangle(
+        [pill_x1, pill_y1, pill_x2, pill_y2],
+        radius=pill_h // 2,
+        fill=accent_theme["bg"],
+        outline=accent_theme["border"],
+        width=1 * scale,
+    )
+    dot_center_x = pill_x1 + pill_padding_x + dot_radius
+    dot_center_y = pill_y1 + (pill_h // 2)
+    pill_draw.ellipse(
+        [dot_center_x - dot_radius, dot_center_y - dot_radius, dot_center_x + dot_radius, dot_center_y + dot_radius],
+        fill=accent_theme["dot"],
+    )
+    img = Image.alpha_composite(img, pill_overlay)
+    draw = ImageDraw.Draw(img)
+
+    text_pos_x = dot_center_x + dot_radius + dot_gap
+    text_pos_y = pill_y1 + pill_padding_y - bbox[1]
+    draw.text((text_pos_x, text_pos_y), rank_badge_text, font=f_badge, fill=accent_theme["text"])
+
+    # 2. Header Area: Avatar + Name + Meta
+    header_y = content_y + (38 * scale)
+    avatar_size = 88 * scale
+    avatar_rect = [content_x, header_y, content_x + avatar_size, header_y + avatar_size]
+    avatar_radius = 16 * scale
+
+    if avatar_bytes:
+        try:
+            with Image.open(io.BytesIO(avatar_bytes)) as raw_av:
+                av_rgba = raw_av.convert("RGBA")
+                av_resized = av_rgba.resize((avatar_size, avatar_size), Image.Resampling.LANCZOS)
+                av_rgba.close()
+
+                mask = Image.new("L", (avatar_size, avatar_size), 0)
+                mask_draw = ImageDraw.Draw(mask)
+                mask_draw.rounded_rectangle([0, 0, avatar_size, avatar_size], radius=avatar_radius, fill=255)
+
+                img.paste(av_resized, (content_x, header_y), mask)
+                av_resized.close()
+                mask.close()
+        except Exception:
+            draw.rounded_rectangle(avatar_rect, radius=avatar_radius, fill=COLOR_BOX_BG)
+    else:
+        # Fallback stylized avatar box with ML icon initial
+        draw.rounded_rectangle(avatar_rect, radius=avatar_radius, fill=COLOR_BOX_BG)
+        initial = (name[0] if name else "M").upper()
+        f_init = _load_font(font_bold_path, 36 * scale)
+        ibox = f_init.getbbox(initial)
+        iw = ibox[2] - ibox[0]
+        ih = ibox[3] - ibox[1]
+        draw.text(
+            (content_x + (avatar_size - iw) // 2 - ibox[0], header_y + (avatar_size - ih) // 2 - ibox[1]),
+            initial,
+            font=f_init,
+            fill=accent_theme["dot"],
+        )
+
+    # Avatar glowing hairline border
+    draw.rounded_rectangle(avatar_rect, radius=avatar_radius, outline=COLOR_BORDER_LIGHT, width=2 * scale)
+
+    # Name and Meta next to avatar
+    text_info_x = content_x + avatar_size + (22 * scale)
+    name_y = header_y + (4 * scale)
+    draw.text((text_info_x, name_y), name, font=f_name, fill=COLOR_TEXT_WHITE)
+
+    meta_y1 = name_y + (38 * scale)
+    id_str = f"ID: {role_id} ({zone_id})" if role_id and zone_id else f"ID: {role_id}"
+    meta_line1 = f"{id_str}   •   LEVEL {level}   •   SERVER CIS / GLOBAL"
+    draw.text((text_info_x, meta_y1), meta_line1, font=f_meta_mono, fill=COLOR_TEXT_MUTED)
+
+    meta_y2 = meta_y1 + (22 * scale)
+    meta_line2 = f"ПИКОВЫЙ РАНГ: {peak_rank_name.upper()}   •   НАГРАДЫ MVP: {total_mvps:,}"
+    draw.text((text_info_x, meta_y2), meta_line2, font=f_meta, fill=COLOR_TEXT_DIM)
+
+    # Hairline divider
+    divider_y = header_y + avatar_size + (24 * scale)
+    draw.line([(content_x, divider_y), (content_right, divider_y)], fill=COLOR_BORDER, width=1 * scale)
+
+    # 3. Main Stats Grid (4 Metric Boxes)
+    curr_y = divider_y + (20 * scale)
+    stat_cards_h = 92 * scale
+    col_gap = 14 * scale
+
+    grid_stats = [
+        ("ОБЩИЙ ВИНРЕЙТ", overall_wr_str, BADGE_THEMES["success"]["text"] if overall_wr_str != "—" and float(overall_wr_str.rstrip("%")) >= 55 else COLOR_TEXT_WHITE),
+        ("ВСЕГО МАТЧЕЙ", f"{total_games:,}" if total_games else "—", COLOR_TEXT_WHITE),
+        (f"СЕЗОН {cur_season_num} (RANKED)", cur_season_text, COLOR_TEXT_WHITE),
+        ("KDA СЕЗОНА & MVP", cur_kda_text, accent_theme["text"]),
+    ]
+
+    total_gaps = col_gap * (len(grid_stats) - 1)
+    card_width = (content_right - content_x - total_gaps) // len(grid_stats)
+
+    for i, (label, val, val_color) in enumerate(grid_stats):
+        cx1 = content_x + i * (card_width + col_gap)
+        cx2 = cx1 + card_width
+        cy1 = curr_y
+        cy2 = cy1 + stat_cards_h
+
+        draw.rounded_rectangle([cx1, cy1, cx2, cy2], radius=10 * scale, fill=COLOR_BOX_BG, outline=COLOR_BORDER, width=1 * scale)
+        draw.text((cx1 + 16 * scale, cy1 + 14 * scale), label, font=f_stat_label, fill=COLOR_TEXT_DIM)
+        draw.text((cx1 + 16 * scale, cy1 + 38 * scale), str(val), font=f_stat_val_mono, fill=val_color)
+
+    curr_y += stat_cards_h + (18 * scale)
+
+    # 4. Ranked Seasons History Strip (Last 3 ranked seasons)
+    hist_box_h = 138 * scale
+    draw.rounded_rectangle(
+        [content_x, curr_y, content_right, curr_y + hist_box_h],
+        radius=10 * scale,
+        fill=COLOR_BOX_BG,
+        outline=COLOR_BORDER,
+        width=1 * scale,
+    )
+
+    # Title of history strip
+    draw.text((content_x + 18 * scale, curr_y + 14 * scale), "ИСТОРИЯ ПОСЛЕДНИХ СЕЗОНОВ // RANKED MATCHES", font=f_stat_label, fill=COLOR_TEXT_DIM)
+
+    # Show up to 3 seasons rows
+    sample_seasons = ranked_seasons[:3]
+    if sample_seasons:
+        row_y = curr_y + (38 * scale)
+        for s_idx, s_data in enumerate(sample_seasons):
+            s_num = s_data.get("season", "")
+            s_games = s_data.get("games", 0)
+            s_wr = s_data.get("winRate", 0.0)
+            s_kda = s_data.get("kda", 0.0)
+            s_mvp = s_data.get("mvp", 0)
+
+            col1 = f"СЕЗОН {s_num}"
+            col2 = f"{s_games} МАТЧЕЙ"
+            col3 = f"WIN RATE: {s_wr:.1f}%"
+            col4 = f"KDA: {s_kda:.2f}"
+            col5 = f"MVP: {s_mvp}"
+
+            draw.text((content_x + 18 * scale, row_y), col1, font=f_row_label, fill=COLOR_TEXT_WHITE)
+            draw.text((content_x + 180 * scale, row_y), col2, font=f_row_val, fill=COLOR_TEXT_MUTED)
+            draw.text((content_x + 380 * scale, row_y), col3, font=f_row_val, fill=BADGE_THEMES["success"]["text"] if s_wr >= 55 else COLOR_TEXT_WHITE)
+            draw.text((content_x + 590 * scale, row_y), col4, font=f_row_val, fill=COLOR_TEXT_MUTED)
+            draw.text((content_x + 780 * scale, row_y), col5, font=f_row_val, fill=accent_theme["text"])
+
+            row_y += 30 * scale
+    else:
+        draw.text(
+            (content_x + 18 * scale, curr_y + 60 * scale),
+            "Подробная история матчей отсутствует или скрыта в настройках приватности",
+            font=f_meta,
+            fill=COLOR_TEXT_MUTED,
+        )
+
+    # 5. Footer Bar
+    footer_y = h - card_inset - (38 * scale)
+    draw.line([(content_x, footer_y - (14 * scale)), (content_right, footer_y - (14 * scale))], fill=COLOR_BORDER, width=1 * scale)
+    draw.text((content_x, footer_y), "MLBB TELEMETRY ENGINE // USERBOT v1.0", font=f_footer, fill=COLOR_TEXT_DIM)
+
+    meta_r = "REAL-TIME SYNCED • DATA VERIFIED"
+    bbox_r = f_footer.getbbox(meta_r)
+    w_r = bbox_r[2] - bbox_r[0]
+    draw.text((content_right - w_r, footer_y), meta_r, font=f_footer, fill=COLOR_TEXT_DIM)
+
+    # 6. Downsample 2x Lanczos -> 1x
+    final_img = img.resize((target_width, target_height), Image.Resampling.LANCZOS)
+    img.close()
+
+    output = io.BytesIO()
+    rgb_img = final_img.convert("RGB")
+    final_img.close()
+    rgb_img.save(output, format="PNG", optimize=True)
+    rgb_img.close()
+
+    output.seek(0)
+    output.name = "mlbb_card.png"
+    return output
+
+

@@ -130,6 +130,7 @@ def register_system_handlers(client: TelegramClient, prefix: str):
                 (f"{prefix}update", "Обновить юзербота (git pull + автоперезапуск)"),
                 (f"{prefix}restart", "Перезапустить службу юзербота 24/7"),
                 (f"{prefix}plugins", "Центр управления плагинами (каталог расширений)"),
+                (f"{prefix}mlbb [id zone|auth|top]", "Карточка статистики Mobile Legends (MLBB)"),
                 (f"{prefix}animequiz [stop]", "Мини-игра 'Угадай аниме по кадру' в реальном времени"),
                 (f"{prefix}online [on|off]", "Вечный онлайн (автоматический статус 'В сети' 24/7)"),
                 (f"{prefix}autoname [on|off]", "Динамическое время в никнейме (поминутно)"),

@@ -25,6 +25,7 @@ from handlers.plugins_handler import register_plugins_handlers
 from plugins.always_online import register_always_online, stop_always_online
 from plugins.time_name import register_time_name, stop_autoname
 from plugins.anime_quiz import register_anime_quiz
+from plugins.mlbb import register_mlbb
 from plugins.keru_bot import start_keru_bot, stop_keru_bot
 
 
@@ -78,6 +79,7 @@ async def run_userbot(api_id: int, api_hash: str, stop_event: asyncio.Event):
     register_always_online(client, COMMAND_PREFIX)
     register_time_name(client, COMMAND_PREFIX)
     register_anime_quiz(client, COMMAND_PREFIX)
+    register_mlbb(client, COMMAND_PREFIX)
 
     retry_delay = 5
     max_retry_delay = 60
