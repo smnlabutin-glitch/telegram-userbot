@@ -1408,3 +1408,282 @@ def render_mlbb_card(
     output.seek(0)
     output.name = "mlbb_card.png"
     return output
+
+
+def render_profile_card(
+    user_id: int,
+    name: str,
+    username: str,
+    user_type: str,
+    reg_date: str,
+    country_region: str,
+    dc_str: str,
+    chat_id: str,
+    avatar_bytes: io.BytesIO = None,
+    items: list = None,
+    badge_type: str = "info",
+    category: str = "TELEGRAM // USER DOSSIER",
+) -> io.BytesIO:
+    scale = 2
+    target_width = 1040
+    target_height = 620
+    w = target_width * scale
+    h = target_height * scale
+
+    # Load fonts
+    font_bold_path = _find_font(bold=True)
+    font_reg_path = _find_font(bold=False)
+    font_mono_path = _find_font(mono=True)
+
+    f_category = _load_font(font_bold_path, 12 * scale)
+    f_badge = _load_font(font_bold_path, 12 * scale)
+    f_badge_sm = _load_font(font_bold_path, 11 * scale)
+    f_name = _load_font(font_bold_path, 30 * scale)
+    f_meta = _load_font(font_reg_path, 13 * scale)
+    f_meta_mono = _load_font(font_mono_path or font_bold_path, 13 * scale)
+    f_stat_label = _load_font(font_bold_path, 11 * scale)
+    f_stat_val = _load_font(font_bold_path, 20 * scale)
+    f_stat_val_mono = _load_font(font_mono_path or font_bold_path, 20 * scale)
+    f_stat_sub = _load_font(font_reg_path, 11 * scale)
+    f_row_label = _load_font(font_bold_path, 13 * scale)
+    f_row_val = _load_font(font_mono_path or font_bold_path, 13 * scale)
+    f_footer = _load_font(font_reg_path, 12 * scale)
+
+    # Base background
+    anime_bg_path = os.path.normpath(os.path.join(ASSETS_FONT_DIR, "..", "anime_bg.jpg"))
+    if os.path.isfile(anime_bg_path):
+        try:
+            with Image.open(anime_bg_path) as raw_bg:
+                bg_w, bg_h = raw_bg.size
+                ratio = max(w / bg_w, h / bg_h)
+                new_w = int(bg_w * ratio)
+                new_h = int(bg_h * ratio)
+                resized_bg = raw_bg.resize((new_w, new_h), Image.Resampling.LANCZOS)
+                left = (new_w - w) // 2
+                top = (new_h - h) // 2
+                img = resized_bg.crop((left, top, left + w, top + h)).convert("RGBA")
+                resized_bg.close()
+        except Exception:
+            img = Image.new("RGBA", (w, h), COLOR_BG)
+    else:
+        img = Image.new("RGBA", (w, h), COLOR_BG)
+
+    card_inset = 20 * scale
+    card_rect = [card_inset, card_inset, w - card_inset, h - card_inset]
+    card_radius = 18 * scale
+
+    glass_overlay = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+    glass_draw = ImageDraw.Draw(glass_overlay)
+    GLASS_SURFACE = (11, 14, 21, 235)
+    GLASS_BORDER = (75, 92, 125, 185)
+    glass_draw.rounded_rectangle(card_rect, radius=card_radius, fill=GLASS_SURFACE, outline=GLASS_BORDER, width=2 * scale)
+
+    accent_theme = BADGE_THEMES.get(badge_type, BADGE_THEMES["info"])
+    accent_bar_len = 160 * scale
+    glass_draw.line(
+        [(card_inset + card_radius, card_inset), (card_inset + card_radius + accent_bar_len, card_inset)],
+        fill=accent_theme["dot"],
+        width=3 * scale,
+    )
+    img = Image.alpha_composite(img, glass_overlay)
+    glass_overlay.close()
+    draw = ImageDraw.Draw(img)
+
+    content_x = card_inset + (34 * scale)
+    content_y = card_inset + (26 * scale)
+    content_right = w - card_inset - (34 * scale)
+
+    # 1. Top row: Category tag + Status Pill
+    draw.text((content_x, content_y + 4 * scale), category, font=f_category, fill=COLOR_TEXT_DIM)
+
+    # Status Pill on right
+    badge_label = user_type.upper()
+    bbox = f_badge.getbbox(badge_label)
+    text_w = bbox[2] - bbox[0]
+    pill_padding_x = 16 * scale
+    pill_padding_y = 6 * scale
+    dot_radius = 4 * scale
+    dot_gap = 8 * scale
+    pill_w = text_w + (dot_radius * 2) + dot_gap + (pill_padding_x * 2)
+    pill_h = (bbox[3] - bbox[1]) + (pill_padding_y * 2)
+
+    pill_x2 = content_right
+    pill_x1 = pill_x2 - pill_w
+    pill_y1 = content_y
+    pill_y2 = pill_y1 + pill_h
+
+    pill_overlay = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+    pill_draw = ImageDraw.Draw(pill_overlay)
+    pill_draw.rounded_rectangle(
+        [pill_x1, pill_y1, pill_x2, pill_y2],
+        radius=pill_h // 2,
+        fill=accent_theme["bg"],
+        outline=accent_theme["border"],
+        width=1 * scale,
+    )
+    dot_center_x = pill_x1 + pill_padding_x + dot_radius
+    dot_center_y = pill_y1 + (pill_h // 2)
+    pill_draw.ellipse(
+        [dot_center_x - dot_radius, dot_center_y - dot_radius, dot_center_x + dot_radius, dot_center_y + dot_radius],
+        fill=accent_theme["dot"],
+    )
+    img = Image.alpha_composite(img, pill_overlay)
+    draw = ImageDraw.Draw(img)
+
+    text_pos_x = dot_center_x + dot_radius + dot_gap
+    text_pos_y = pill_y1 + pill_padding_y - bbox[1]
+    draw.text((text_pos_x, text_pos_y), badge_label, font=f_badge, fill=accent_theme["text"])
+
+    # 2. Header Area: Avatar + Name + Meta
+    header_y = content_y + (36 * scale)
+    avatar_size = 80 * scale
+    avatar_rect = [content_x, header_y, content_x + avatar_size, header_y + avatar_size]
+    avatar_radius = 16 * scale
+
+    if avatar_bytes:
+        try:
+            with Image.open(io.BytesIO(avatar_bytes) if isinstance(avatar_bytes, bytes) else avatar_bytes) as raw_av:
+                av_rgba = raw_av.convert("RGBA")
+                av_resized = av_rgba.resize((avatar_size, avatar_size), Image.Resampling.LANCZOS)
+                av_rgba.close()
+
+                mask = Image.new("L", (avatar_size, avatar_size), 0)
+                mask_draw = ImageDraw.Draw(mask)
+                mask_draw.rounded_rectangle([0, 0, avatar_size, avatar_size], radius=avatar_radius, fill=255)
+
+                img.paste(av_resized, (content_x, header_y), mask)
+                av_resized.close()
+                mask.close()
+        except Exception:
+            draw.rounded_rectangle(avatar_rect, radius=avatar_radius, fill=COLOR_BOX_BG)
+    else:
+        draw.rounded_rectangle(avatar_rect, radius=avatar_radius, fill=COLOR_BOX_BG)
+        initial = (name[0] if name else "U").upper()
+        f_init = _load_font(font_bold_path, 34 * scale)
+        ibox = f_init.getbbox(initial)
+        iw = ibox[2] - ibox[0]
+        ih = ibox[3] - ibox[1]
+        draw.text(
+            (content_x + (avatar_size - iw) // 2 - ibox[0], header_y + (avatar_size - ih) // 2 - ibox[1]),
+            initial,
+            font=f_init,
+            fill=accent_theme["dot"],
+        )
+
+    draw.rounded_rectangle(avatar_rect, radius=avatar_radius, outline=COLOR_BORDER_LIGHT, width=2 * scale)
+
+    # Name and Meta next to avatar
+    text_info_x = content_x + avatar_size + (20 * scale)
+    name_y = header_y + (2 * scale)
+    draw.text((text_info_x, name_y), name, font=f_name, fill=COLOR_TEXT_WHITE)
+
+    # Username tag next to name if present
+    if username and username != "—":
+        name_bbox = f_name.getbbox(name)
+        nw = name_bbox[2] - name_bbox[0]
+        tag_x = text_info_x + nw + (14 * scale)
+        tag_str = username.upper()
+        t_box = f_badge_sm.getbbox(tag_str)
+        t_w = t_box[2] - t_box[0]
+        t_h = t_box[3] - t_box[1]
+        t_pad_x = 10 * scale
+        t_pad_y = 4 * scale
+        t_pw = t_w + (t_pad_x * 2)
+        t_ph = t_h + (t_pad_y * 2)
+        t_py = name_y + (28 * scale - t_ph) // 2
+
+        tag_overlay = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+        tag_draw = ImageDraw.Draw(tag_overlay)
+        tag_draw.rounded_rectangle(
+            [tag_x, t_py, tag_x + t_pw, t_py + t_ph],
+            radius=t_ph // 2,
+            fill=BADGE_THEMES["info"]["bg"],
+            outline=BADGE_THEMES["info"]["border"],
+            width=1 * scale,
+        )
+        img = Image.alpha_composite(img, tag_overlay)
+        tag_overlay.close()
+        draw = ImageDraw.Draw(img)
+        draw.text((tag_x + t_pad_x - t_box[0], t_py + t_pad_y - t_box[1]), tag_str, font=f_badge_sm, fill=BADGE_THEMES["info"]["text"])
+
+    meta_y1 = name_y + (34 * scale)
+    meta_line1 = f"ID: {user_id}   •   {dc_str}   •   STATUS: {user_type.upper()}"
+    draw.text((text_info_x, meta_y1), meta_line1, font=f_meta_mono, fill=COLOR_TEXT_MUTED)
+
+    meta_y2 = meta_y1 + (20 * scale)
+    meta_line2 = f"РЕГИСТРАЦИЯ: {reg_date.upper()}   •   РЕГИОН: {country_region.upper()}"
+    draw.text((text_info_x, meta_y2), meta_line2, font=f_meta, fill=COLOR_TEXT_DIM)
+
+    # Hairline divider
+    divider_y = header_y + avatar_size + (18 * scale)
+    draw.line([(content_x, divider_y), (content_right, divider_y)], fill=COLOR_BORDER, width=1 * scale)
+
+    # 3. Main Stats Grid (4 Metric Boxes)
+    curr_y = divider_y + (16 * scale)
+    stat_cards_h = 78 * scale
+    col_gap = 14 * scale
+
+    grid_stats = [
+        ("TELEGRAM ID", str(user_id), "Уникальный номер", COLOR_TEXT_WHITE),
+        ("РЕГИСТРАЦИЯ", reg_date, "Примерная дата", BADGE_THEMES["warn"]["text"]),
+        ("РЕГИОН АККАУНТА", country_region, dc_str, COLOR_TEXT_WHITE),
+        ("ТЕКУЩИЙ ЧАТ", str(chat_id), "Идентификатор чата", COLOR_TEXT_MUTED),
+    ]
+
+    total_gaps = col_gap * (len(grid_stats) - 1)
+    card_width = (content_right - content_x - total_gaps) // len(grid_stats)
+
+    for i, (label, val, sub_val, val_color) in enumerate(grid_stats):
+        cx1 = content_x + i * (card_width + col_gap)
+        cx2 = cx1 + card_width
+        cy1 = curr_y
+        cy2 = cy1 + stat_cards_h
+
+        draw.rounded_rectangle([cx1, cy1, cx2, cy2], radius=10 * scale, fill=COLOR_BOX_BG, outline=COLOR_BORDER, width=1 * scale)
+        draw.text((cx1 + 16 * scale, cy1 + 10 * scale), label, font=f_stat_label, fill=COLOR_TEXT_DIM)
+        draw.text((cx1 + 16 * scale, cy1 + 28 * scale), str(val), font=f_stat_val if label in ("РЕГИСТРАЦИЯ", "РЕГИОН АККАУНТА") else f_stat_val_mono, fill=val_color)
+        draw.text((cx1 + 16 * scale, cy1 + 54 * scale), str(sub_val), font=f_stat_sub, fill=COLOR_TEXT_MUTED)
+
+    curr_y += stat_cards_h + (18 * scale)
+
+    # 4. Detailed Info Strip (Items)
+    if items:
+        info_box_h = 138 * scale
+        draw.rounded_rectangle(
+            [content_x, curr_y, content_right, curr_y + info_box_h],
+            radius=10 * scale,
+            fill=COLOR_BOX_BG,
+            outline=COLOR_BORDER,
+            width=1 * scale,
+        )
+
+        draw.text((content_x + 18 * scale, curr_y + 14 * scale), "ДЕТАЛЬНАЯ ИНФОРМАЦИЯ // PROFILE ATTRIBUTES", font=f_stat_label, fill=COLOR_TEXT_DIM)
+
+        row_y = curr_y + (38 * scale)
+        for key, value in items[:3]:
+            draw.text((content_x + 18 * scale, row_y), key, font=f_row_label, fill=COLOR_TEXT_WHITE)
+            draw.text((content_x + 280 * scale, row_y), value, font=f_row_val, fill=COLOR_TEXT_MUTED)
+            row_y += 30 * scale
+
+    # 5. Footer Bar
+    footer_y = h - card_inset - (26 * scale)
+    draw.line([(content_x, footer_y - (12 * scale)), (content_right, footer_y - (12 * scale))], fill=COLOR_BORDER, width=1 * scale)
+    draw.text((content_x, footer_y), "TELEGRAM IDENTITY ENGINE // USERBOT v1.0", font=f_footer, fill=COLOR_TEXT_DIM)
+
+    meta_r = "PEER RESOLVED • REAL-TIME MTPROTO"
+    bbox_r = f_footer.getbbox(meta_r)
+    w_r = bbox_r[2] - bbox_r[0]
+    draw.text((content_right - w_r, footer_y), meta_r, font=f_footer, fill=COLOR_TEXT_DIM)
+
+    final_img = img.resize((target_width, target_height), Image.Resampling.LANCZOS)
+    img.close()
+
+    output = io.BytesIO()
+    rgb_img = final_img.convert("RGB")
+    final_img.close()
+    rgb_img.save(output, format="PNG", optimize=True)
+    rgb_img.close()
+
+    output.seek(0)
+    output.name = "telegram_profile_card.png"
+    return output

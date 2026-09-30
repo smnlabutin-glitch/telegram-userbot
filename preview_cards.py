@@ -135,6 +135,30 @@ def generate_samples():
         f.write(card_mlbb.getvalue())
     print("Generated previews/sample_mlbb.png")
 
+    # 7. Telegram Profile ID Card
+    from card_engine import render_profile_card
+    card_profile = render_profile_card(
+        user_id=314626595,
+        name="anesthésie.",
+        username="@anesthesia_tg",
+        user_type="Telegram Premium",
+        reg_date="~ Весна 2017",
+        country_region="Европа / Нидерланды",
+        dc_str="DC 2 (Амстердам)",
+        chat_id="-1001234567890",
+        items=[
+            ("Имя профиля", "anesthésie."),
+            ("Юзернейм", "@anesthesia_tg"),
+            ("Серверный датацентр", "DC 2 (Амстердам)"),
+            ("ID Сообщения", "4201"),
+        ],
+        badge_type="info",
+    )
+    with open("previews/sample_id.png", "wb") as f:
+        f.write(card_profile.getvalue())
+    print("Generated previews/sample_id.png")
+
 if __name__ == "__main__":
     generate_samples()
+
 

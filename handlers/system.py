@@ -4,7 +4,7 @@ import time
 import platform
 import asyncio
 from telethon import TelegramClient, events
-from card_engine import render_card
+from card_engine import render_card, render_profile_card
 from config import BASE_DIR
 
 BOOT_TIME = time.monotonic()
@@ -358,6 +358,77 @@ def register_system_handlers(client: TelegramClient, prefix: str):
             await msg.edit(f"💻 **Результат (`{cmd}`):**\n```\n{res}\n```")
         except Exception as e:
             await msg.edit(f"❌ **Ошибка выполнения:** `{e}`")
+ID_REGISTRATION_EPOCHS = [
+    (100_000, "Август 2013"),
+    (1_000_000, "Октябрь 2013"),
+    (5_000_000, "Начало 2014"),
+    (20_000_000, "Лето 2014"),
+    (40_000_000, "Конец 2014"),
+    (80_000_000, "Весна 2015"),
+    (140_000_000, "Осень 2015"),
+    (200_000_000, "Начало 2016"),
+    (280_000_000, "Осень 2016"),
+    (380_000_000, "Весна 2017"),
+    (480_000_000, "Осень 2017"),
+    (600_000_000, "Весна 2018"),
+    (750_000_000, "Конец 2018"),
+    (900_000_000, "Лето 2019"),
+    (1_050_000_000, "Конец 2019"),
+    (1_250_000_000, "Весна 2020"),
+    (1_450_000_000, "Осень 2020"),
+    (1_700_000_000, "Весна 2021"),
+    (2_000_000_000, "Лето 2021"),
+    (2_147_483_647, "Осень 2021"),
+    (5_200_000_000, "Зима 2021/2022"),
+    (5_600_000_000, "Лето 2022"),
+    (6_000_000_000, "Зима 2022/2023"),
+    (6_400_000_000, "Лето 2023"),
+    (6_800_000_000, "Конец 2023"),
+    (7_200_000_000, "Весна 2024"),
+    (7_700_000_000, "Осень 2024"),
+    (8_100_000_000, "Весна 2025"),
+    (8_600_000_000, "Конец 2025"),
+    (9_200_000_000, "2026 год"),
+]
+
+def _estimate_registration_date(user_id: int) -> str:
+    if user_id <= 0:
+        return "Чат / Канал"
+    for max_id, date_str in ID_REGISTRATION_EPOCHS:
+        if user_id <= max_id:
+            return f"~ {date_str}"
+    return "~ 2026 год"
+
+DC_REGIONS = {
+    1: ("DC 1 (Майами)", "США / Сев. Америка"),
+    2: ("DC 2 (Амстердам)", "Европа / Нидерланды"),
+    3: ("DC 3 (Майами)", "США / Сев. Америка"),
+    4: ("DC 4 (Амстердам)", "Европа / СНГ"),
+    5: ("DC 5 (Сингапур)", "Азия / Сингапур"),
+}
+
+def _resolve_country_region(dc_id: int, phone: str = "") -> tuple:
+    if phone:
+        p = str(phone).lstrip("+")
+        if p.startswith("7"):
+            return ("Россия / Казахстан", f"DC {dc_id}" if dc_id else "—")
+        elif p.startswith("380"):
+            return ("Украина", f"DC {dc_id}" if dc_id else "—")
+        elif p.startswith("375"):
+            return ("Беларусь", f"DC {dc_id}" if dc_id else "—")
+        elif p.startswith("998"):
+            return ("Узбекистан", f"DC {dc_id}" if dc_id else "—")
+        elif p.startswith("1"):
+            return ("США / Канада", f"DC {dc_id}" if dc_id else "—")
+        elif p.startswith("49"):
+            return ("Германия", f"DC {dc_id}" if dc_id else "—")
+
+    if dc_id in DC_REGIONS:
+        dc_name, reg = DC_REGIONS[dc_id]
+        return (reg, dc_name)
+
+    return ("Не определен", f"DC {dc_id}" if dc_id else "—")
+
 
     # .id [user | reply]
     @client.on(events.NewMessage(outgoing=True, pattern=rf"^{prefix}id(?:(?:\s+)(.*))?$"))
@@ -425,7 +496,8 @@ def register_system_handlers(client: TelegramClient, prefix: str):
                 name_str = "Скрытый пользователь"
                 username_str = "Скрыт настройками"
                 type_str = "Пользователь (Аноним)"
-                dc_str = "—"
+                dc_id = None
+                phone = ""
             else:
                 card = render_card(
                     title="Не удалось определить ID",
@@ -453,46 +525,56 @@ def register_system_handlers(client: TelegramClient, prefix: str):
                 else:
                     type_str = "Пользователь"
                 dc_id = getattr(getattr(target_entity, "photo", None), "dc_id", None)
-                dc_str = f"DC {dc_id}" if dc_id else "—"
+                phone = getattr(target_entity, "phone", "") or ""
             elif isinstance(target_entity, (Channel, Chat)):
                 name_str = getattr(target_entity, "title", "Группа / Канал")
                 username_str = f"@{target_entity.username}" if getattr(target_entity, "username", None) else "Приватный"
                 type_str = "Канал" if getattr(target_entity, "broadcast", False) else "Супергруппа"
                 dc_id = getattr(getattr(target_entity, "photo", None), "dc_id", None)
-                dc_str = f"DC {dc_id}" if dc_id else "—"
+                phone = ""
             else:
                 name_str = str(target_entity)
                 username_str = "—"
                 type_str = "Сущность"
-                dc_str = "—"
+                dc_id = None
+                phone = ""
 
-        caption = f"🆔 **Telegram ID:** `{target_id}`\n👤 **Объект:** {name_str} ({username_str})"
+        # Fetch profile photo bytes
+        avatar_bytes = None
+        try:
+            avatar_bytes = await client.download_profile_photo(target_entity, file=bytes)
+        except Exception:
+            avatar_bytes = None
 
-        stats_list = [
-            ("TELEGRAM ID", str(target_id)),
-            ("ТИП АККАУНТА", type_str.upper()),
-            ("ДАТАЦЕНТР", dc_str),
-            ("ТЕКУЩИЙ ЧАТ", str(event.chat_id)),
-        ]
+        reg_date = _estimate_registration_date(target_id)
+        country_region, dc_str = _resolve_country_region(dc_id, phone)
+
+        # Build clean caption WITHOUT @ mention so the user does NOT get tagged/notified
+        username_clean = username_str.lstrip("@")
+        username_display = f"({username_clean})" if username_clean and username_clean != "Нет юзернейма" else ""
+        caption = f"🆔 **Telegram ID:** `{target_id}`\n👤 **Профиль:** {name_str} {username_display}".strip()
 
         items_list = [
-            ("Имя / Название", name_str),
+            ("Имя профиля", name_str),
             ("Юзернейм", username_str),
-            ("Источник запроса", source_desc),
+            ("Серверный датацентр", dc_str),
         ]
         if reply_msg:
             items_list.append(("ID Сообщения", str(reply_msg.id)))
 
-        card = render_card(
-            title=f"ID: {target_id}",
-            subtitle=f"{name_str} • {username_str}",
-            badge_text=type_str.upper(),
-            badge_type="info" if type_str != "Бот Telegram" else "warn",
-            stats=stats_list,
+        card = render_profile_card(
+            user_id=target_id,
+            name=name_str,
+            username=username_str,
+            user_type=type_str,
+            reg_date=reg_date,
+            country_region=country_region,
+            dc_str=dc_str,
+            chat_id=str(event.chat_id),
+            avatar_bytes=avatar_bytes,
             items=items_list,
-            meta_left=f"TELEGRAM RESOLVER // {source_desc.upper()}",
-            meta_right=f"PEER ID: {target_id}",
-            category="TELEGRAM IDENTIFIER",
+            badge_type="info" if type_str != "Бот Telegram" else "warn",
+            category="TELEGRAM // PROFILE DOSSIER",
         )
 
         try:
@@ -501,4 +583,3 @@ def register_system_handlers(client: TelegramClient, prefix: str):
             pass
 
         await client.send_file(event.chat_id, file=card, caption=caption)
-
