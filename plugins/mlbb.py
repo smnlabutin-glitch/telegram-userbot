@@ -6,6 +6,7 @@ import asyncio
 import logging
 import urllib.request
 import urllib.error
+import ssl
 from typing import Dict, Tuple, Optional, List
 from telethon import TelegramClient, events
 
@@ -17,6 +18,19 @@ logger = logging.getLogger("userbot.plugins.mlbb")
 API_BASE_URL = os.getenv("MLBB_API_BASE_URL", "https://mlbb-stats.ru/api").rstrip("/")
 USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
 
+# Permissive SSL context to prevent TLS/handshake failures on various Linux distros
+SSL_CONTEXT = ssl.create_default_context()
+SSL_CONTEXT.check_hostname = False
+SSL_CONTEXT.verify_mode = ssl.CERT_NONE
+
+DEFAULT_HEADERS = {
+    "User-Agent": USER_AGENT,
+    "Accept": "application/json, text/plain, */*",
+    "Accept-Language": "ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7",
+    "Origin": "https://mlbb-stats.ru",
+    "Referer": "https://mlbb-stats.ru/",
+}
+
 # In-memory session tracking for two-step authentication: sender_id -> (role_id, zone_id, timestamp)
 PENDING_AUTH: Dict[int, Tuple[int, int, float]] = {}
 
@@ -26,33 +40,31 @@ AVATAR_CACHE: Dict[str, Tuple[bytes, float]] = {}
 CACHE_TTL = 300  # 5 minutes
 
 
-def _http_get(url: str, timeout: int = 10) -> Tuple[int, bytes]:
-    req = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
+def _http_get(url: str, timeout: int = 12) -> Tuple[int, bytes, str]:
+    req = urllib.request.Request(url, headers=DEFAULT_HEADERS)
     try:
-        with urllib.request.urlopen(req, timeout=timeout) as resp:
-            return resp.status, resp.read()
+        with urllib.request.urlopen(req, timeout=timeout, context=SSL_CONTEXT) as resp:
+            return resp.status, resp.read(), ""
     except urllib.error.HTTPError as e:
-        return e.code, e.read()
+        return e.code, e.read(), str(e)
     except Exception as e:
-        logger.debug("HTTP GET error for %s: %s", url, e)
-        return 0, b""
+        logger.error("HTTP GET error for %s: %s", url, e)
+        return 0, b"", str(e)
 
 
-def _http_post_json(url: str, payload: dict, timeout: int = 15) -> Tuple[int, bytes]:
+def _http_post_json(url: str, payload: dict, timeout: int = 15) -> Tuple[int, bytes, str]:
     data = json.dumps(payload).encode("utf-8")
-    req = urllib.request.Request(
-        url,
-        data=data,
-        headers={"User-Agent": USER_AGENT, "Content-Type": "application/json"},
-    )
+    headers = dict(DEFAULT_HEADERS)
+    headers["Content-Type"] = "application/json"
+    req = urllib.request.Request(url, data=data, headers=headers)
     try:
-        with urllib.request.urlopen(req, timeout=timeout) as resp:
-            return resp.status, resp.read()
+        with urllib.request.urlopen(req, timeout=timeout, context=SSL_CONTEXT) as resp:
+            return resp.status, resp.read(), ""
     except urllib.error.HTTPError as e:
-        return e.code, e.read()
+        return e.code, e.read(), str(e)
     except Exception as e:
-        logger.debug("HTTP POST error for %s: %s", url, e)
-        return 0, b""
+        logger.error("HTTP POST error for %s: %s", url, e)
+        return 0, b"", str(e)
 
 
 async def fetch_player_profile(role_id: int, zone_id: int) -> Tuple[Optional[dict], Optional[str]]:
@@ -66,7 +78,7 @@ async def fetch_player_profile(role_id: int, zone_id: int) -> Tuple[Optional[dic
 
     url = f"{API_BASE_URL}/profile/{role_id}-{zone_id}"
     try:
-        status, body = await asyncio.to_thread(_http_get, url, 12)
+        status, body, err_msg = await asyncio.to_thread(_http_get, url, 12)
         if status == 200:
             json_data = json.loads(body.decode("utf-8", "ignore"))
             profile = json_data.get("profile")
@@ -76,6 +88,8 @@ async def fetch_player_profile(role_id: int, zone_id: int) -> Tuple[Optional[dic
             return None, "Пустые данные профиля"
         elif status == 404:
             return None, "Игрок не найден в базе данных"
+        elif status == 0:
+            return None, f"Ошибка сети сервера: {err_msg}"
         else:
             return None, f"HTTP {status}"
     except Exception as e:
@@ -94,7 +108,7 @@ async def fetch_player_avatar(role_id: int, zone_id: int) -> Optional[bytes]:
 
     url = f"{API_BASE_URL}/profile/{role_id}-{zone_id}/avatar"
     try:
-        status, data = await asyncio.to_thread(_http_get, url, 10)
+        status, data, _ = await asyncio.to_thread(_http_get, url, 10)
         if status == 200 and data and len(data) > 100:
             AVATAR_CACHE[cache_key] = (data, now)
             return data
@@ -109,14 +123,14 @@ async def request_auth_code(role_id: int, zone_id: int) -> Tuple[bool, str]:
     payload = {"roleId": role_id, "zoneId": zone_id}
 
     try:
-        status, body = await asyncio.to_thread(_http_post_json, url, payload, 15)
+        status, body, err_msg = await asyncio.to_thread(_http_post_json, url, payload, 15)
         if status in (200, 201):
             return True, "Код успешно отправлен во внутриигровую почту Mobile Legends"
         try:
             data = json.loads(body.decode("utf-8", "ignore"))
-            err = data.get("error") or data.get("message") or f"HTTP {status}"
+            err = data.get("error") or data.get("message") or err_msg or f"HTTP {status}"
         except Exception:
-            err = f"HTTP {status}"
+            err = err_msg or f"HTTP {status}"
         return False, str(err)
     except Exception as e:
         logger.error("Error sending MLBB auth code: %s", e)
@@ -129,7 +143,7 @@ async def verify_player_code(role_id: int, zone_id: int, code: str) -> Tuple[boo
     payload = {"roleId": role_id, "zoneId": zone_id, "code": code.strip()}
 
     try:
-        status, body = await asyncio.to_thread(_http_post_json, url, payload, 15)
+        status, body, err_msg = await asyncio.to_thread(_http_post_json, url, payload, 15)
         try:
             data = json.loads(body.decode("utf-8", "ignore"))
         except Exception:
@@ -138,7 +152,7 @@ async def verify_player_code(role_id: int, zone_id: int, code: str) -> Tuple[boo
         if status in (200, 201):
             user_data = data.get("user") or {}
             return True, "Авторизация успешно завершена", user_data
-        err = data.get("error") or data.get("message") or f"Неверный код (HTTP {status})"
+        err = data.get("error") or data.get("message") or err_msg or f"Неверный код (HTTP {status})"
         return False, str(err), None
     except Exception as e:
         logger.error("Error verifying MLBB code: %s", e)
@@ -149,13 +163,14 @@ async def fetch_leaderboard() -> Optional[List[dict]]:
     """Fetches top ranking players."""
     url = f"{API_BASE_URL}/rankings/rank"
     try:
-        status, body = await asyncio.to_thread(_http_get, url, 12)
+        status, body, _ = await asyncio.to_thread(_http_get, url, 12)
         if status == 200:
             data = json.loads(body.decode("utf-8", "ignore"))
             return data.get("rankings") or []
     except Exception as e:
         logger.error("Error fetching MLBB leaderboard: %s", e)
     return None
+
 
 
 def register_mlbb(client: TelegramClient, prefix: str):
