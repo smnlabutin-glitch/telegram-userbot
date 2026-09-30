@@ -1,10 +1,12 @@
 import io
 import os
-import re
+import json
 import time
+import asyncio
 import logging
+import urllib.request
+import urllib.error
 from typing import Dict, Tuple, Optional, List
-import aiohttp
 from telethon import TelegramClient, events
 
 from card_engine import render_card, render_mlbb_card
@@ -24,6 +26,35 @@ AVATAR_CACHE: Dict[str, Tuple[bytes, float]] = {}
 CACHE_TTL = 300  # 5 minutes
 
 
+def _http_get(url: str, timeout: int = 10) -> Tuple[int, bytes]:
+    req = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
+    try:
+        with urllib.request.urlopen(req, timeout=timeout) as resp:
+            return resp.status, resp.read()
+    except urllib.error.HTTPError as e:
+        return e.code, e.read()
+    except Exception as e:
+        logger.debug("HTTP GET error for %s: %s", url, e)
+        return 0, b""
+
+
+def _http_post_json(url: str, payload: dict, timeout: int = 15) -> Tuple[int, bytes]:
+    data = json.dumps(payload).encode("utf-8")
+    req = urllib.request.Request(
+        url,
+        data=data,
+        headers={"User-Agent": USER_AGENT, "Content-Type": "application/json"},
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=timeout) as resp:
+            return resp.status, resp.read()
+    except urllib.error.HTTPError as e:
+        return e.code, e.read()
+    except Exception as e:
+        logger.debug("HTTP POST error for %s: %s", url, e)
+        return 0, b""
+
+
 async def fetch_player_profile(role_id: int, zone_id: int) -> Tuple[Optional[dict], Optional[str]]:
     """Fetches player dossier from MLBB telemetry API."""
     cache_key = f"{role_id}-{zone_id}"
@@ -34,24 +65,19 @@ async def fetch_player_profile(role_id: int, zone_id: int) -> Tuple[Optional[dic
             return data, None
 
     url = f"{API_BASE_URL}/profile/{role_id}-{zone_id}"
-    headers = {"User-Agent": USER_AGENT}
-
     try:
-        timeout = aiohttp.ClientTimeout(total=12)
-        async with aiohttp.ClientSession(timeout=timeout) as session:
-            async with session.get(url, headers=headers) as resp:
-                if resp.status == 200:
-                    json_data = await resp.json()
-                    profile = json_data.get("profile")
-                    if profile:
-                        PROFILE_CACHE[cache_key] = (profile, now)
-                        return profile, None
-                    return None, "Пустые данные профиля"
-                elif resp.status == 404:
-                    return None, "Игрок не найден в базе данных"
-                else:
-                    text = await resp.text()
-                    return None, f"HTTP {resp.status}: {text[:100]}"
+        status, body = await asyncio.to_thread(_http_get, url, 12)
+        if status == 200:
+            json_data = json.loads(body.decode("utf-8", "ignore"))
+            profile = json_data.get("profile")
+            if profile:
+                PROFILE_CACHE[cache_key] = (profile, now)
+                return profile, None
+            return None, "Пустые данные профиля"
+        elif status == 404:
+            return None, "Игрок не найден в базе данных"
+        else:
+            return None, f"HTTP {status}"
     except Exception as e:
         logger.error("Error fetching MLBB profile %s-%s: %s", role_id, zone_id, e)
         return None, f"Ошибка сети: {e}"
@@ -67,17 +93,11 @@ async def fetch_player_avatar(role_id: int, zone_id: int) -> Optional[bytes]:
             return av_bytes
 
     url = f"{API_BASE_URL}/profile/{role_id}-{zone_id}/avatar"
-    headers = {"User-Agent": USER_AGENT}
-
     try:
-        timeout = aiohttp.ClientTimeout(total=10)
-        async with aiohttp.ClientSession(timeout=timeout) as session:
-            async with session.get(url, headers=headers) as resp:
-                if resp.status == 200:
-                    data = await resp.read()
-                    if data and len(data) > 100:
-                        AVATAR_CACHE[cache_key] = (data, now)
-                        return data
+        status, data = await asyncio.to_thread(_http_get, url, 10)
+        if status == 200 and data and len(data) > 100:
+            AVATAR_CACHE[cache_key] = (data, now)
+            return data
     except Exception as e:
         logger.debug("Could not fetch avatar for %s-%s: %s", role_id, zone_id, e)
     return None
@@ -86,18 +106,18 @@ async def fetch_player_avatar(role_id: int, zone_id: int) -> Optional[bytes]:
 async def request_auth_code(role_id: int, zone_id: int) -> Tuple[bool, str]:
     """Sends verification code request to player in-game mailbox."""
     url = f"{API_BASE_URL}/auth/send-code"
-    headers = {"User-Agent": USER_AGENT, "Content-Type": "application/json"}
     payload = {"roleId": role_id, "zoneId": zone_id}
 
     try:
-        timeout = aiohttp.ClientTimeout(total=15)
-        async with aiohttp.ClientSession(timeout=timeout) as session:
-            async with session.post(url, json=payload, headers=headers) as resp:
-                if resp.status in (200, 201):
-                    return True, "Код успешно отправлен во внутриигровую почту Mobile Legends"
-                data = await resp.json()
-                err = data.get("error") or data.get("message") or f"HTTP {resp.status}"
-                return False, str(err)
+        status, body = await asyncio.to_thread(_http_post_json, url, payload, 15)
+        if status in (200, 201):
+            return True, "Код успешно отправлен во внутриигровую почту Mobile Legends"
+        try:
+            data = json.loads(body.decode("utf-8", "ignore"))
+            err = data.get("error") or data.get("message") or f"HTTP {status}"
+        except Exception:
+            err = f"HTTP {status}"
+        return False, str(err)
     except Exception as e:
         logger.error("Error sending MLBB auth code: %s", e)
         return False, f"Сетевая ошибка: {e}"
@@ -106,19 +126,20 @@ async def request_auth_code(role_id: int, zone_id: int) -> Tuple[bool, str]:
 async def verify_player_code(role_id: int, zone_id: int, code: str) -> Tuple[bool, str, Optional[dict]]:
     """Verifies the code from in-game mail and links the profile."""
     url = f"{API_BASE_URL}/auth/verify"
-    headers = {"User-Agent": USER_AGENT, "Content-Type": "application/json"}
     payload = {"roleId": role_id, "zoneId": zone_id, "code": code.strip()}
 
     try:
-        timeout = aiohttp.ClientTimeout(total=15)
-        async with aiohttp.ClientSession(timeout=timeout) as session:
-            async with session.post(url, json=payload, headers=headers) as resp:
-                data = await resp.json()
-                if resp.status in (200, 201):
-                    user_data = data.get("user") or {}
-                    return True, "Авторизация успешно завершена", user_data
-                err = data.get("error") or data.get("message") or f"Неверный код (HTTP {resp.status})"
-                return False, str(err), None
+        status, body = await asyncio.to_thread(_http_post_json, url, payload, 15)
+        try:
+            data = json.loads(body.decode("utf-8", "ignore"))
+        except Exception:
+            data = {}
+
+        if status in (200, 201):
+            user_data = data.get("user") or {}
+            return True, "Авторизация успешно завершена", user_data
+        err = data.get("error") or data.get("message") or f"Неверный код (HTTP {status})"
+        return False, str(err), None
     except Exception as e:
         logger.error("Error verifying MLBB code: %s", e)
         return False, f"Сетевая ошибка: {e}", None
@@ -127,15 +148,11 @@ async def verify_player_code(role_id: int, zone_id: int, code: str) -> Tuple[boo
 async def fetch_leaderboard() -> Optional[List[dict]]:
     """Fetches top ranking players."""
     url = f"{API_BASE_URL}/rankings/rank"
-    headers = {"User-Agent": USER_AGENT}
-
     try:
-        timeout = aiohttp.ClientTimeout(total=12)
-        async with aiohttp.ClientSession(timeout=timeout) as session:
-            async with session.get(url, headers=headers) as resp:
-                if resp.status == 200:
-                    data = await resp.json()
-                    return data.get("rankings") or []
+        status, body = await asyncio.to_thread(_http_get, url, 12)
+        if status == 200:
+            data = json.loads(body.decode("utf-8", "ignore"))
+            return data.get("rankings") or []
     except Exception as e:
         logger.error("Error fetching MLBB leaderboard: %s", e)
     return None
