@@ -5,6 +5,7 @@ import time
 import asyncio
 import logging
 import urllib.request
+import urllib.parse
 import urllib.error
 import ssl
 from typing import Dict, Tuple, Optional, List
@@ -15,13 +16,24 @@ from plugins import get_plugin_config, update_plugin_config
 
 logger = logging.getLogger("userbot.plugins.mlbb")
 
-API_BASE_URL = os.getenv("MLBB_API_BASE_URL", "https://mlbb-stats.ru/api").rstrip("/")
+API_BASE_URL = os.getenv("MLBB_API_BASE_URL", "https://functions.yandexcloud.net/d4ep3gkd0uu5f0n6cbtt").rstrip("/")
 USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
 
 # Permissive SSL context to prevent TLS/handshake failures on various Linux distros
 SSL_CONTEXT = ssl.create_default_context()
 SSL_CONTEXT.check_hostname = False
 SSL_CONTEXT.verify_mode = ssl.CERT_NONE
+
+
+def _build_api_url(endpoint: str) -> str:
+    """Builds API URL, supporting direct mlbb-stats.ru and Yandex Cloud Function proxy."""
+    clean_endpoint = endpoint.strip("/")
+    if "functions.yandexcloud.net" in API_BASE_URL:
+        path = f"/api/{clean_endpoint}" if not clean_endpoint.startswith("api/") else f"/{clean_endpoint}"
+        delim = "&" if "?" in API_BASE_URL else "?"
+        return f"{API_BASE_URL}{delim}path={urllib.parse.quote(path)}"
+    else:
+        return f"{API_BASE_URL}/{clean_endpoint}"
 
 DEFAULT_HEADERS = {
     "User-Agent": USER_AGENT,
@@ -76,7 +88,7 @@ async def fetch_player_profile(role_id: int, zone_id: int) -> Tuple[Optional[dic
         if now - ts < CACHE_TTL:
             return data, None
 
-    url = f"{API_BASE_URL}/profile/{role_id}-{zone_id}"
+    url = _build_api_url(f"profile/{role_id}-{zone_id}")
     try:
         status, body, err_msg = await asyncio.to_thread(_http_get, url, 12)
         if status == 200:
@@ -106,7 +118,7 @@ async def fetch_player_avatar(role_id: int, zone_id: int) -> Optional[bytes]:
         if now - ts < CACHE_TTL:
             return av_bytes
 
-    url = f"{API_BASE_URL}/profile/{role_id}-{zone_id}/avatar"
+    url = _build_api_url(f"profile/{role_id}-{zone_id}/avatar")
     try:
         status, data, _ = await asyncio.to_thread(_http_get, url, 10)
         if status == 200 and data and len(data) > 100:
@@ -119,7 +131,7 @@ async def fetch_player_avatar(role_id: int, zone_id: int) -> Optional[bytes]:
 
 async def request_auth_code(role_id: int, zone_id: int) -> Tuple[bool, str]:
     """Sends verification code request to player in-game mailbox."""
-    url = f"{API_BASE_URL}/auth/send-code"
+    url = _build_api_url("auth/send-code")
     payload = {"roleId": role_id, "zoneId": zone_id}
 
     try:
@@ -139,7 +151,7 @@ async def request_auth_code(role_id: int, zone_id: int) -> Tuple[bool, str]:
 
 async def verify_player_code(role_id: int, zone_id: int, code: str) -> Tuple[bool, str, Optional[dict]]:
     """Verifies the code from in-game mail and links the profile."""
-    url = f"{API_BASE_URL}/auth/verify"
+    url = _build_api_url("auth/verify")
     payload = {"roleId": role_id, "zoneId": zone_id, "code": code.strip()}
 
     try:
@@ -161,7 +173,7 @@ async def verify_player_code(role_id: int, zone_id: int, code: str) -> Tuple[boo
 
 async def fetch_leaderboard() -> Optional[List[dict]]:
     """Fetches top ranking players."""
-    url = f"{API_BASE_URL}/rankings/rank"
+    url = _build_api_url("rankings/rank")
     try:
         status, body, _ = await asyncio.to_thread(_http_get, url, 12)
         if status == 200:
