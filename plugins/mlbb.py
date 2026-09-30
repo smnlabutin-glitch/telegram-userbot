@@ -152,6 +152,54 @@ async def fetch_player_avatar(role_id: int, zone_id: int, avatar_path: Optional[
     return None
 
 
+HERO_ICON_CACHE: Dict[str, Tuple[bytes, float]] = {}
+
+
+async def fetch_hero_icon(icon_path: str) -> Optional[bytes]:
+    """Fetches hero avatar icon with caching."""
+    if not icon_path or not isinstance(icon_path, str):
+        return None
+    now = time.time()
+    if icon_path in HERO_ICON_CACHE:
+        data, ts = HERO_ICON_CACHE[icon_path]
+        if now - ts < 86400:
+            return data
+
+    url = _build_api_url(icon_path)
+    try:
+        status, data, _ = await asyncio.to_thread(_http_get, url, 10)
+        if status == 200 and data and len(data) > 100:
+            HERO_ICON_CACHE[icon_path] = (data, now)
+            return data
+    except Exception as e:
+        logger.warning("Error fetching hero icon from %s: %s", url, e)
+    return None
+
+
+async def fetch_hero_icons_batch(heroes: List[dict]) -> Dict[str, bytes]:
+    """Concurrently fetches hero icons for a list of heroes."""
+    if not heroes:
+        return {}
+    tasks = []
+    icon_paths = []
+    for h in heroes:
+        p = h.get("heroIcon")
+        if p and isinstance(p, str) and p.strip():
+            icon_paths.append(p)
+            tasks.append(fetch_hero_icon(p))
+
+    if not tasks:
+        return {}
+
+    results = await asyncio.gather(*tasks, return_exceptions=True)
+    res_dict = {}
+    for p, r in zip(icon_paths, results):
+        if isinstance(r, bytes):
+            res_dict[p] = r
+    return res_dict
+
+
+
 async def request_auth_code(role_id: int, zone_id: int) -> Tuple[bool, str]:
     """Sends verification code request to player in-game mailbox."""
     url = _build_api_url("auth/send-code")
@@ -366,7 +414,9 @@ def register_mlbb(client: TelegramClient, prefix: str):
                 avatar_bytes = await fetch_player_avatar(role_id, zone_id, profile.get("avatar") if profile else None)
 
                 if profile:
-                    card = render_mlbb_card(profile, avatar_bytes)
+                    heroes_list = profile.get("stats", {}).get("heroes", [])[:3] if isinstance(profile.get("stats"), dict) else []
+                    hero_icons = await fetch_hero_icons_batch(heroes_list)
+                    card = render_mlbb_card(profile, avatar_bytes, hero_icons)
                 else:
                     card = render_card(
                         title="Аккаунт успешно привязан",
@@ -565,9 +615,11 @@ def register_mlbb(client: TelegramClient, prefix: str):
                     pass
                 return await client.send_file(event.chat_id, file=card)
 
-            # Player found - fetch avatar and render card asynchronously
+            # Player found - fetch avatar, hero icons and render card asynchronously
             avatar_bytes = await fetch_player_avatar(int(target_role), int(target_zone), profile.get("avatar") if profile else None)
-            card_image = await asyncio.to_thread(render_mlbb_card, profile, avatar_bytes)
+            heroes_list = profile.get("stats", {}).get("heroes", [])[:3] if isinstance(profile.get("stats"), dict) else []
+            hero_icons = await fetch_hero_icons_batch(heroes_list)
+            card_image = await asyncio.to_thread(render_mlbb_card, profile, avatar_bytes, hero_icons)
 
             stop_event.set()
             await anim_task

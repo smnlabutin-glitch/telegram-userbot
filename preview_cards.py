@@ -111,12 +111,24 @@ def generate_samples():
         "historyRank": {
             "name": "Mythical Immortal",
         },
-        "stats": [
-            {"season": 37, "mode": 2, "games": 42, "winRate": 64.3, "kda": 4.12, "mvp": 14},
-            {"season": 36, "mode": 2, "games": 185, "winRate": 61.8, "kda": 3.75, "mvp": 38},
-            {"season": 35, "mode": 2, "games": 310, "winRate": 59.4, "kda": 3.28, "mvp": 52},
-            {"season": 34, "mode": 2, "games": 161, "winRate": 60.2, "kda": 3.33, "mvp": 22},
-        ],
+        "stats": {
+            "totalGames": 2550,
+            "totalWins": 1552,
+            "winRate": 60.9,
+            "playstyle": "Support",
+            "activeSeasons": 12,
+            "totalHeroesPlayed": 39,
+            "heroes": [
+                {"heroName": "Zhuxin", "heroNameRu": "Чжусинь", "heroRole": "Mage", "games": 602, "winRate": 67.3, "kda": 4.89},
+                {"heroName": "Kimmy", "heroNameRu": "Кимми", "heroRole": "Marksman", "games": 579, "winRate": 61.7, "kda": 3.51},
+                {"heroName": "Yve", "heroNameRu": "Ив", "heroRole": "Mage", "games": 289, "winRate": 65.7, "kda": 6.23},
+            ],
+            "seasonSummaries": [
+                {"season": 42, "mode": 2, "games": 254, "winRate": 74.4, "kda": 6.99, "mvp": 38},
+                {"season": 41, "mode": 2, "games": 952, "winRate": 57.0, "kda": 4.73, "mvp": 112},
+                {"season": 40, "mode": 2, "games": 1004, "winRate": 57.8, "kda": 4.75, "mvp": 178},
+            ]
+        },
     }
     card_mlbb = render_mlbb_card(sample_player)
     with open("previews/sample_mlbb.png", "wb") as f:

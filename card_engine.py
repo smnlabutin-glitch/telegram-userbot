@@ -2,7 +2,7 @@ import io
 import os
 import sys
 from functools import lru_cache
-from typing import List, Tuple, Optional
+from typing import List, Tuple, Optional, Dict
 from PIL import Image, ImageDraw, ImageFont
 
 ASSETS_FONT_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets", "fonts")
@@ -627,20 +627,67 @@ def render_quiz_card(
     return output
 
 
+ROLE_RU = {
+    "mage": "МАГ",
+    "assassin": "УБИЙЦА",
+    "fighter": "БОЕЦ",
+    "marksman": "СТРЕЛОК",
+    "tank": "ТАНК",
+    "support": "ПОДДЕРЖКА",
+}
+
+PLAYSTYLE_INFO = {
+    "balanced": ("Balanced", "Универсальный стиль"),
+    "support": ("Support", "Командная поддержка"),
+    "assassin": ("Assassin", "Охотник за головами"),
+    "marksman": ("Marksman", "Стрелок дальнего боя"),
+    "mage": ("Mage", "Магический контроль"),
+    "fighter": ("Fighter", "Контактный боец"),
+    "tank": ("Tank", "Надёжный защитник"),
+    "roamer": ("Roamer", "Активная ротация"),
+    "jungler": ("Jungler", "Контроль объектов и леса"),
+}
+
+RANK_BADGE_THEMES = {
+    1: {"bg": (245, 158, 11, 45), "border": (245, 158, 11, 160), "text": (251, 191, 36)},
+    2: {"bg": (148, 163, 184, 45), "border": (148, 163, 184, 160), "text": (226, 232, 240)},
+    3: {"bg": (217, 119, 6, 45), "border": (217, 119, 6, 160), "text": (245, 158, 11)},
+}
+
+
+def _plural_ru(n: int, one: str, two: str, five: str) -> str:
+    n_abs = abs(n) % 100
+    if 11 <= n_abs <= 19:
+        return five
+    rem = n_abs % 10
+    if rem == 1:
+        return one
+    if 2 <= rem <= 4:
+        return two
+    return five
+
+
 def render_mlbb_card(
     player_data: dict,
     avatar_bytes: Optional[bytes] = None,
+    hero_icons: Optional[Dict[str, bytes]] = None,
 ) -> io.BytesIO:
     """
     Renders an ultra-premium Mobile Legends: Bang Bang player dossier card.
-    Uses Frosted Glassmorphism, 2x supersampling and Lanczos downsampling.
-    Matches the exact architectural dark theme of the Telegram userbot.
+    Includes:
+    - Player header with current rank, peak rank, level, server, MVP
+    - Key metrics: Winrate, Playstyle (Стиль игры), Current Season, Activity (Активность)
+    - Top Heroes (Топ герои) podium with circular icons, roles, KDA, matches, winrate
+    - Season history strip
     """
     scale = 2
     target_width = 1040
-    target_height = 680
+    target_height = 650
     w = target_width * scale
     h = target_height * scale
+
+    if hero_icons is None:
+        hero_icons = {}
 
     # Load typography
     font_bold_path = _find_font(bold=True)
@@ -649,15 +696,23 @@ def render_mlbb_card(
 
     f_category = _load_font(font_bold_path, 12 * scale)
     f_badge = _load_font(font_bold_path, 12 * scale)
-    f_name = _load_font(font_bold_path, 30 * scale)
-    f_meta = _load_font(font_reg_path, 14 * scale)
-    f_meta_mono = _load_font(font_mono_path or font_bold_path, 14 * scale)
+    f_badge_sm = _load_font(font_bold_path, 11 * scale)
+    f_name = _load_font(font_bold_path, 28 * scale)
+    f_meta = _load_font(font_reg_path, 13 * scale)
+    f_meta_mono = _load_font(font_mono_path or font_bold_path, 13 * scale)
     f_stat_label = _load_font(font_bold_path, 11 * scale)
-    f_stat_val = _load_font(font_bold_path, 21 * scale)
+    f_stat_val = _load_font(font_bold_path, 20 * scale)
     f_stat_val_mono = _load_font(font_mono_path or font_bold_path, 20 * scale)
+    f_stat_sub = _load_font(font_reg_path, 11 * scale)
     f_row_label = _load_font(font_bold_path, 13 * scale)
     f_row_val = _load_font(font_mono_path or font_bold_path, 13 * scale)
     f_footer = _load_font(font_reg_path, 12 * scale)
+
+    f_hero_name = _load_font(font_bold_path, 15 * scale)
+    f_hero_role = _load_font(font_bold_path, 10 * scale)
+    f_hero_stat = _load_font(font_bold_path, 11 * scale)
+    f_hero_wr = _load_font(font_bold_path, 20 * scale)
+    f_hero_rank = _load_font(font_bold_path, 11 * scale)
 
     # Extract player properties
     name = str(player_data.get("name") or "Player").strip()
@@ -676,18 +731,17 @@ def render_mlbb_card(
     else:
         rank_badge_text = rank_name.upper()
 
-
     # Determine badge theme based on rank tier
     if "immortal" in rank_name.lower() or "glory" in rank_name.lower():
-        badge_type = "warn"  # Gold / Amber for top Mythic
+        badge_type = "warn"
     elif "mythic" in rank_name.lower() or "myth" in tier:
-        badge_type = "running"  # Violet for Mythic
+        badge_type = "running"
     elif "legend" in rank_name.lower():
-        badge_type = "info"  # Blue for Legend
+        badge_type = "info"
     else:
-        badge_type = "success"  # Emerald
+        badge_type = "success"
 
-    # Peak / Highest Rank
+    # Peak Rank
     hist_rank = player_data.get("historyRank")
     if isinstance(hist_rank, dict):
         peak_rank_name = hist_rank.get("name") or rank_name
@@ -696,12 +750,16 @@ def render_mlbb_card(
     else:
         peak_rank_name = rank_name
 
-    # Compute overall statistics from all seasons
+    # Raw stats extraction
     raw_stats = player_data.get("stats")
     total_games = 0
     total_wins = 0
     total_mvps = 0
     ranked_seasons = []
+    playstyle_raw = ""
+    heroes_pool = []
+    active_seasons_cnt = 0
+    total_heroes_cnt = 0
 
     if isinstance(raw_stats, dict):
         total_games = raw_stats.get("totalGames") or 0
@@ -714,6 +772,11 @@ def render_mlbb_card(
             overall_wr_str = f"{(total_wins / total_games) * 100:.1f}%"
         else:
             overall_wr_str = "—"
+
+        playstyle_raw = raw_stats.get("playstyle") or ""
+        heroes_pool = raw_stats.get("heroes") or []
+        active_seasons_cnt = raw_stats.get("activeSeasons") or 0
+        total_heroes_cnt = raw_stats.get("totalHeroesPlayed") or len(heroes_pool)
 
         seasons_pool = raw_stats.get("seasonSummaries") or []
         for entry in seasons_pool:
@@ -742,10 +805,42 @@ def render_mlbb_card(
     else:
         overall_wr_str = "—"
 
-    # Sort ranked seasons descending by season number
+    if not playstyle_raw:
+        playstyle_raw = player_data.get("playstyle") or ""
+
+    if not heroes_pool and isinstance(player_data.get("heroes"), list):
+        heroes_pool = player_data.get("heroes")
+
+    # If playstyle is empty, deduce from most played hero role
+    if not playstyle_raw and heroes_pool:
+        role_counts = {}
+        for h_item in heroes_pool:
+            r = (h_item.get("heroRole") or "").strip().lower()
+            if r:
+                role_counts[r] = role_counts.get(r, 0) + h_item.get("games", 0)
+        if role_counts:
+            playstyle_raw = max(role_counts.items(), key=lambda x: x[1])[0]
+
+    # Resolve playstyle title and description
+    p_info = PLAYSTYLE_INFO.get(playstyle_raw.lower())
+    if p_info:
+        style_title, style_desc = p_info
+    elif playstyle_raw:
+        style_title = playstyle_raw.capitalize()
+        style_desc = "Индивидуальный стиль"
+    else:
+        style_title = "Balanced"
+        style_desc = "Универсальный стиль"
+
+    # Sort ranked seasons descending
     ranked_seasons.sort(key=lambda x: x.get("season", 0), reverse=True)
 
-    # Current / latest season info
+    if not active_seasons_cnt:
+        active_seasons_cnt = len(ranked_seasons) if ranked_seasons else 1
+    if not total_heroes_cnt:
+        total_heroes_cnt = len(heroes_pool)
+
+    # Current season info
     if ranked_seasons:
         latest = ranked_seasons[0]
         cur_season_num = latest.get("season", "")
@@ -753,17 +848,15 @@ def render_mlbb_card(
         cur_season_wr = latest.get("winRate", 0.0)
         cur_season_kda = latest.get("kda", 0.0)
         cur_season_mvp = latest.get("mvp", 0)
-        cur_season_text = f"{cur_season_games} игр ({cur_season_wr:.1f}%)"
-        cur_kda_text = f"{cur_season_kda:.2f} KDA • {cur_season_mvp} MVP"
+        cur_season_val = f"{cur_season_wr:.1f}% WR"
+        cur_season_sub = f"{cur_season_games} игр · {cur_season_kda:.2f} KDA"
     else:
         cur_season_num = ""
-        cur_season_text = "Нет матчей"
-        cur_kda_text = "—"
+        cur_season_val = "—"
+        cur_season_sub = "Нет матчей"
 
-
-    # 0. Base wallpaper / dark obsidian background
-    anime_bg_path = os.path.join(ASSETS_FONT_DIR, "..", "anime_bg.jpg")
-    anime_bg_path = os.path.normpath(anime_bg_path)
+    # Base background
+    anime_bg_path = os.path.normpath(os.path.join(ASSETS_FONT_DIR, "..", "anime_bg.jpg"))
     if os.path.isfile(anime_bg_path):
         try:
             with Image.open(anime_bg_path) as raw_bg:
@@ -781,19 +874,17 @@ def render_mlbb_card(
     else:
         img = Image.new("RGBA", (w, h), COLOR_BG)
 
-    # Outer container with rounded corners and subtle border
+    # Outer container
     card_inset = 20 * scale
     card_rect = [card_inset, card_inset, w - card_inset, h - card_inset]
     card_radius = 18 * scale
 
-    # Dark Frosted Glassmorphism card surface
     glass_overlay = Image.new("RGBA", (w, h), (0, 0, 0, 0))
     glass_draw = ImageDraw.Draw(glass_overlay)
-    GLASS_SURFACE = (11, 14, 21, 230)
+    GLASS_SURFACE = (11, 14, 21, 235)
     GLASS_BORDER = (75, 92, 125, 185)
     glass_draw.rounded_rectangle(card_rect, radius=card_radius, fill=GLASS_SURFACE, outline=GLASS_BORDER, width=2 * scale)
 
-    # Decorative top accent hairline
     accent_theme = BADGE_THEMES.get(badge_type, BADGE_THEMES["warn"])
     accent_bar_len = 160 * scale
     glass_draw.line(
@@ -806,7 +897,7 @@ def render_mlbb_card(
     draw = ImageDraw.Draw(img)
 
     content_x = card_inset + (34 * scale)
-    content_y = card_inset + (30 * scale)
+    content_y = card_inset + (26 * scale)
     content_right = w - card_inset - (34 * scale)
 
     # 1. Top row: Category tag + Status Pill
@@ -850,8 +941,8 @@ def render_mlbb_card(
     draw.text((text_pos_x, text_pos_y), rank_badge_text, font=f_badge, fill=accent_theme["text"])
 
     # 2. Header Area: Avatar + Name + Meta
-    header_y = content_y + (38 * scale)
-    avatar_size = 88 * scale
+    header_y = content_y + (36 * scale)
+    avatar_size = 80 * scale
     avatar_rect = [content_x, header_y, content_x + avatar_size, header_y + avatar_size]
     avatar_radius = 16 * scale
 
@@ -872,10 +963,9 @@ def render_mlbb_card(
         except Exception:
             draw.rounded_rectangle(avatar_rect, radius=avatar_radius, fill=COLOR_BOX_BG)
     else:
-        # Fallback stylized avatar box with ML icon initial
         draw.rounded_rectangle(avatar_rect, radius=avatar_radius, fill=COLOR_BOX_BG)
         initial = (name[0] if name else "M").upper()
-        f_init = _load_font(font_bold_path, 36 * scale)
+        f_init = _load_font(font_bold_path, 34 * scale)
         ibox = f_init.getbbox(initial)
         iw = ibox[2] - ibox[0]
         ih = ibox[3] - ibox[1]
@@ -886,56 +976,246 @@ def render_mlbb_card(
             fill=accent_theme["dot"],
         )
 
-    # Avatar glowing hairline border
     draw.rounded_rectangle(avatar_rect, radius=avatar_radius, outline=COLOR_BORDER_LIGHT, width=2 * scale)
 
     # Name and Meta next to avatar
-    text_info_x = content_x + avatar_size + (22 * scale)
-    name_y = header_y + (4 * scale)
+    text_info_x = content_x + avatar_size + (20 * scale)
+    name_y = header_y + (2 * scale)
     draw.text((text_info_x, name_y), name, font=f_name, fill=COLOR_TEXT_WHITE)
 
-    meta_y1 = name_y + (38 * scale)
+    # Playstyle pill tag next to player name
+    tag_str = style_title.upper()
+    name_bbox = f_name.getbbox(name)
+    nw = name_bbox[2] - name_bbox[0]
+    tag_x = text_info_x + nw + (14 * scale)
+    t_box = f_badge_sm.getbbox(tag_str)
+    t_w = t_box[2] - t_box[0]
+    t_h = t_box[3] - t_box[1]
+    t_pad_x = 10 * scale
+    t_pad_y = 4 * scale
+    t_pw = t_w + (t_pad_x * 2)
+    t_ph = t_h + (t_pad_y * 2)
+    t_py = name_y + (28 * scale - t_ph) // 2
+
+    tag_overlay = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+    tag_draw = ImageDraw.Draw(tag_overlay)
+    tag_draw.rounded_rectangle(
+        [tag_x, t_py, tag_x + t_pw, t_py + t_ph],
+        radius=t_ph // 2,
+        fill=BADGE_THEMES["info"]["bg"],
+        outline=BADGE_THEMES["info"]["border"],
+        width=1 * scale,
+    )
+    img = Image.alpha_composite(img, tag_overlay)
+    tag_overlay.close()
+    draw = ImageDraw.Draw(img)
+    draw.text((tag_x + t_pad_x - t_box[0], t_py + t_pad_y - t_box[1]), tag_str, font=f_badge_sm, fill=BADGE_THEMES["info"]["text"])
+
+    meta_y1 = name_y + (34 * scale)
     id_str = f"ID: {role_id} ({zone_id})" if role_id and zone_id else f"ID: {role_id}"
     meta_line1 = f"{id_str}   •   LEVEL {level}   •   SERVER CIS / GLOBAL"
     draw.text((text_info_x, meta_y1), meta_line1, font=f_meta_mono, fill=COLOR_TEXT_MUTED)
 
-    meta_y2 = meta_y1 + (22 * scale)
+    meta_y2 = meta_y1 + (20 * scale)
     meta_line2 = f"ПИКОВЫЙ РАНГ: {peak_rank_name.upper()}   •   НАГРАДЫ MVP: {total_mvps:,}"
     draw.text((text_info_x, meta_y2), meta_line2, font=f_meta, fill=COLOR_TEXT_DIM)
 
     # Hairline divider
-    divider_y = header_y + avatar_size + (24 * scale)
+    divider_y = header_y + avatar_size + (18 * scale)
     draw.line([(content_x, divider_y), (content_right, divider_y)], fill=COLOR_BORDER, width=1 * scale)
 
-    # 3. Main Stats Grid (4 Metric Boxes)
-    curr_y = divider_y + (20 * scale)
-    stat_cards_h = 92 * scale
+    # 3. Main Stats Grid (4 Metric Boxes):
+    # Box 1: ОБЩИЙ ВИНРЕЙТ
+    # Box 2: СТИЛЬ ИГРЫ (with subtitle description)
+    # Box 3: СЕЗОН (RANKED)
+    # Box 4: АКТИВНОСТЬ (with played heroes count)
+    curr_y = divider_y + (16 * scale)
+    stat_cards_h = 78 * scale
     col_gap = 14 * scale
 
+    seasons_plural = _plural_ru(active_seasons_cnt, "сезон", "сезона", "сезонов")
+    heroes_plural = _plural_ru(total_heroes_cnt, "герой сыгран", "героя сыграно", "героев сыграно")
+
     grid_stats = [
-        ("ОБЩИЙ ВИНРЕЙТ", overall_wr_str, BADGE_THEMES["success"]["text"] if overall_wr_str != "—" and float(overall_wr_str.rstrip("%")) >= 55 else COLOR_TEXT_WHITE),
-        ("ВСЕГО МАТЧЕЙ", f"{total_games:,}" if total_games else "—", COLOR_TEXT_WHITE),
-        (f"СЕЗОН {cur_season_num} (RANKED)", cur_season_text, COLOR_TEXT_WHITE),
-        ("KDA СЕЗОНА & MVP", cur_kda_text, accent_theme["text"]),
+        (
+            "ОБЩИЙ ВИНРЕЙТ",
+            overall_wr_str,
+            f"{total_games:,} игр всего" if total_games else "—",
+            BADGE_THEMES["success"]["text"] if overall_wr_str != "—" and float(overall_wr_str.rstrip("%")) >= 55 else COLOR_TEXT_WHITE,
+        ),
+        (
+            "СТИЛЬ ИГРЫ",
+            style_title,
+            style_desc,
+            BADGE_THEMES["warn"]["text"],
+        ),
+        (
+            f"СЕЗОН {cur_season_num} (RANKED)",
+            cur_season_val,
+            cur_season_sub,
+            accent_theme["text"],
+        ),
+        (
+            "АКТИВНОСТЬ",
+            f"{active_seasons_cnt} {seasons_plural}",
+            f"{total_heroes_cnt} {heroes_plural}",
+            COLOR_TEXT_WHITE,
+        ),
     ]
 
     total_gaps = col_gap * (len(grid_stats) - 1)
     card_width = (content_right - content_x - total_gaps) // len(grid_stats)
 
-    for i, (label, val, val_color) in enumerate(grid_stats):
+    for i, (label, val, sub_val, val_color) in enumerate(grid_stats):
         cx1 = content_x + i * (card_width + col_gap)
         cx2 = cx1 + card_width
         cy1 = curr_y
         cy2 = cy1 + stat_cards_h
 
         draw.rounded_rectangle([cx1, cy1, cx2, cy2], radius=10 * scale, fill=COLOR_BOX_BG, outline=COLOR_BORDER, width=1 * scale)
-        draw.text((cx1 + 16 * scale, cy1 + 14 * scale), label, font=f_stat_label, fill=COLOR_TEXT_DIM)
-        draw.text((cx1 + 16 * scale, cy1 + 38 * scale), str(val), font=f_stat_val_mono, fill=val_color)
+        draw.text((cx1 + 16 * scale, cy1 + 10 * scale), label, font=f_stat_label, fill=COLOR_TEXT_DIM)
+        draw.text((cx1 + 16 * scale, cy1 + 28 * scale), str(val), font=f_stat_val if label in ('СТИЛЬ ИГРЫ', 'АКТИВНОСТЬ') else f_stat_val_mono, fill=val_color)
+        draw.text((cx1 + 16 * scale, cy1 + 54 * scale), str(sub_val), font=f_stat_sub, fill=COLOR_TEXT_MUTED)
 
     curr_y += stat_cards_h + (18 * scale)
 
-    # 4. Ranked Seasons History Strip (Last 3 ranked seasons)
-    hist_box_h = 138 * scale
+    # 4. Top Heroes Section (Podium layout like the website)
+    valid_heroes = [h_entry for h_entry in heroes_pool if isinstance(h_entry, dict) and h_entry.get("games", 0) > 0]
+    valid_heroes.sort(key=lambda x: x.get("games", 0), reverse=True)
+    top_3 = valid_heroes[:3]
+
+    if len(top_3) == 3:
+        podium_heroes = [(top_3[1], 2), (top_3[0], 1), (top_3[2], 3)]
+    elif len(top_3) == 2:
+        podium_heroes = [(top_3[0], 1), (top_3[1], 2)]
+    elif len(top_3) == 1:
+        podium_heroes = [(top_3[0], 1)]
+    else:
+        podium_heroes = []
+
+    if podium_heroes:
+        draw.text((content_x + 2 * scale, curr_y), "ТОП ГЕРОИ", font=f_stat_label, fill=COLOR_TEXT_WHITE)
+        heroes_total_label = f"ВСЕ ГЕРОИ ({len(heroes_pool)}) >" if heroes_pool else "ВСЕ ГЕРОИ >"
+        h_bbox = f_stat_label.getbbox(heroes_total_label)
+        draw.text((content_right - (h_bbox[2] - h_bbox[0]), curr_y), heroes_total_label, font=f_stat_label, fill=BADGE_THEMES["info"]["text"])
+
+        curr_y += 18 * scale
+
+        hero_card_h = 76 * scale
+        h_gaps = col_gap * (len(podium_heroes) - 1)
+        h_card_w = (content_right - content_x - h_gaps) // len(podium_heroes)
+
+        for idx, (h_data, rank_num) in enumerate(podium_heroes):
+            hx1 = content_x + idx * (h_card_w + col_gap)
+            hx2 = hx1 + h_card_w
+            hy1 = curr_y
+            hy2 = hy1 + hero_card_h
+
+            badge_style = RANK_BADGE_THEMES.get(rank_num, RANK_BADGE_THEMES[2])
+
+            # Hero card container
+            draw.rounded_rectangle([hx1, hy1, hx2, hy2], radius=10 * scale, fill=COLOR_BOX_BG, outline=COLOR_BORDER, width=1 * scale)
+
+            # Rank number pill (top right)
+            rw = 18 * scale
+            rh = 18 * scale
+            rx2 = hx2 - 12 * scale
+            ry1 = hy1 + 10 * scale
+            rx1 = rx2 - rw
+            ry2 = ry1 + rh
+
+            r_overlay = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+            r_draw = ImageDraw.Draw(r_overlay)
+            r_draw.rounded_rectangle([rx1, ry1, rx2, ry2], radius=4 * scale, fill=badge_style["bg"], outline=badge_style["border"], width=1 * scale)
+            img = Image.alpha_composite(img, r_overlay)
+            r_overlay.close()
+            draw = ImageDraw.Draw(img)
+
+            r_text = str(rank_num)
+            rbox = f_hero_rank.getbbox(r_text)
+            draw.text((rx1 + (rw - (rbox[2] - rbox[0])) // 2 - rbox[0], ry1 + (rh - (rbox[3] - rbox[1])) // 2 - rbox[1]), r_text, font=f_hero_rank, fill=badge_style["text"])
+
+            # Circular hero avatar
+            av_dia = 50 * scale
+            av_x = hx1 + 12 * scale
+            av_y = hy1 + (hero_card_h - av_dia) // 2
+            av_rect = [av_x, av_y, av_x + av_dia, av_y + av_dia]
+
+            hero_icon_path = h_data.get("heroIcon") or ""
+            icon_bytes = hero_icons.get(hero_icon_path) or hero_icons.get(str(h_data.get("heroId")))
+
+            if icon_bytes:
+                try:
+                    with Image.open(io.BytesIO(icon_bytes)) as raw_icon:
+                        icon_rgba = raw_icon.convert("RGBA")
+                        icon_resized = icon_rgba.resize((av_dia, av_dia), Image.Resampling.LANCZOS)
+                        icon_rgba.close()
+
+                        c_mask = Image.new("L", (av_dia, av_dia), 0)
+                        c_draw = ImageDraw.Draw(c_mask)
+                        c_draw.ellipse([0, 0, av_dia, av_dia], fill=255)
+
+                        img.paste(icon_resized, (av_x, av_y), c_mask)
+                        icon_resized.close()
+                        c_mask.close()
+                except Exception:
+                    draw.ellipse(av_rect, fill=(22, 27, 36))
+            else:
+                draw.ellipse(av_rect, fill=(22, 27, 36))
+                h_name_initial = (h_data.get("heroNameRu") or h_data.get("heroName") or "H")[0].upper()
+                f_hi = _load_font(font_bold_path, 20 * scale)
+                hib = f_hi.getbbox(h_name_initial)
+                draw.text(
+                    (av_x + (av_dia - (hib[2] - hib[0])) // 2 - hib[0], av_y + (av_dia - (hib[3] - hib[1])) // 2 - hib[1]),
+                    h_name_initial,
+                    font=f_hi,
+                    fill=badge_style["text"],
+                )
+
+            # Circular hairline border
+            draw.ellipse(av_rect, outline=badge_style["border"], width=1 * scale)
+
+            # Hero info
+            info_x = av_x + av_dia + 12 * scale
+            ru_name = h_data.get("heroNameRu")
+            if ru_name and "\ufffd" not in ru_name and len(ru_name.strip()) > 1:
+                hero_name = ru_name.strip()
+            else:
+                hero_name = str(h_data.get("heroName") or "Hero").strip()
+
+            hero_role_raw = str(h_data.get("heroRole") or "").lower()
+            hero_role = ROLE_RU.get(hero_role_raw, hero_role_raw.upper()) if hero_role_raw else "ГЕРОЙ"
+            hero_games = h_data.get("games", 0)
+            hero_kda = h_data.get("kda", 0.0)
+            hero_wr = h_data.get("winRate", 0.0)
+
+            # Hero Name
+            draw.text((info_x, hy1 + 10 * scale), hero_name, font=f_hero_name, fill=COLOR_TEXT_WHITE)
+
+            # Role
+            draw.text((info_x, hy1 + 30 * scale), hero_role, font=f_hero_role, fill=COLOR_TEXT_DIM)
+
+            # Stat line: "{kda:.2f} KDA · {games} игр"
+            kda_color = BADGE_THEMES["success"]["text"] if hero_kda >= 4.0 else (BADGE_THEMES["warn"]["text"] if hero_kda >= 3.0 else COLOR_TEXT_WHITE)
+            kda_str = f"{hero_kda:.2f}"
+            draw.text((info_x, hy1 + 47 * scale), kda_str, font=f_hero_stat, fill=kda_color)
+            kbox = f_hero_stat.getbbox(kda_str)
+            kda_w = kbox[2] - kbox[0]
+            draw.text((info_x + kda_w + 4 * scale, hy1 + 47 * scale), f"KDA · {hero_games} игр", font=f_hero_stat, fill=COLOR_TEXT_MUTED)
+
+            # Win Rate on right side
+            wr_str = f"{hero_wr:.1f}%" if not float(hero_wr).is_integer() else f"{int(hero_wr)}%"
+            wbox = f_hero_wr.getbbox(wr_str)
+            ww = wbox[2] - wbox[0]
+            wh = wbox[3] - wbox[1]
+            wr_x = hx2 - 16 * scale - ww
+            wr_y = hy1 + (hero_card_h - wh) // 2 + 3 * scale
+            draw.text((wr_x, wr_y), wr_str, font=f_hero_wr, fill=COLOR_TEXT_WHITE)
+
+        curr_y += hero_card_h + (18 * scale)
+
+    # 5. Ranked Seasons History Strip (Last 3 ranked seasons)
+    hist_box_h = 136 * scale
     draw.rounded_rectangle(
         [content_x, curr_y, content_right, curr_y + hist_box_h],
         radius=10 * scale,
@@ -944,13 +1224,11 @@ def render_mlbb_card(
         width=1 * scale,
     )
 
-    # Title of history strip
-    draw.text((content_x + 18 * scale, curr_y + 14 * scale), "ИСТОРИЯ ПОСЛЕДНИХ СЕЗОНОВ // RANKED MATCHES", font=f_stat_label, fill=COLOR_TEXT_DIM)
+    draw.text((content_x + 18 * scale, curr_y + 12 * scale), "ИСТОРИЯ ПОСЛЕДНИХ СЕЗОНОВ // RANKED MATCHES", font=f_stat_label, fill=COLOR_TEXT_DIM)
 
-    # Show up to 3 seasons rows
     sample_seasons = ranked_seasons[:3]
     if sample_seasons:
-        row_y = curr_y + (38 * scale)
+        row_y = curr_y + (34 * scale)
         for s_idx, s_data in enumerate(sample_seasons):
             s_num = s_data.get("season", "")
             s_games = s_data.get("games", 0)
@@ -973,15 +1251,15 @@ def render_mlbb_card(
             row_y += 30 * scale
     else:
         draw.text(
-            (content_x + 18 * scale, curr_y + 60 * scale),
+            (content_x + 18 * scale, curr_y + 50 * scale),
             "Подробная история матчей отсутствует или скрыта в настройках приватности",
             font=f_meta,
             fill=COLOR_TEXT_MUTED,
         )
 
-    # 5. Footer Bar
-    footer_y = h - card_inset - (38 * scale)
-    draw.line([(content_x, footer_y - (14 * scale)), (content_right, footer_y - (14 * scale))], fill=COLOR_BORDER, width=1 * scale)
+    # 6. Footer Bar
+    footer_y = h - card_inset - (34 * scale)
+    draw.line([(content_x, footer_y - (12 * scale)), (content_right, footer_y - (12 * scale))], fill=COLOR_BORDER, width=1 * scale)
     draw.text((content_x, footer_y), "MLBB TELEMETRY ENGINE // USERBOT v1.0", font=f_footer, fill=COLOR_TEXT_DIM)
 
     meta_r = "REAL-TIME SYNCED • DATA VERIFIED"
@@ -989,7 +1267,7 @@ def render_mlbb_card(
     w_r = bbox_r[2] - bbox_r[0]
     draw.text((content_right - w_r, footer_y), meta_r, font=f_footer, fill=COLOR_TEXT_DIM)
 
-    # 6. Downsample 2x Lanczos -> 1x
+    # Downsample 2x Lanczos -> 1x
     final_img = img.resize((target_width, target_height), Image.Resampling.LANCZOS)
     img.close()
 
@@ -1002,5 +1280,3 @@ def render_mlbb_card(
     output.seek(0)
     output.name = "mlbb_card.png"
     return output
-
-
