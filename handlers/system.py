@@ -136,6 +136,7 @@ def register_system_handlers(client: TelegramClient, prefix: str):
                 (f"{prefix}autoname [on|off]", "Динамическое время в никнейме (поминутно)"),
                 (f"{prefix}delall", "Удалить все свои сообщения в текущем чате"),
                 (f"{prefix}delall <chat>", "Удалить свои сообщения в указанном чате"),
+                (f"{prefix}id [user|reply]", "Узнать Telegram ID пользователя или чата (по реплаю/юзернейму)"),
                 (f"{prefix}ping", "Проверить статус работы, задержку MTProto, RAM и аптайм"),
                 (f"{prefix}help", "Показать эту графическую карточку справки"),
             ],
@@ -357,3 +358,147 @@ def register_system_handlers(client: TelegramClient, prefix: str):
             await msg.edit(f"💻 **Результат (`{cmd}`):**\n```\n{res}\n```")
         except Exception as e:
             await msg.edit(f"❌ **Ошибка выполнения:** `{e}`")
+
+    # .id [user | reply]
+    @client.on(events.NewMessage(outgoing=True, pattern=rf"^{prefix}id(?:(?:\s+)(.*))?$"))
+    async def id_handler(event: events.NewMessage.Event):
+        from telethon.tl.types import User, Channel, Chat
+        args = (event.pattern_match.group(1) or "").strip()
+        reply_msg = await event.get_reply_message()
+        target_entity = None
+        source_desc = "Текущий аккаунт"
+
+        if args:
+            source_desc = f"Запрос: {args}"
+            try:
+                target_val = int(args) if (args.isdigit() or (args.startswith("-") and args[1:].isdigit())) else args
+                target_entity = await client.get_entity(target_val)
+            except Exception as e:
+                card = render_card(
+                    title="Объект не найден",
+                    subtitle=f"Не удалось найти пользователя или чат: {args}",
+                    badge_text="ОШИБКА",
+                    badge_type="error",
+                    items=[
+                        ("Запрос", args),
+                        ("Причина", str(e)),
+                        ("Форматы", f"{prefix}id @username, {prefix}id 12345678 или реплай"),
+                    ],
+                    stats=[
+                        ("СТАТУС", "НЕ НАЙДЕН"),
+                        ("ТИП ПОИСКА", "ENTITY LOOKUP"),
+                    ],
+                    category="TELEGRAM IDENTIFIER",
+                )
+                try:
+                    await event.delete()
+                except Exception:
+                    pass
+                return await client.send_file(event.chat_id, file=card)
+        elif reply_msg:
+            source_desc = "Ответ на сообщение"
+            if reply_msg.sender:
+                target_entity = reply_msg.sender
+            elif reply_msg.sender_id:
+                try:
+                    target_entity = await client.get_entity(reply_msg.sender_id)
+                except Exception:
+                    pass
+
+            if not target_entity and reply_msg.forward:
+                source_desc = "Пересланное сообщение"
+                if reply_msg.forward.sender:
+                    target_entity = reply_msg.forward.sender
+                elif reply_msg.forward.sender_id:
+                    try:
+                        target_entity = await client.get_entity(reply_msg.forward.sender_id)
+                    except Exception:
+                        pass
+        else:
+            source_desc = "Текущий профиль"
+            target_entity = await client.get_me()
+
+        if not target_entity:
+            sender_id = reply_msg.sender_id if reply_msg else None
+            if sender_id:
+                target_id = sender_id
+                name_str = "Скрытый пользователь"
+                username_str = "Скрыт настройками"
+                type_str = "Пользователь (Аноним)"
+                dc_str = "—"
+            else:
+                card = render_card(
+                    title="Не удалось определить ID",
+                    subtitle="Сообщение отправлено анонимно либо автор скрыт",
+                    badge_text="СКРЫТО",
+                    badge_type="warn",
+                    stats=[("ЧАТ", str(event.chat_id)), ("СТАТУС", "НЕ ОПРЕДЕЛЕН")],
+                    category="TELEGRAM IDENTIFIER",
+                )
+                try:
+                    await event.delete()
+                except Exception:
+                    pass
+                return await client.send_file(event.chat_id, file=card)
+        else:
+            target_id = target_entity.id
+            if isinstance(target_entity, User):
+                name_parts = [target_entity.first_name or "", target_entity.last_name or ""]
+                name_str = " ".join(p for p in name_parts if p).strip() or "Без имени"
+                username_str = f"@{target_entity.username}" if target_entity.username else "Нет юзернейма"
+                if target_entity.bot:
+                    type_str = "Бот Telegram"
+                elif getattr(target_entity, "premium", False):
+                    type_str = "Telegram Premium"
+                else:
+                    type_str = "Пользователь"
+                dc_id = getattr(getattr(target_entity, "photo", None), "dc_id", None)
+                dc_str = f"DC {dc_id}" if dc_id else "—"
+            elif isinstance(target_entity, (Channel, Chat)):
+                name_str = getattr(target_entity, "title", "Группа / Канал")
+                username_str = f"@{target_entity.username}" if getattr(target_entity, "username", None) else "Приватный"
+                type_str = "Канал" if getattr(target_entity, "broadcast", False) else "Супергруппа"
+                dc_id = getattr(getattr(target_entity, "photo", None), "dc_id", None)
+                dc_str = f"DC {dc_id}" if dc_id else "—"
+            else:
+                name_str = str(target_entity)
+                username_str = "—"
+                type_str = "Сущность"
+                dc_str = "—"
+
+        caption = f"🆔 **Telegram ID:** `{target_id}`\n👤 **Объект:** {name_str} ({username_str})"
+
+        stats_list = [
+            ("TELEGRAM ID", str(target_id)),
+            ("ТИП АККАУНТА", type_str.upper()),
+            ("ДАТАЦЕНТР", dc_str),
+            ("ТЕКУЩИЙ ЧАТ", str(event.chat_id)),
+        ]
+
+        items_list = [
+            ("Имя / Название", name_str),
+            ("Юзернейм", username_str),
+            ("Источник запроса", source_desc),
+        ]
+        if reply_msg:
+            items_list.append(("ID Сообщения", str(reply_msg.id)))
+
+        card = render_card(
+            title=f"ID: {target_id}",
+            subtitle=f"{name_str} • {username_str}",
+            badge_text=type_str.upper(),
+            badge_type="info" if type_str != "Бот Telegram" else "warn",
+            stats=stats_list,
+            items=items_list,
+            meta_left=f"TELEGRAM RESOLVER // {source_desc.upper()}",
+            meta_right=f"PEER ID: {target_id}",
+            category="TELEGRAM IDENTIFIER",
+        )
+
+        try:
+            await event.delete()
+        except Exception:
+            pass
+
+        await client.send_file(event.chat_id, file=card, caption=caption)
+
