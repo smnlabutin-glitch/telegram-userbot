@@ -29,10 +29,18 @@ def _build_api_url(endpoint: str) -> str:
     """Builds API URL, supporting direct mlbb-stats.ru and Yandex Cloud Function proxy."""
     clean_endpoint = endpoint.strip("/")
     if "functions.yandexcloud.net" in API_BASE_URL:
-        path = f"/api/{clean_endpoint}" if not clean_endpoint.startswith("api/") else f"/{clean_endpoint}"
+        if clean_endpoint.startswith("img/"):
+            path = f"/{clean_endpoint}"
+        elif clean_endpoint.startswith("api/"):
+            path = f"/{clean_endpoint}"
+        else:
+            path = f"/api/{clean_endpoint}"
         delim = "&" if "?" in API_BASE_URL else "?"
         return f"{API_BASE_URL}{delim}path={urllib.parse.quote(path)}"
     else:
+        if clean_endpoint.startswith("img/"):
+            base = API_BASE_URL.replace("/api", "")
+            return f"{base}/{clean_endpoint}"
         return f"{API_BASE_URL}/{clean_endpoint}"
 
 DEFAULT_HEADERS = {
@@ -109,8 +117,9 @@ async def fetch_player_profile(role_id: int, zone_id: int) -> Tuple[Optional[dic
         return None, f"Ошибка сети: {e}"
 
 
-async def fetch_player_avatar(role_id: int, zone_id: int) -> Optional[bytes]:
-    """Fetches player avatar binary bytes."""
+async def fetch_player_avatar(role_id: int, zone_id: int, avatar_path: Optional[str] = None) -> Optional[bytes]:
+    """Fetches player avatar binary bytes with multi-source fallback and base64 decoding."""
+    import base64
     cache_key = f"{role_id}-{zone_id}"
     now = time.time()
     if cache_key in AVATAR_CACHE:
@@ -118,14 +127,28 @@ async def fetch_player_avatar(role_id: int, zone_id: int) -> Optional[bytes]:
         if now - ts < CACHE_TTL:
             return av_bytes
 
-    url = _build_api_url(f"profile/{role_id}-{zone_id}/avatar")
-    try:
-        status, data, _ = await asyncio.to_thread(_http_get, url, 10)
-        if status == 200 and data and len(data) > 100:
-            AVATAR_CACHE[cache_key] = (data, now)
-            return data
-    except Exception as e:
-        logger.debug("Could not fetch avatar for %s-%s: %s", role_id, zone_id, e)
+    urls_to_try = []
+    if avatar_path and isinstance(avatar_path, str) and avatar_path.strip():
+        urls_to_try.append(_build_api_url(avatar_path))
+    urls_to_try.append(_build_api_url(f"profile/{role_id}-{zone_id}/avatar"))
+
+    for url in urls_to_try:
+        try:
+            status, data, err = await asyncio.to_thread(_http_get, url, 15)
+            if status == 200 and data and len(data) > 100:
+                # If proxy returned base64 string
+                if (not data.startswith(b'\xff\xd8') and not data.startswith(b'\x89PNG')) and (b';base64,' in data or data.startswith(b'/9j/')):
+                    try:
+                        raw_b64 = data.split(b',')[-1]
+                        data = base64.b64decode(raw_b64)
+                    except Exception:
+                        pass
+                AVATAR_CACHE[cache_key] = (data, now)
+                return data
+            logger.warning("Avatar fetch returned status %s for %s: %s", status, url, err)
+        except Exception as e:
+            logger.warning("Error fetching avatar from %s: %s", url, e)
+
     return None
 
 
@@ -309,7 +332,7 @@ def register_mlbb(client: TelegramClient, prefix: str):
 
                 # Immediately fetch profile and avatar
                 profile, _ = await fetch_player_profile(role_id, zone_id)
-                avatar_bytes = await fetch_player_avatar(role_id, zone_id)
+                avatar_bytes = await fetch_player_avatar(role_id, zone_id, profile.get("avatar") if profile else None)
 
                 if profile:
                     card = render_mlbb_card(profile, avatar_bytes)
@@ -495,7 +518,7 @@ def register_mlbb(client: TelegramClient, prefix: str):
             return await client.send_file(event.chat_id, file=card)
 
         # Player found - fetch avatar and render card
-        avatar_bytes = await fetch_player_avatar(int(target_role), int(target_zone))
+        avatar_bytes = await fetch_player_avatar(int(target_role), int(target_zone), profile.get("avatar") if profile else None)
         card_image = render_mlbb_card(profile, avatar_bytes)
 
         try:
